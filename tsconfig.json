@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true
+  },
+  "files": [],
+  "references": [
+    { "path": "packages/services/core" },
+    { "path": "packages/services/auth" },
+    { "path": "packages/services/content-store" },
+    { "path": "packages/services/content-ingestion" },
+    { "path": "packages/services/pronunciation" },
+    { "path": "packages/services/grammar" },
+    { "path": "packages/services/comprehension" },
+    { "path": "packages/services/sync" },
+    { "path": "packages/services/api" },
+    { "path": "packages/platform-contracts" },
+    { "path": "packages/platform-web/app" },
+    { "path": "packages/platform-web/camera" },
+    { "path": "packages/platform-web/filesystem" },
+    { "path": "packages/platform-web/notifications" },
+    { "path": "packages/platform-web/audio" },
+    { "path": "packages/platform-web/ui" },
+    { "path": "packages/platform-mobile/app" },
+    { "path": "packages/platform-mobile/camera" },
+    { "path": "packages/platform-mobile/filesystem" },
+    { "path": "packages/platform-mobile/notifications" },
+    { "path": "packages/platform-mobile/audio" },
+    { "path": "packages/platform-mobile/ui" }
+  ]
+}

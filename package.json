@@ -1,0 +1,36 @@
+{
+  "name": "chikumiku-learnverse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ChikuMiku LearnVerse - Multi-subject learning platform for children",
+  "workspaces": [
+    "packages/services/*",
+    "packages/platform-contracts",
+    "packages/platform-web/*",
+    "packages/platform-mobile/*"
+  ],
+  "scripts": {
+    "build": "npm run build:user-guide && tsc --build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint 'packages/services/*/src/**/*.ts' 'packages/platform-contracts/src/**/*.ts' 'packages/platform-web/*/src/**/*.ts' 'packages/platform-mobile/*/src/**/*.ts'",
+    "build:user-guide": "npx tsx scripts/build-user-guide.ts",
+    "validate:naming": "npx tsx scripts/validate-naming.ts",
+    "validate:boundaries": "npx tsx scripts/validate-boundaries.ts",
+    "validate": "npm run validate:naming && npm run validate:boundaries",
+    "clean": "rm -rf packages/*/dist"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "eslint": "8.57.1",
+    "fast-check": "3.22.0",
+    "happy-dom": "^20.9.0",
+    "marked": "14.1.4",
+    "typescript": "5.6.3",
+    "vitest": "2.1.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

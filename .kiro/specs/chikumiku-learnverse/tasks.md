@@ -1,0 +1,343 @@
+# Implementation Plan: ChikuMiku LearnVerse
+
+## Overview
+
+This implementation plan builds the ChikuMiku LearnVerse platform incrementally, starting with core infrastructure (data models, authentication, storage), then layering subject-specific services (content ingestion, pronunciation, grammar, comprehension), and finally wiring together cross-cutting concerns (sync, offline queue, caching). TypeScript is used throughout with a monorepo structure. Property-based tests use fast-check.
+
+## Tasks
+
+- [x] 1. Set up project structure and core data models
+  - [x] 1.1 Initialize TypeScript monorepo with shared packages
+    - Create workspace with packages: `core`, `auth`, `content-store`, `content-ingestion`, `pronunciation`, `grammar`, `comprehension`, `sync`, `api`
+    - Configure TypeScript, ESLint, Vitest, and fast-check
+    - _Requirements: 14.1, 14.2_
+  - [x] 1.2 Implement core data model types and validation
+    - Define all TypeScript interfaces: Learner, Chapter, Page, Question, ProgressRecord, ActivityScore, RevisionSession, GradeArchive, QueuedAction
+    - Implement Grade type (1-12) with validation
+    - Implement ImageInput validation (format: jpeg/png/heic, size: max 10MB)
+    - _Requirements: 1.7, 9.1_
+  - [ ]* 1.3 Write property tests for data model validation
+    - **Property 3: Image upload validation**
+    - **Property 20: Registration input validation (grade portion)**
+    - **Validates: Requirements 1.7, 1.9, 9.1**
+
+- [x] 2. Implement Authentication Service
+  - [x] 2.1 Implement registration with input validation
+    - Password validation: 8-128 chars, at least 1 letter + 1 digit
+    - Email format and phone number format validation
+    - Preserve valid form data on validation failure, return field-specific errors
+    - _Requirements: 8.1, 8.8_
+  - [ ]* 2.2 Write property tests for registration validation
+    - **Property 20: Registration input validation**
+    - **Validates: Requirements 8.1, 8.8, 9.1**
+  - [x] 2.3 Implement login and session management
+    - Authenticate with valid credentials, establish session
+    - Session validity: minimum 30 days
+    - Session expiry detection and redirect logic
+    - _Requirements: 8.2, 8.3, 8.4, 8.9_
+  - [ ]* 2.4 Write property test for session validity duration
+    - **Property 21: Session validity duration**
+    - **Validates: Requirements 8.4**
+  - [x] 2.5 Implement account lockout logic
+    - Lock after 3 consecutive failed attempts for 15 minutes
+    - Reset failure counter on successful authentication
+    - Notify registered contact on lockout
+    - _Requirements: 8.5_
+  - [ ]* 2.6 Write property test for account lockout
+    - **Property 22: Account lockout after consecutive failures**
+    - **Validates: Requirements 8.5**
+  - [x] 2.7 Implement parental account linking
+    - Parent can view learner progress, reset password, update profile (grade, contact)
+    - _Requirements: 8.6_
+  - [x] 2.8 Implement local progress backup with 7-day retention
+    - Continuously preserve progress locally regardless of session status
+    - Purge backups older than 7 days
+    - Restore local progress on re-authentication after session expiry
+    - _Requirements: 8.7, 8.10_
+  - [ ]* 2.9 Write property test for local backup retention
+    - **Property 23: Local backup retention**
+    - **Validates: Requirements 8.7**
+
+- [x] 3. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 4. Implement Subject Module Registry
+  - [x] 4.1 Create SubjectModule interface and registry
+    - Implement SubjectModuleRegistry with register, getModule, listModules
+    - Define SubjectModule interface with extractionPipeline, questionGenerationStrategy, grammarRules, pronunciationAssets, renderingConfig
+    - Implement module lookup by subject ID
+    - _Requirements: 10.3, 10.5_
+  - [ ]* 4.2 Write property test for Subject Module routing
+    - **Property 4: Subject Module routing correctness**
+    - **Validates: Requirements 1.11, 2.8, 10.4**
+  - [x] 4.3 Implement multi-subject enrollment and isolation
+    - Allow enrollment in up to 10 subjects
+    - Create isolated content/progress space per subject
+    - Ensure operations on one subject don't affect others
+    - _Requirements: 10.1, 10.2, 10.6_
+  - [ ]* 4.4 Write property test for subject enrollment and isolation
+    - **Property 27: Subject enrollment limit and isolation**
+    - **Validates: Requirements 10.1, 10.2**
+
+- [x] 5. Implement Content Store
+  - [x] 5.1 Implement chapter persistence (save, retrieve, list)
+    - Save chapter associated with learner and subject
+    - Organize by subject, textbook, chapter number
+    - Retrieve within 3 navigation steps
+    - _Requirements: 5.1, 5.2_
+  - [ ]* 5.2 Write property tests for content store
+    - **Property 11: Data persistence round-trip**
+    - **Property 12: Chapter organization by subject, textbook, and number**
+    - **Validates: Requirements 5.1, 5.2, 10.2**
+  - [x] 5.3 Implement progress tracking
+    - Track completion percentage per chapter (proportion of completed activities)
+    - Track individual scores per activity type
+    - Track last accessed date
+    - Identify weak activities (below 60%)
+    - _Requirements: 5.4, 5.5_
+  - [ ]* 5.4 Write property tests for progress tracking
+    - **Property 14: Completion percentage calculation**
+    - **Property 15: Weak activity identification at 60% threshold**
+    - **Validates: Requirements 5.4, 5.5**
+  - [x] 5.5 Implement revision material presentation
+    - Present chapters with comprehension options for all subjects
+    - Add pronunciation and grammar options only for language subjects
+    - Aggregate progress summaries across enrolled subjects on dashboard
+    - _Requirements: 5.3, 10.7_
+  - [ ]* 5.6 Write property tests for revision options and aggregate progress
+    - **Property 13: Revision options based on subject type**
+    - **Property 28: Aggregate progress calculation**
+    - **Validates: Requirements 5.3, 10.7**
+  - [x] 5.7 Implement error handling for persistence failures
+    - Display error on save failure, retain content locally for retry
+    - Display guidance when no chapters stored for a subject
+    - _Requirements: 5.6, 5.7_
+
+- [x] 6. Implement Content Ingestion Service
+  - [x] 6.1 Implement image upload and validation
+    - Accept JPEG, PNG, HEIC up to 10 MB
+    - Compress images to max 1 MB before transmission
+    - Reject invalid formats/sizes with error messages
+    - _Requirements: 1.7, 1.9, 12.5_
+  - [ ]* 6.2 Write property test for image compression
+    - **Property 33: Image compression output size**
+    - **Validates: Requirements 12.5**
+  - [x] 6.3 Implement chapter page management
+    - Combine pages in sequential order (max 50 per chapter)
+    - Append new pages to existing chapters
+    - Reorder pages within a chapter
+    - Reject pages beyond 50-page limit
+    - _Requirements: 1.3, 1.4, 1.5_
+  - [ ]* 6.4 Write property tests for page management
+    - **Property 1: Chapter page combination respects ordering and limits**
+    - **Property 2: Page reorder preserves all content**
+    - **Validates: Requirements 1.3, 1.4, 1.5**
+  - [x] 6.5 Implement text extraction pipeline integration
+    - Route to correct Subject Module extraction pipeline
+    - Handle full extraction, partial extraction, and extraction failure
+    - Allow learner to review and edit extracted text before saving
+    - Display partial regions that couldn't be processed
+    - _Requirements: 1.1, 1.2, 1.6, 1.8, 1.10, 1.11_
+  - [x] 6.6 Implement question extraction from images
+    - Extract questions from uploaded photos
+    - Associate extracted questions with selected chapter
+    - Handle extraction failure with corrective action suggestions
+    - _Requirements: 4.1, 4.7_
+
+- [x] 7. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 8. Implement Pronunciation Engine
+  - [x] 8.1 Implement syllable breakdown
+    - Break words into syllables per language Subject Module rules
+    - Provide pronunciation for each syllable and complete word
+    - Display character with English transliteration
+    - _Requirements: 2.4, 2.5_
+  - [ ]* 8.2 Write property test for syllable breakdown
+    - **Property 5: Syllable breakdown round-trip**
+    - **Validates: Requirements 2.4**
+  - [x] 8.3 Implement pronunciation scoring
+    - Accept recordings up to 10 seconds
+    - Compare against correct pronunciation
+    - Produce accuracy score 0-100 with syllable-level feedback
+    - Load correct pronunciation rules per active language subject
+    - _Requirements: 2.1, 2.2, 2.3, 2.8_
+  - [ ]* 8.4 Write property test for pronunciation scoring
+    - **Property 6: Pronunciation score validity**
+    - **Validates: Requirements 2.2**
+  - [x] 8.5 Implement error handling for pronunciation
+    - Handle microphone access failure and low audio level
+    - Handle audio playback failure with retry option
+    - Gracefully degrade when some assets fail to load
+    - _Requirements: 2.6, 2.7, 2.9_
+
+- [x] 9. Implement Grammar Engine
+  - [x] 9.1 Implement sentence analysis
+    - Analyze sentences using Subject Module grammar rules
+    - Identify errors with corrections and grade-appropriate explanations
+    - Confirm correct sentences
+    - _Requirements: 3.1, 3.2, 3.4_
+  - [x] 9.2 Implement grammar exercise generation
+    - Generate 5-10 exercises from stored chapter vocabulary
+    - Handle empty chapter state with guidance message
+    - _Requirements: 3.3, 3.6_
+  - [ ]* 9.3 Write property test for exercise generation
+    - **Property 7: Grammar exercise generation constraints**
+    - **Validates: Requirements 3.3**
+  - [x] 9.4 Implement grammar exercise scoring
+    - Score 0-100 percentage
+    - Identify weak grammar rules (below 60%)
+    - _Requirements: 3.5_
+  - [ ]* 9.5 Write property test for grammar scoring
+    - **Property 8: Grammar scoring with weak area identification**
+    - **Validates: Requirements 3.5**
+
+- [x] 10. Implement Comprehension Service
+  - [x] 10.1 Implement model answer generation and evaluation
+    - Verify chapter content sufficiency before generating answer
+    - Generate model answer using Subject Module question strategy
+    - Evaluate learner answers: percentage score, missing points, factual errors
+    - Indicate when additional chapter pages are needed
+    - _Requirements: 4.2, 4.3, 4.8_
+  - [x] 10.2 Implement hint system
+    - Provide step-by-step guidance from chapter content
+    - Each step builds toward answer without revealing full answer
+    - _Requirements: 4.4_
+  - [ ]* 10.3 Write property test for hints
+    - **Property 9: Hints do not reveal full answer**
+    - **Validates: Requirements 4.4**
+  - [x] 10.4 Implement chapter performance summary
+    - Calculate percentage score, correct/total count
+    - Identify weak questions (below 60%)
+    - Support all question types: fill-in-the-blank, short answer, match-the-following, descriptive
+    - _Requirements: 4.5, 4.6_
+  - [ ]* 10.5 Write property test for performance summary
+    - **Property 10: Performance summary correctness**
+    - **Validates: Requirements 4.5**
+
+- [x] 11. Implement Revision Mode
+  - [x] 11.1 Implement revision session creation
+    - Display all stored chapters for subject with selection options
+    - Generate 5-20 questions per selected chapter
+    - Distribute across recall, understanding, application levels (at least 1 each per chapter)
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [ ]* 11.2 Write property test for revision question generation
+    - **Property 16: Revision question count and difficulty distribution**
+    - **Validates: Requirements 6.2, 6.3**
+  - [x] 11.3 Implement timed test mode
+    - Configurable time limit 5-120 minutes
+    - Auto-end session at time limit
+    - Mark unanswered questions as unattempted
+    - Score based on answered questions only
+    - _Requirements: 6.4, 6.8_
+  - [ ]* 11.4 Write property test for timed test validation
+    - **Property 17: Timed test time limit validation**
+    - **Property 19: Partial progress preservation**
+    - **Validates: Requirements 6.4, 6.7, 6.8**
+  - [x] 11.5 Implement revision performance summary
+    - Per-chapter scores with strengths (>=70%) and weak areas (<70%)
+    - Record session results (date, subject, chapters, scores, responses)
+    - Save partial progress on early exit, allow resume
+    - _Requirements: 6.5, 6.6, 6.7_
+  - [ ]* 11.6 Write property test for revision performance classification
+    - **Property 18: Revision performance strength/weakness classification**
+    - **Validates: Requirements 6.5**
+
+- [x] 12. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 13. Implement Grade Management
+  - [x] 13.1 Implement grade promotion workflow
+    - Store grade 1-12 in learner profile
+    - Prompt to keep or delete previous grade content on promotion
+    - Require confirmation before permanent deletion
+    - Archive kept content in read-only state
+    - Reset progress for new grade, preserve cumulative history
+    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
+  - [ ]* 13.2 Write property tests for grade management
+    - **Property 24: Archived content is read-only**
+    - **Property 25: Grade promotion resets new grade progress while preserving history**
+    - **Validates: Requirements 9.4, 9.5**
+  - [x] 13.3 Implement academic year notification
+    - Notify parent 30 days before configured academic year end
+    - Allow parent to set/adjust expected promotion date
+    - _Requirements: 9.6_
+  - [ ]* 13.4 Write property test for notification timing
+    - **Property 26: Academic year notification timing**
+    - **Validates: Requirements 9.6**
+
+- [x] 14. Implement Sync Service and Offline Queue
+  - [x] 14.1 Implement offline action queue
+    - Queue actions while offline (max 50)
+    - Reject actions beyond limit
+    - Maintain sequential ordering for replay
+    - _Requirements: 13.4_
+  - [ ]* 14.2 Write property test for offline queue
+    - **Property 34: Offline action queue limit and ordering**
+    - **Validates: Requirements 13.4, 13.5**
+  - [x] 14.3 Implement sync with conflict resolution
+    - Sync queued actions in order when connectivity restored
+    - Resolve conflicts: retain most recent version
+    - Provide option to review overwritten changes
+    - Synchronize within 5 seconds for conflict-free changes
+    - _Requirements: 7.3, 7.6, 13.5_
+  - [ ]* 14.4 Write property test for conflict resolution
+    - **Property 29: Conflict resolution favors most recent**
+    - **Validates: Requirements 7.6**
+  - [x] 14.5 Implement optimistic UI updates with rollback
+    - Apply optimistic updates for saves and progress marking
+    - Revert local state on server rejection
+    - Notify learner of failed actions
+    - _Requirements: 13.6, 13.7_
+  - [ ]* 14.6 Write property test for optimistic rollback
+    - **Property 35: Optimistic update rollback on rejection**
+    - **Validates: Requirements 13.7**
+  - [x] 14.7 Implement platform state restoration
+    - Save and restore: active subject, chapter, exercise position, unsaved input
+    - _Requirements: 7.4_
+  - [ ]* 14.8 Write property test for state restoration
+    - **Property 30: Platform state restoration**
+    - **Validates: Requirements 7.4**
+
+- [x] 15. Implement Caching and Storage Tiers
+  - [x] 15.1 Implement client-side caching
+    - Cache content accessed more than once per session
+    - Max 500 MB per device, 7-day expiration since last access
+    - LRU eviction when size limit exceeded
+    - _Requirements: 12.2_
+  - [ ]* 15.2 Write property test for cache eviction
+    - **Property 31: Client cache eviction**
+    - **Validates: Requirements 12.2**
+  - [x] 15.3 Implement tiered storage migration
+    - Hot storage for content accessed within 30 days
+    - Cold storage for content not accessed for 30+ days
+    - _Requirements: 12.3_
+  - [ ]* 15.4 Write property test for tiered storage
+    - **Property 32: Tiered storage assignment**
+    - **Validates: Requirements 12.3**
+
+- [x] 16. Implement API Layer
+  - [x] 16.1 Create RESTful API endpoints
+    - Platform-independent endpoints with JSON payloads
+    - Standard HTTP/HTTPS protocols only
+    - Machine-readable API specification (OpenAPI)
+    - Authentication via platform-agnostic tokens (JWT)
+    - _Requirements: 14.1, 14.3, 14.4, 14.6_
+  - [x] 16.2 Implement platform interface abstraction
+    - Abstract camera access, file system, push notifications behind platform interface
+    - Define input/output contracts independent of platform
+    - Separate business logic from platform-specific UI code
+    - _Requirements: 14.2, 14.5, 7.5_
+
+- [x] 17. Final checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for faster MVP
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties using fast-check with 100+ iterations
+- Unit tests validate specific examples and edge cases
+- The design uses TypeScript throughout; interfaces are defined in the design document
+- Subject Modules are pluggable — new subjects can be added without modifying core services
