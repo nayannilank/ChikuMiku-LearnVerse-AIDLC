@@ -4,6 +4,31 @@
 
 ChikuMiku LearnVerse is a multi-subject learning platform for children built as a TypeScript monorepo with a layered architecture. This guide covers the project structure, development workflow, architecture, and conventions for contributors.
 
+## Tech Stack
+
+| Category | Technology | Version / Notes |
+|----------|-----------|-----------------|
+| **Language & Runtime** | TypeScript | 5.6 (strict mode) |
+| | Node.js | 18+ |
+| **Monorepo** | npm workspaces | Layered architecture with dependency boundaries |
+| **Build** | `tsc --build` | Project references for incremental compilation |
+| | Vite | Web dev server with HMR |
+| | `marked` | Markdown → HTML (User Guide build step) |
+| | `tsx` | TypeScript script execution |
+| **Testing** | Vitest | 2.1 — test runner |
+| | fast-check | 3.22 — property-based testing |
+| | happy-dom | Lightweight DOM for component tests |
+| **Linting** | ESLint | 8.57 with `@typescript-eslint` |
+| **Web Platform** | Vite | Dev server and bundler |
+| | Browser APIs | Camera, FileSystem, Audio, Notifications |
+| **Mobile Platform** | React Native | Android (API 26+) |
+| | Metro | Bundler for React Native |
+| **Backend** | Serverless Framework | AWS Lambda + API Gateway emulation via `serverless-offline` |
+| | JWT | Authentication tokens (30-day minimum validity) |
+| **Infrastructure** | AWS Lambda + API Gateway | Production compute |
+| | DynamoDB | Database (local emulation for dev) |
+| | Tiered Storage | Hot (30-day) / Cold archival |
+
 ## Prerequisites
 
 - Node.js 18+
