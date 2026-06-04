@@ -5,4 +5,5 @@
  */
 
 export * from './endpoints';
+export * from './learningHandlers';
 export * from '@chikumiku/platform-contracts';

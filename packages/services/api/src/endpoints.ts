@@ -10,6 +10,18 @@
  * Validates: Requirements 14.1, 14.3, 14.4, 14.6
  */
 
+import {
+  handleStartLearning,
+  handleSelectSubject,
+  handleSelectChapter,
+  handleNewChapter,
+  handleEndChapter,
+  handleEndLearning,
+  handleGetSession,
+  handleEnrollSubject,
+  handleListSubjects,
+} from './learningHandlers';
+
 // --- HTTP Types ---
 
 /** Standard HTTP methods */
@@ -533,26 +545,75 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'GET',
       path: '/api/v1/subjects',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { data: [] },
-      }),
+      handler: handleListSubjects,
       requiresAuth: true,
-      description: 'List available subjects',
+      description: 'List enrolled subjects for the learner',
       tags: ['subjects'],
     },
     {
       method: 'POST',
       path: '/api/v1/subjects/:subjectId/enroll',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { message: 'Enrolled successfully' },
-      }),
+      handler: handleEnrollSubject,
       requiresAuth: true,
       description: 'Enroll in a subject',
       tags: ['subjects'],
+    },
+    // Learning session routes (subject-first workflow)
+    {
+      method: 'POST',
+      path: '/api/v1/learning/start',
+      handler: handleStartLearning,
+      requiresAuth: true,
+      description: 'Start a learning session — returns enrolled subjects for selection',
+      tags: ['learning'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/learning/select-subject',
+      handler: handleSelectSubject,
+      requiresAuth: true,
+      description: 'Select a subject — returns chapters for selection or new chapter creation',
+      tags: ['learning'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/learning/select-chapter',
+      handler: handleSelectChapter,
+      requiresAuth: true,
+      description: 'Select an existing chapter to continue learning',
+      tags: ['learning'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/learning/new-chapter',
+      handler: handleNewChapter,
+      requiresAuth: true,
+      description: 'Start a new chapter within the selected subject',
+      tags: ['learning'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/learning/end-chapter',
+      handler: handleEndChapter,
+      requiresAuth: true,
+      description: 'End current chapter and return to chapter selection',
+      tags: ['learning'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/learning/end',
+      handler: handleEndLearning,
+      requiresAuth: true,
+      description: 'End the entire learning session',
+      tags: ['learning'],
+    },
+    {
+      method: 'GET',
+      path: '/api/v1/learning/session',
+      handler: handleGetSession,
+      requiresAuth: true,
+      description: 'Get current learning session state',
+      tags: ['learning'],
     },
   ];
 }
