@@ -56,10 +56,9 @@ export default function SubjectSelectionScreen({navigation}: Props) {
 
   async function handleSelectSubject(subjectId: string) {
     try {
-      const response = await selectSubject(subjectId);
-      navigation.navigate('ChapterSelection', {
-        subjectId: response.selectedSubjectId,
-        chapters: response.availableChapters,
+      await selectSubject(subjectId);
+      navigation.navigate('TextbookList', {
+        subjectId,
       });
     } catch (err: any) {
       Alert.alert('Error', err.message);

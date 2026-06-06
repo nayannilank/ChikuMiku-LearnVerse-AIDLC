@@ -6,13 +6,13 @@ react {
     // React Native configuration
 }
 
+def enableProguardInReleaseBuilds = false
+
 android {
-    ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.chikumiku.learnverse"
-
     defaultConfig {
         applicationId "com.chikumiku.learnverse"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -20,7 +20,6 @@ android {
         versionCode 1
         versionName "0.1.0"
     }
-
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -29,15 +28,14 @@ android {
             keyPassword 'android'
         }
     }
-
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.debug
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
 }

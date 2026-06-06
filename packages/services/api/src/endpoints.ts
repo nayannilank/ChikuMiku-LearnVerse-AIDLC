@@ -22,6 +22,22 @@ import {
   handleListSubjects,
 } from './learningHandlers';
 
+import {
+  handleListTextbooks,
+  handleCreateTextbook,
+  handleListChapters,
+  handleCreateChapter,
+  handleAddPage,
+} from './contentHandlers';
+
+import {
+  handleLogin,
+  handleRegisterParent,
+  handleRegisterStudent,
+  handleForgotPassword,
+  handleValidateSession,
+} from './authHandlers';
+
 // --- HTTP Types ---
 
 /** Standard HTTP methods */
@@ -371,26 +387,42 @@ export function createDefaultRoutes(): ApiRoute[] {
     // Auth routes
     {
       method: 'POST',
-      path: '/api/v1/auth/register',
-      handler: async (req) => ({
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-        body: { message: 'Registration successful' },
-      }),
+      path: '/api/v1/auth/login',
+      handler: handleLogin,
       requiresAuth: false,
-      description: 'Register a new learner account',
+      description: 'Authenticate and obtain JWT tokens',
       tags: ['auth'],
     },
     {
       method: 'POST',
-      path: '/api/v1/auth/login',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { accessToken: '', refreshToken: '', expiresAt: 0, tokenType: 'Bearer' },
-      }),
+      path: '/api/v1/auth/register/parent',
+      handler: handleRegisterParent,
       requiresAuth: false,
-      description: 'Authenticate and obtain JWT tokens',
+      description: 'Register a new parent account',
+      tags: ['auth'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/auth/register/student',
+      handler: handleRegisterStudent,
+      requiresAuth: false,
+      description: 'Register a new student account linked to a parent',
+      tags: ['auth'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/auth/forgot-password',
+      handler: handleForgotPassword,
+      requiresAuth: false,
+      description: 'Initiate password recovery via registered contact',
+      tags: ['auth'],
+    },
+    {
+      method: 'GET',
+      path: '/api/v1/auth/validate',
+      handler: handleValidateSession,
+      requiresAuth: true,
+      description: 'Validate current session token',
       tags: ['auth'],
     },
     {
@@ -405,7 +437,50 @@ export function createDefaultRoutes(): ApiRoute[] {
       description: 'Refresh an expired access token',
       tags: ['auth'],
     },
-    // Content routes
+    // Content routes — Textbooks
+    {
+      method: 'GET',
+      path: '/api/v1/subjects/:subjectId/textbooks',
+      handler: handleListTextbooks,
+      requiresAuth: true,
+      description: 'List textbooks for a subject',
+      tags: ['content'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/subjects/:subjectId/textbooks',
+      handler: handleCreateTextbook,
+      requiresAuth: true,
+      description: 'Create a textbook under a subject',
+      tags: ['content'],
+    },
+    // Content routes — Chapters
+    {
+      method: 'GET',
+      path: '/api/v1/textbooks/:textbookId/chapters',
+      handler: handleListChapters,
+      requiresAuth: true,
+      description: 'List chapters for a textbook',
+      tags: ['content'],
+    },
+    {
+      method: 'POST',
+      path: '/api/v1/textbooks/:textbookId/chapters',
+      handler: handleCreateChapter,
+      requiresAuth: true,
+      description: 'Create a chapter under a textbook',
+      tags: ['content'],
+    },
+    // Content routes — Pages
+    {
+      method: 'POST',
+      path: '/api/v1/chapters/:chapterId/pages',
+      handler: handleAddPage,
+      requiresAuth: true,
+      description: 'Add a page image to a chapter',
+      tags: ['content'],
+    },
+    // Content routes — Legacy stubs
     {
       method: 'POST',
       path: '/api/v1/chapters',
@@ -440,18 +515,6 @@ export function createDefaultRoutes(): ApiRoute[] {
       }),
       requiresAuth: true,
       description: 'List chapters for a subject',
-      tags: ['content'],
-    },
-    {
-      method: 'POST',
-      path: '/api/v1/chapters/:chapterId/pages',
-      handler: async (req) => ({
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-        body: { message: 'Page added' },
-      }),
-      requiresAuth: true,
-      description: 'Add a page to an existing chapter',
       tags: ['content'],
     },
     // Progress routes

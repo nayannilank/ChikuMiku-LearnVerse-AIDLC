@@ -62,7 +62,7 @@ packages/
 │   └── api/                 # @chikumiku/service-api
 ├── platform-contracts/      # @chikumiku/platform-contracts (interfaces only)
 ├── platform-web/            # @chikumiku/web-* (browser implementations)
-└── platform-mobile/         # @chikumiku/mobile-* (native implementations)
+└── platform-mobile/         # @chikumiku/mobile-* (native implementations + rn-app)
 ```
 
 ## Infrastructure Components
@@ -79,9 +79,9 @@ packages/
 
 | Component | Recommended Service | Purpose |
 |-----------|-------------------|---------|
-| Primary Database | DynamoDB / Firestore | Learner data, chapters, progress |
-| Object Storage | S3 / Cloud Storage | Images, audio assets |
-| Cache | ElastiCache (Redis) | Session cache, hot content |
+| Primary Database | DynamoDB / Firestore | Learner data, chapters, progress, accounts |
+| Object Storage | S3 / Cloud Storage | Images, audio assets, page uploads |
+| Cache | ElastiCache (Redis) | Session cache, hot content, lockout state |
 | Message Queue | SQS / Cloud Tasks | Offline sync queue, batch processing |
 
 ### Static Assets (User Guide)
@@ -177,6 +177,26 @@ JWT_SECRET=<secure-random-string>
 JWT_EXPIRY_DAYS=30
 SESSION_MIN_DURATION_DAYS=30
 
+# Auth Lockout Configuration
+AUTH_MAX_FAILED_ATTEMPTS=3
+AUTH_LOCKOUT_DURATION_MINUTES=15
+
+# Password Policy
+PASSWORD_MIN_LENGTH=8
+PASSWORD_MAX_LENGTH=20
+PASSWORD_REQUIRE_UPPERCASE=true
+PASSWORD_REQUIRE_LOWERCASE=true
+PASSWORD_REQUIRE_DIGIT=true
+PASSWORD_REQUIRE_SPECIAL_CHAR=true
+
+# Username Policy
+USERNAME_MIN_LENGTH=5
+USERNAME_MAX_LENGTH=15
+USERNAME_ALLOWED_PATTERN="^[a-zA-Z0-9_-]+$"
+
+# Login Configuration
+LOGIN_TIMEOUT_SECONDS=30
+
 # Database
 DATABASE_URL=<connection-string>
 DATABASE_REGION=<aws-region>
@@ -227,6 +247,54 @@ NODE_ENV=production
 LOG_LEVEL=warn
 ```
 
+## API Gateway Configuration
+
+### Route Definitions
+
+The API Gateway routes requests to the appropriate Lambda functions. All routes are prefixed with `/api/v1/`.
+
+#### Authentication Routes (Public — no JWT required)
+
+| Method | Path | Target Lambda | Notes |
+|--------|------|---------------|-------|
+| POST | `/api/v1/auth/login` | `chikumiku-service-auth` | Username + password login |
+| POST | `/api/v1/auth/register/parent` | `chikumiku-service-auth` | Parent account creation |
+| POST | `/api/v1/auth/register/student` | `chikumiku-service-auth` | Student registration (links to parent) |
+| POST | `/api/v1/auth/forgot-password` | `chikumiku-service-auth` | Password recovery via parent phone/email |
+| GET | `/api/v1/auth/validate` | `chikumiku-service-auth` | Token validation (Bearer token in header) |
+
+#### Content Hierarchy Routes (JWT required)
+
+| Method | Path | Target Lambda | Notes |
+|--------|------|---------------|-------|
+| GET | `/api/v1/subjects/:subjectId/textbooks` | `chikumiku-service-content-store` | List textbooks for a subject |
+| POST | `/api/v1/subjects/:subjectId/textbooks` | `chikumiku-service-content-store` | Create textbook (name: 1-200 chars) |
+| GET | `/api/v1/textbooks/:textbookId/chapters` | `chikumiku-service-content-store` | List chapters for a textbook |
+| POST | `/api/v1/textbooks/:textbookId/chapters` | `chikumiku-service-content-store` | Create chapter (name: 1-200 chars) |
+| POST | `/api/v1/chapters/:chapterId/pages` | `chikumiku-service-content-ingestion` | Upload page image (JPEG/PNG, max 10 MB) |
+
+#### Existing Routes (JWT required)
+
+All other existing API routes (subjects, learning, progress, sync, etc.) continue to require JWT authentication as before.
+
+### JWT Authorization Configuration
+
+Configure the API Gateway authorizer to validate JWT tokens on all protected routes:
+
+```yaml
+authorizer:
+  type: TOKEN
+  identitySource: method.request.header.Authorization
+  authorizerResultTtlInSeconds: 300
+  
+# Public routes (no authorizer):
+#   - POST /api/v1/auth/login
+#   - POST /api/v1/auth/register/parent
+#   - POST /api/v1/auth/register/student
+#   - POST /api/v1/auth/forgot-password
+#   - GET  /api/v1/auth/validate (uses Bearer token but validates internally)
+```
+
 ## Deployment Procedures
 
 ### Initial Deployment
@@ -244,7 +312,7 @@ terraform apply -var-file=production.tfvars
 2. **Deploy Database Schema**
 
 ```bash
-# Run migrations
+# Run migrations (includes parent_accounts and student_accounts tables, textbooks table)
 npm run db:migrate -- --env production
 ```
 
@@ -259,12 +327,20 @@ aws lambda update-function-code \
 aws lambda update-function-code \
   --function-name chikumiku-service-api \
   --zip-file fileb://deploy/api-lambda.zip
+
+aws lambda update-function-code \
+  --function-name chikumiku-service-content-store \
+  --zip-file fileb://deploy/content-store-lambda.zip
+
+aws lambda update-function-code \
+  --function-name chikumiku-service-content-ingestion \
+  --zip-file fileb://deploy/content-ingestion-lambda.zip
 ```
 
 4. **Configure API Gateway**
 
 ```bash
-# Deploy API Gateway stage
+# Deploy API Gateway stage (includes new auth and content hierarchy routes)
 aws apigateway create-deployment \
   --rest-api-id <api-id> \
   --stage-name production
@@ -377,10 +453,25 @@ functions:
     memory: 256MB
     timeout: 10s
     reserved_concurrency: 50
-    
+    environment:
+      JWT_SECRET: ${ssm:/chikumiku/jwt-secret}
+      JWT_EXPIRY_DAYS: "30"
+      AUTH_MAX_FAILED_ATTEMPTS: "3"
+      AUTH_LOCKOUT_DURATION_MINUTES: "15"
+      PASSWORD_MIN_LENGTH: "8"
+      PASSWORD_MAX_LENGTH: "20"
+      USERNAME_MIN_LENGTH: "5"
+      USERNAME_MAX_LENGTH: "15"
+      LOGIN_TIMEOUT_SECONDS: "30"
+
+  service-content-store:
+    memory: 256MB
+    timeout: 10s
+    reserved_concurrency: 100
+
   service-content-ingestion:
     memory: 512MB
-    timeout: 30s  # OCR processing
+    timeout: 30s  # OCR processing + image upload
     reserved_concurrency: 100
     
   service-comprehension:
@@ -422,6 +513,9 @@ queues:
 | OCR Processing Time | < 10s | > 15s |
 | Concurrent Learners | — | > 900 (capacity warning) |
 | User Guide Load Time | < 2s | > 3s |
+| Auth Login Latency (P95) | < 2s | > 3s |
+| Failed Login Rate | — | > 50/min (potential brute force) |
+| Account Lockouts | — | > 20/hour (unusual activity) |
 
 ### Health Checks
 
@@ -461,15 +555,22 @@ Configure alerts for:
 - Storage capacity approaching limits
 - Queue depth exceeding 1000 messages
 - Failed deployments
+- Excessive account lockouts (potential brute-force attempts)
+- Unusual registration volume (potential spam/abuse)
 
 ## Security
 
 ### Authentication
 
-- JWT tokens with platform-agnostic standards
-- Tokens issued per-session, minimum 30-day validity
-- Refresh token rotation on each use
-- Account lockout after 3 failed attempts (15 minutes)
+- **Username-based login**: Students and parents authenticate with username (5-15 chars, alphanumeric + `_` + `-`) and password
+- **Password policy**: 8-20 characters, requires uppercase + lowercase + digit + special character
+- **Parent-student linking**: Every student account is linked to a parent account via parent username; parents own the recovery credentials (phone/email)
+- **JWT tokens**: Issued per-session, minimum 30-day validity
+- **Token validation**: Clients validate stored token on app launch via `GET /api/v1/auth/validate`
+- **Account lockout**: 3 consecutive failed login attempts triggers a 15-minute lockout; lockout state stored in cache (Redis)
+- **Forgot password**: Recovery initiated via phone or email registered to the parent account
+- **Session expiry handling**: Mid-session 401 → app saves unsaved input to local storage → redirects to auth screen
+- **Login timeout**: 30-second maximum for login API response; client shows network error on timeout
 
 ### Data Isolation
 
@@ -477,6 +578,7 @@ Configure alerts for:
 - No learner can access another learner's data via any API
 - Database queries always scoped by `learnerId`
 - Object storage paths include learner ID prefix
+- Textbook and chapter data scoped to the owning learner
 
 ### Network Security
 
@@ -484,13 +586,15 @@ Configure alerts for:
 - API Gateway with rate limiting
 - WAF rules for common attack patterns
 - VPC isolation for backend services
+- Auth endpoints rate-limited to prevent brute-force attacks
 
 ### Data Protection
 
 - Passwords hashed with bcrypt (cost factor 12+)
-- PII encrypted at rest
+- PII encrypted at rest (parent phone numbers, email addresses)
 - Backups encrypted
 - 7-day local backup retention (auto-purge)
+- JWT secrets stored in AWS SSM Parameter Store (encrypted)
 
 ## Maintenance
 
@@ -538,9 +642,9 @@ backups:
 
 | Metric | Per 1000 Learners | Notes |
 |--------|-------------------|-------|
-| Database Storage | ~50 GB | Chapters + progress |
+| Database Storage | ~50 GB | Chapters + progress + accounts |
 | Object Storage | ~500 GB | Images (compressed to 1 MB each) |
-| Cache Memory | ~2 GB | Active sessions + hot content |
+| Cache Memory | ~2 GB | Active sessions + hot content + lockout state |
 | Compute (peak) | ~100 Lambda invocations/sec | During school hours |
 
 ## Rollback Procedures
@@ -619,3 +723,5 @@ The `validate:boundaries` step ensures no service package imports from web/mobil
 | Zero-Downtime Deploys | Required for all updates |
 | Data Isolation | Logical per-learner, no cross-access |
 | Horizontal Scaling | 1000+ concurrent learners |
+| Auth Login Latency | < 2 seconds (P95) |
+| Token Validation | < 500ms |

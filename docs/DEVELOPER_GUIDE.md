@@ -21,7 +21,8 @@ ChikuMiku LearnVerse is a multi-subject learning platform for children built as 
 | **Linting** | ESLint | 8.57 with `@typescript-eslint` |
 | **Web Platform** | Vite | Dev server and bundler |
 | | Browser APIs | Camera, FileSystem, Audio, Notifications |
-| **Mobile Platform** | React Native | Android (API 26+) |
+| **Mobile Platform** | React Native | 0.74, Android (API 26+) |
+| | React Navigation | 6 — Native stack navigator |
 | | Metro | Bundler for React Native |
 | **Backend** | Serverless Framework | AWS Lambda + API Gateway emulation via `serverless-offline` |
 | | JWT | Authentication tokens (30-day minimum validity) |
@@ -75,7 +76,7 @@ In addition to the base prerequisites, you'll need:
 
 - **Web**: No extra tools — Vite is included as a dev dependency
 - **Mobile**: Android Studio (latest stable), JDK 17+, Android SDK (API 26+), React Native CLI
-- **Backend**: `serverless` framework and `serverless-offline` plugin (installed as dev dependencies)
+- **Backend**: `tsx` (installed as a dev dependency) for running the local API server
 
 ### Running the Web App
 
@@ -103,26 +104,22 @@ VITE_API_URL=http://localhost:3000
 
 ### Running the Backend Locally
 
-The backend services run locally using `serverless-offline`, which emulates AWS Lambda and API Gateway on your machine:
+The API service includes a built-in local development server using Node.js `http` module:
 
 ```bash
-# Build all service packages
+# Build all service packages first
 npm run build
 
 # Start the local API server
-cd packages/services/api
-npx serverless offline
-
-# Or if a dev script is configured:
-npm run dev:api --workspace=@chikumiku/service-api
+npx tsx packages/services/api/src/server.ts
 ```
 
-This starts a local HTTP server (typically at `http://localhost:3000`) that mimics the production API Gateway + Lambda setup. All service endpoints are available locally.
+This starts a local HTTP server at `http://localhost:3000` with all API endpoints available, CORS headers configured, and request logging to stdout.
 
 **Tips**:
+- Set `PORT=<number>` to use a different port: `PORT=4000 npx tsx packages/services/api/src/server.ts`
 - Set `NODE_ENV=development` for verbose logging
-- The local server auto-reloads when you rebuild service packages
-- Use `--stage dev` to load development-specific configuration
+- Rebuild service packages (`npm run build`) after making changes, then restart the server
 - DynamoDB Local or a local Docker instance can be used for database emulation
 
 ### Running the Mobile App (Android)
@@ -134,7 +131,7 @@ The mobile app is built with React Native. To run it on an Android emulator or p
 npm run build
 
 # 2. Install mobile dependencies (if not already done)
-cd packages/platform-mobile/app
+cd packages/platform-mobile/rn-app
 npm install
 
 # 3. Start the Metro bundler
@@ -147,7 +144,7 @@ npx react-native run-android
 **Using Android Studio**:
 
 1. Open Android Studio
-2. Select **Open an Existing Project** and navigate to `packages/platform-mobile/app/android/`
+2. Select **Open an Existing Project** and navigate to `packages/platform-mobile/rn-app/android/`
 3. Let Gradle sync complete
 4. Select your target device (emulator or connected device via USB debugging)
 5. Click **Run** (green play button) or press `Shift+F10`
@@ -168,13 +165,13 @@ For full-stack local development:
 
 ```bash
 # Terminal 1: Backend API
-cd packages/services/api && npx serverless offline
+npx tsx packages/services/api/src/server.ts
 
 # Terminal 2: Web app (points to local backend)
 cd packages/platform-web/app && npx vite
 
 # Terminal 3: Mobile Metro bundler (points to local backend)
-cd packages/platform-mobile/app && npx react-native start
+cd packages/platform-mobile/rn-app && npx react-native start
 ```
 
 Set the API URL in both clients to `http://localhost:3000` (or your machine's local IP for the Android emulator — typically `http://10.0.2.2:3000`).
@@ -206,6 +203,7 @@ ChikuMiku LearnVerse/
 │   │   └── ui/                      # Web UI components
 │   └── platform-mobile/             # Mobile-specific implementations (native APIs)
 │       ├── app/                     # Mobile platform provider entry point
+│       ├── rn-app/                  # React Native app (screens, navigation, components)
 │       ├── camera/                  # Mobile camera implementation
 │       ├── filesystem/              # Mobile file system implementation
 │       ├── notifications/           # Mobile notifications implementation
@@ -217,12 +215,76 @@ ChikuMiku LearnVerse/
 │   └── validate-boundaries.ts       # Validates dependency boundary rules
 ├── docs/                            # Documentation (this guide, user guide, deployment guide)
 ├── .kiro/specs/                     # Spec-driven development artifacts
+├── ChikuMiku-LearnVerse-Logo.png    # Brand logo asset (used for app icon, splash, nav header, favicon)
 ├── package.json                     # Root workspace configuration
 ├── tsconfig.json                    # Root TypeScript project references
 ├── tsconfig.base.json               # Shared TypeScript compiler options
 ├── vitest.config.ts                 # Test configuration
 └── eslint.config.mjs                # Linting configuration
 ```
+
+### Mobile App Structure (`packages/platform-mobile/rn-app/`)
+
+The React Native app follows a screen-based architecture with React Navigation 6:
+
+```
+rn-app/
+├── src/
+│   ├── context/
+│   │   └── AuthContext.tsx              # React context: token state, auth API calls
+│   ├── hooks/
+│   │   └── useAuth.ts                   # Exposes login, register, logout, isAuthenticated
+│   ├── navigation/
+│   │   ├── RootNavigator.tsx            # Conditional: Auth Stack vs Main Stack
+│   │   └── routeResolver.ts            # resolveInitialRoute based on token state
+│   ├── screens/
+│   │   ├── SplashScreen.tsx             # Branded splash, token validation, route decision
+│   │   ├── LoginScreen.tsx              # Username/password login with lockout handling
+│   │   ├── ParentRegistrationScreen.tsx # Parent account creation form
+│   │   ├── StudentRegistrationScreen.tsx# Student registration linked to parent
+│   │   ├── TextbookListScreen.tsx       # Lists textbooks for a subject; shows form if empty
+│   │   └── ... (existing screens)
+│   └── components/
+│       ├── TextbookEntryForm.tsx         # Textbook name input (max 200 chars), inline validation
+│       ├── ChapterCreationForm.tsx       # Chapter name input (max 200 chars), inline validation
+│       ├── PageAdditionUI.tsx            # Camera + gallery buttons in Learning Screen
+│       ├── ImagePreview.tsx              # Preview captured/selected image with accept/retake
+│       ├── HeaderLogo.tsx               # Logo in navigation bar header
+│       └── ... (existing components)
+├── android/
+│   └── app/src/main/res/               # App icon (generated from ChikuMiku-LearnVerse-Logo.png)
+└── package.json
+```
+
+### Navigation Structure
+
+The app uses a conditional navigation structure based on authentication state:
+
+```typescript
+// RootNavigator renders one of these stacks based on token state:
+
+// Auth Stack (no valid token)
+type AuthStackParamList = {
+  Login: undefined;
+  ParentRegistration: undefined;
+  StudentRegistration: undefined;
+  ForgotPassword: undefined;
+};
+
+// Main Stack (valid token present)
+type MainStackParamList = {
+  SubjectSelection: undefined;
+  TextbookList: { subjectId: string };
+  ChapterSelection: { subjectId: string; textbookId: string };
+  Learning: { subjectId: string; textbookId: string; chapterId: string | null };
+};
+```
+
+**Route resolution logic** (`routeResolver.ts`):
+- No token in device storage → Auth Stack
+- Token exists but validation fails (expired/invalid) → Auth Stack with "Session ended" message
+- Token exists but network error on validation → Auth Stack with "Connection problem" message
+- Token valid → Main Stack (Subject Selection)
 
 ## Architecture Overview
 
@@ -246,9 +308,32 @@ The platform follows a **layered architecture** with strict dependency boundarie
 
 ┌─────────────────────────────────────────────────────────────┐
 │  Platform Mobile (packages/platform-mobile/*)                │
-│  @chikumiku/mobile-app, mobile-camera, mobile-filesystem     │
+│  @chikumiku/mobile-app, rn-app, mobile-camera, etc.          │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### Authentication Flow
+
+```
+App Launch
+    │
+    ▼
+┌────────────┐    token exists?     ┌──────────────────┐
+│ SplashScreen├────── yes ──────────►│ GET /auth/validate│
+│ (1-5 sec)  │                      └────────┬─────────┘
+└──────┬─────┘                               │
+       │ no token                    valid?   │
+       ▼                            yes ──────┼──► Main Stack (SubjectSelection)
+┌────────────┐                               │
+│ Auth Stack │◄────────── no / error ────────┘
+│  (Login)   │
+└──────┬─────┘
+       │ login success
+       ▼
+  Main Stack (SubjectSelection)
+```
+
+Mid-session token expiry: API returns 401 → app attempts to save unsaved input → redirect to Auth Stack with "Session ended" message.
 
 ### Dependency Rules
 
@@ -275,11 +360,13 @@ New subjects (e.g., Tamil, French, Physics) can be added by deploying a new Subj
 
 ### Key Design Principles
 
-1. **Offline-First**: Clients cache content locally and queue actions when offline (max 50). Sync happens automatically when connectivity is restored.
-2. **Optimistic UI**: Local state updates immediately; rollback occurs if the server rejects the action.
-3. **Platform-Agnostic Services**: Business logic is fully separated from platform-specific code via the contracts layer.
-4. **Tiered Storage**: Hot storage for content accessed within 30 days; cold storage for older content.
-5. **Build-Time Content Processing**: The User Guide is converted from Markdown to static HTML at build time — no runtime parsing needed.
+1. **Auth-First Navigation**: The navigator conditionally renders an auth stack or the main stack based on token presence, using `DeviceStorageInterface` for token persistence.
+2. **Offline-First**: Clients cache content locally and queue actions when offline (max 50). Sync happens automatically when connectivity is restored.
+3. **Optimistic UI**: Local state updates immediately; rollback occurs if the server rejects the action.
+4. **Platform-Agnostic Services**: Business logic is fully separated from platform-specific code via the contracts layer.
+5. **Textbook as Intermediate Entity**: Subjects own textbooks; textbooks own chapters. Mirrors physical study material organization.
+6. **Tiered Storage**: Hot storage for content accessed within 30 days; cold storage for older content.
+7. **Build-Time Content Processing**: The User Guide is converted from Markdown to static HTML at build time — no runtime parsing needed.
 
 ## Package Details
 
@@ -294,8 +381,8 @@ Cross-cutting features shared across the entire application.
 
 Shared types and utilities used across all service packages.
 
-- **Data Models**: `Learner`, `Chapter`, `Page`, `Question`, `ProgressRecord`, `ActivityScore`, `RevisionSession`, `GradeArchive`, `QueuedAction`
-- **Validation**: Grade (1-12), ImageInput (format + size), registration input
+- **Data Models**: `Learner`, `Chapter`, `Page`, `Textbook`, `Question`, `ProgressRecord`, `ActivityScore`, `RevisionSession`, `GradeArchive`, `QueuedAction`
+- **Validation**: Grade (1-12), ImageInput (format + size), registration input, content name validation (textbook/chapter: 1-200 chars)
 - **Subject Module Registry**: `SubjectModuleRegistry` with `register`, `getModule`, `listModules`
 - **Enrollment**: Multi-subject enrollment with isolation (max 10 subjects)
 
@@ -303,17 +390,22 @@ Shared types and utilities used across all service packages.
 
 Authentication and session management.
 
-- **Registration**: Email/phone + password (8-128 chars, 1 letter + 1 digit)
-- **Session**: JWT-based, minimum 30-day validity
-- **Lockout**: 3 consecutive failures → 15-minute lock
-- **Parental Linking**: Parent can view progress, reset password, update profile
+- **Registration**: Two account types — Parent and Student
+  - **Parent**: Name (max 100), username (5-15, alphanumeric + `_` + `-`), phone (10 digits), email (max 254)
+  - **Student**: Name (max 100), username (5-15, alphanumeric + `_` + `-`), password (8-20, uppercase + lowercase + digit + special char), grade (1-12), linked to parent via parent username
+- **Login**: Username-based (5-15 chars), password (max 20 chars, masked), 30-second timeout
+- **Session**: JWT-based, minimum 30-day validity, stored in device storage
+- **Lockout**: 3 consecutive failures → 15-minute lock, submit button disabled during lockout
+- **Forgot Password**: Recovery via phone/email registered to linked parent account
+- **Parental Linking**: Parent can view progress, reset password, update profile; students always linked to a parent
 - **Local Backup**: 7-day retention of progress regardless of session status
 
 ### `packages/services/content-store`
 
 Persistent storage and progress tracking.
 
-- **Chapter CRUD**: Save, retrieve, list (organized by subject/textbook/chapter number)
+- **Textbook CRUD**: Create, list textbooks per subject (name: 1-200 chars)
+- **Chapter CRUD**: Create, list chapters per textbook (name: 1-200 chars, auto-numbered)
 - **Progress Tracking**: Completion percentage, activity scores, weak activity identification (< 60%)
 - **Grade Management**: Promotion workflow, archiving (read-only), deletion with confirmation
 - **Revision Material**: Subject-type-aware options (language subjects get pronunciation + grammar)
@@ -369,6 +461,28 @@ API layer and platform abstraction.
 - **RESTful Endpoints**: Platform-independent, JSON payloads, JWT authentication
 - **Platform Interface**: Abstract camera, file system, push notifications behind contracts
 
+### API Endpoints
+
+#### Authentication Endpoints (public — no JWT required)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/auth/login` | Login with username + password; returns JWT |
+| POST | `/api/v1/auth/register/parent` | Register parent account (name, username, phone, email) |
+| POST | `/api/v1/auth/register/student` | Register student account linked to parent username |
+| POST | `/api/v1/auth/forgot-password` | Initiate password recovery via parent's phone/email |
+| GET | `/api/v1/auth/validate` | Validate current token (requires Bearer token) |
+
+#### Content Hierarchy Endpoints (JWT required)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/subjects/:subjectId/textbooks` | List textbooks for a subject |
+| POST | `/api/v1/subjects/:subjectId/textbooks` | Create a textbook under a subject |
+| GET | `/api/v1/textbooks/:textbookId/chapters` | List chapters for a textbook |
+| POST | `/api/v1/textbooks/:textbookId/chapters` | Create a chapter under a textbook |
+| POST | `/api/v1/chapters/:chapterId/pages` | Upload a page image to a chapter |
+
 ### `packages/platform-contracts`
 
 Interface definitions that form the boundary between services and platform implementations.
@@ -378,7 +492,7 @@ Interface definitions that form the boundary between services and platform imple
 - **AudioInterface**: Recording, playback
 - **PushNotificationInterface**: Local/remote notifications
 - **NavigationInterface**: Route navigation, back navigation
-- **DeviceStorageInterface**: Key-value device storage
+- **DeviceStorageInterface**: Key-value device storage (used for session token persistence)
 - **PlatformProvider**: Aggregate interface combining all capabilities
 - **PlatformRegistry**: Runtime registry for platform provider lookup
 
@@ -394,6 +508,7 @@ Browser-based implementations of platform contracts.
 Native mobile implementations of platform contracts.
 
 - **`mobile-app`**: Exports `createMobilePlatformProvider` — the mobile entry point
+- **`rn-app`**: React Native application — screens, navigation, context, hooks, components (see Mobile App Structure above)
 - **`mobile-camera`**, **`mobile-filesystem`**, **`mobile-audio`**, **`mobile-notifications`**, **`mobile-ui`**: Individual capability implementations using native APIs
 
 ## Package Naming Convention
@@ -453,6 +568,9 @@ npx vitest run packages/services/auth/src/registration.test.ts
 # Run help button integration tests
 npx vitest run packages/core/src/helpButton
 
+# Run mobile UX property tests
+npx vitest run packages/platform-mobile/rn-app/src/__tests__
+
 # Watch mode
 npm run test:watch
 ```
@@ -479,13 +597,16 @@ describe('Registration', () => {
 });
 
 // Property-based test example
-describe('Property: Registration input validation', () => {
-  it('accepts valid passwords (8-128 chars, 1 letter + 1 digit)', () => {
+describe('Property: Username validation', () => {
+  it('accepts valid usernames (5-15 chars, alphanumeric + _ + -)', () => {
     fc.assert(
       fc.property(
-        fc.string({ minLength: 8, maxLength: 128 }).filter(s => /[a-zA-Z]/.test(s) && /\d/.test(s)),
-        (password) => {
-          const result = validatePassword(password);
+        fc.stringOf(
+          fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'.split('')),
+          { minLength: 5, maxLength: 15 }
+        ),
+        (username) => {
+          const result = validateUsername(username);
           expect(result.valid).toBe(true);
         }
       ),
@@ -564,6 +685,7 @@ This project uses spec-driven development. Specs live in `.kiro/specs/`:
 - `.kiro/specs/chikumiku-learnverse/` — Core platform spec
 - `.kiro/specs/source-code-restructuring/` — Package restructuring spec
 - `.kiro/specs/help-button-user-guide/` — Help button & User Guide viewer spec
+- `.kiro/specs/mobile-app-ux-improvements/` — Authentication, textbook hierarchy, camera/gallery page capture, branding
 
 Each spec contains:
 - `requirements.md` — Formal requirements with acceptance criteria

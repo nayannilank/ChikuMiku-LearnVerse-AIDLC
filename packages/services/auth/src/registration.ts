@@ -4,11 +4,14 @@
  * Validates registration input fields and returns field-specific errors
  * while preserving valid form data on validation failure.
  *
- * Requirements: 8.1, 8.8
+ * Requirements: 8.1, 8.8, 3.1, 3.6, 3.7, 3.10, 3.12, 3.14
  */
 
 import { Grade, ContactType } from '@chikumiku/service-core';
 import { validateGrade, ValidationResult } from '@chikumiku/service-core';
+import { randomUUID } from 'crypto';
+import { validateUsername, validatePassword as validatePasswordStrict, validateEmail as validateEmailStrict, validatePhone } from './validation';
+import { hashPassword } from './session';
 
 // --- Registration Types ---
 
@@ -281,4 +284,423 @@ export function validateRegistrationInput(
       displayName: validatedDisplayName.value,
     },
   };
+}
+
+
+// --- Parent-Student Registration Types ---
+
+/** Maximum name length */
+const MAX_NAME_LENGTH = 100;
+
+/**
+ * Represents a registered parent account.
+ * Requirements: 3.1
+ */
+export interface ParentAccount {
+  id: string;
+  name: string;
+  username: string;
+  phoneNumber: string;
+  email: string;
+  passwordHash: string;
+  linkedStudentIds: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Represents a registered student account linked to a parent.
+ * Requirements: 3.7
+ */
+export interface StudentAccount {
+  id: string;
+  name: string;
+  username: string;
+  passwordHash: string;
+  grade: number;
+  parentUsername: string;
+  parentAccountId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Input fields for parent registration.
+ */
+export interface ParentRegistrationInput {
+  name: string;
+  username: string;
+  password: string;
+  phoneNumber: string;
+  email: string;
+}
+
+/**
+ * Input fields for student registration.
+ */
+export interface StudentRegistrationInput {
+  name: string;
+  username: string;
+  password: string;
+  grade: number;
+  parentUsername: string;
+}
+
+/**
+ * Field-level error for parent/student registration.
+ */
+export interface ParentStudentFieldError {
+  field: string;
+  message: string;
+}
+
+/**
+ * Successful parent registration result.
+ */
+export interface ParentRegistrationSuccess {
+  success: true;
+  account: ParentAccount;
+}
+
+/**
+ * Failed parent registration result with field errors and preserved data.
+ */
+export interface ParentRegistrationFailure {
+  success: false;
+  errors: ParentStudentFieldError[];
+  preservedData: Partial<ParentRegistrationInput>;
+}
+
+export type ParentRegistrationResult = ParentRegistrationSuccess | ParentRegistrationFailure;
+
+/**
+ * Successful student registration result.
+ */
+export interface StudentRegistrationSuccess {
+  success: true;
+  account: StudentAccount;
+}
+
+/**
+ * Failed student registration result with field errors and preserved data.
+ */
+export interface StudentRegistrationFailure {
+  success: false;
+  errors: ParentStudentFieldError[];
+  preservedData: Partial<StudentRegistrationInput>;
+}
+
+export type StudentRegistrationResult = StudentRegistrationSuccess | StudentRegistrationFailure;
+
+// --- In-Memory Stores for Parent/Student Accounts ---
+
+const parentAccountStore = new Map<string, ParentAccount>();
+const studentAccountStore = new Map<string, StudentAccount>();
+
+/**
+ * Clears the parent and student account stores. Useful for test isolation.
+ */
+export function clearParentStudentStore(): void {
+  parentAccountStore.clear();
+  studentAccountStore.clear();
+}
+
+/**
+ * Retrieves a parent account by username. Used for parent lookup during student registration.
+ */
+export function findParentByUsername(username: string): ParentAccount | undefined {
+  for (const account of parentAccountStore.values()) {
+    if (account.username === username) {
+      return account;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Retrieves a parent account by email.
+ */
+function findParentByEmail(email: string): ParentAccount | undefined {
+  for (const account of parentAccountStore.values()) {
+    if (account.email === email) {
+      return account;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Retrieves a parent account by phone number.
+ */
+function findParentByPhone(phone: string): ParentAccount | undefined {
+  for (const account of parentAccountStore.values()) {
+    if (account.phoneNumber === phone) {
+      return account;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Checks if a username is already taken by any parent or student.
+ */
+function isUsernameTaken(username: string): boolean {
+  for (const account of parentAccountStore.values()) {
+    if (account.username === username) {
+      return true;
+    }
+  }
+  for (const account of studentAccountStore.values()) {
+    if (account.username === username) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Validates a name field (max 100 chars, non-empty after trim).
+ */
+function validateName(name: string): { valid: boolean; error?: string } {
+  if (typeof name !== 'string') {
+    return { valid: false, error: 'Name must be a string' };
+  }
+  const trimmed = name.trim();
+  if (trimmed.length === 0) {
+    return { valid: false, error: 'Name must not be empty' };
+  }
+  if (trimmed.length > MAX_NAME_LENGTH) {
+    return { valid: false, error: `Name must not exceed ${MAX_NAME_LENGTH} characters` };
+  }
+  return { valid: true };
+}
+
+/**
+ * Validates a grade value (integer between 1 and 12 inclusive).
+ */
+function validateGradeField(grade: number): { valid: boolean; error?: string } {
+  if (typeof grade !== 'number' || !Number.isInteger(grade)) {
+    return { valid: false, error: 'Grade must be an integer' };
+  }
+  if (grade < 1 || grade > 12) {
+    return { valid: false, error: 'Grade must be between 1 and 12' };
+  }
+  return { valid: true };
+}
+
+// --- Parent Registration ---
+
+/**
+ * Registers a new parent account.
+ *
+ * Validates all fields:
+ * - name: max 100 chars, non-empty
+ * - username: 5-15 chars, alphanumeric + underscores + hyphens
+ * - password: 8-20 chars with uppercase + lowercase + digit + special
+ * - phoneNumber: exactly 10 digits
+ * - email: max 254 chars with @ and domain
+ *
+ * Checks for duplicate username, email, and phone.
+ * Returns field-specific errors and preserves valid field values on failure.
+ *
+ * Requirements: 3.1, 3.6, 3.14
+ */
+export function registerParent(input: ParentRegistrationInput): ParentRegistrationResult {
+  const errors: ParentStudentFieldError[] = [];
+
+  // Validate name
+  const nameResult = validateName(input.name);
+  if (!nameResult.valid) {
+    errors.push({ field: 'name', message: nameResult.error! });
+  }
+
+  // Validate username
+  const usernameResult = validateUsername(input.username);
+  if (!usernameResult.valid) {
+    errors.push({ field: 'username', message: usernameResult.error! });
+  }
+
+  // Validate password (strict: 8-20, uppercase + lowercase + digit + special)
+  const passwordResult = validatePasswordStrict(input.password);
+  if (!passwordResult.valid) {
+    errors.push({ field: 'password', message: passwordResult.error! });
+  }
+
+  // Validate phone
+  const phoneResult = validatePhone(input.phoneNumber);
+  if (!phoneResult.valid) {
+    errors.push({ field: 'phoneNumber', message: phoneResult.error! });
+  }
+
+  // Validate email
+  const emailResult = validateEmailStrict(input.email);
+  if (!emailResult.valid) {
+    errors.push({ field: 'email', message: emailResult.error! });
+  }
+
+  // If there are validation errors, return early with preserved data
+  if (errors.length > 0) {
+    const preservedData: Partial<ParentRegistrationInput> = {};
+    const errorFields = new Set(errors.map((e) => e.field));
+
+    if (!errorFields.has('name')) preservedData.name = input.name;
+    if (!errorFields.has('username')) preservedData.username = input.username;
+    if (!errorFields.has('phoneNumber')) preservedData.phoneNumber = input.phoneNumber;
+    if (!errorFields.has('email')) preservedData.email = input.email;
+    // Never preserve password
+
+    return { success: false, errors, preservedData };
+  }
+
+  // Check for duplicates
+  if (isUsernameTaken(input.username)) {
+    errors.push({ field: 'username', message: 'Username is already taken' });
+  }
+
+  if (findParentByEmail(input.email)) {
+    errors.push({ field: 'email', message: 'Email is already registered' });
+  }
+
+  if (findParentByPhone(input.phoneNumber)) {
+    errors.push({ field: 'phoneNumber', message: 'Phone number is already registered' });
+  }
+
+  if (errors.length > 0) {
+    const preservedData: Partial<ParentRegistrationInput> = {};
+    const errorFields = new Set(errors.map((e) => e.field));
+
+    if (!errorFields.has('name')) preservedData.name = input.name;
+    if (!errorFields.has('username')) preservedData.username = input.username;
+    if (!errorFields.has('phoneNumber')) preservedData.phoneNumber = input.phoneNumber;
+    if (!errorFields.has('email')) preservedData.email = input.email;
+
+    return { success: false, errors, preservedData };
+  }
+
+  // Create the parent account
+  const now = new Date();
+  const account: ParentAccount = {
+    id: randomUUID(),
+    name: input.name.trim(),
+    username: input.username,
+    phoneNumber: input.phoneNumber,
+    email: input.email,
+    passwordHash: hashPassword(input.password),
+    linkedStudentIds: [],
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  parentAccountStore.set(account.id, account);
+  return { success: true, account };
+}
+
+// --- Student Registration ---
+
+/**
+ * Registers a new student account linked to a parent.
+ *
+ * Validates all fields:
+ * - name: max 100 chars, non-empty
+ * - username: 5-15 chars, alphanumeric + underscores + hyphens
+ * - password: 8-20 chars with uppercase + lowercase + digit + special
+ * - grade: integer 1-12
+ * - parentUsername: 5-15 chars, must exist as a registered parent
+ *
+ * Checks for duplicate username.
+ * Verifies parent username exists and links student to parent.
+ * Returns field-specific errors and preserves valid field values on failure.
+ *
+ * Requirements: 3.7, 3.10, 3.12, 3.14
+ */
+export function registerStudent(input: StudentRegistrationInput): StudentRegistrationResult {
+  const errors: ParentStudentFieldError[] = [];
+
+  // Validate name
+  const nameResult = validateName(input.name);
+  if (!nameResult.valid) {
+    errors.push({ field: 'name', message: nameResult.error! });
+  }
+
+  // Validate username
+  const usernameResult = validateUsername(input.username);
+  if (!usernameResult.valid) {
+    errors.push({ field: 'username', message: usernameResult.error! });
+  }
+
+  // Validate password (strict: 8-20, uppercase + lowercase + digit + special)
+  const passwordResult = validatePasswordStrict(input.password);
+  if (!passwordResult.valid) {
+    errors.push({ field: 'password', message: passwordResult.error! });
+  }
+
+  // Validate grade
+  const gradeResult = validateGradeField(input.grade);
+  if (!gradeResult.valid) {
+    errors.push({ field: 'grade', message: gradeResult.error! });
+  }
+
+  // Validate parentUsername format
+  const parentUsernameResult = validateUsername(input.parentUsername);
+  if (!parentUsernameResult.valid) {
+    errors.push({ field: 'parentUsername', message: parentUsernameResult.error! });
+  }
+
+  // If there are validation errors, return early with preserved data
+  if (errors.length > 0) {
+    const preservedData: Partial<StudentRegistrationInput> = {};
+    const errorFields = new Set(errors.map((e) => e.field));
+
+    if (!errorFields.has('name')) preservedData.name = input.name;
+    if (!errorFields.has('username')) preservedData.username = input.username;
+    if (!errorFields.has('grade')) preservedData.grade = input.grade;
+    if (!errorFields.has('parentUsername')) preservedData.parentUsername = input.parentUsername;
+    // Never preserve password
+
+    return { success: false, errors, preservedData };
+  }
+
+  // Check for duplicate username
+  if (isUsernameTaken(input.username)) {
+    errors.push({ field: 'username', message: 'Username is already taken' });
+  }
+
+  // Verify parent username exists
+  const parentAccount = findParentByUsername(input.parentUsername);
+  if (!parentAccount) {
+    errors.push({ field: 'parentUsername', message: 'Parent username does not exist' });
+  }
+
+  if (errors.length > 0) {
+    const preservedData: Partial<StudentRegistrationInput> = {};
+    const errorFields = new Set(errors.map((e) => e.field));
+
+    if (!errorFields.has('name')) preservedData.name = input.name;
+    if (!errorFields.has('username')) preservedData.username = input.username;
+    if (!errorFields.has('grade')) preservedData.grade = input.grade;
+    if (!errorFields.has('parentUsername')) preservedData.parentUsername = input.parentUsername;
+
+    return { success: false, errors, preservedData };
+  }
+
+  // Create the student account and link to parent
+  const now = new Date();
+  const account: StudentAccount = {
+    id: randomUUID(),
+    name: input.name.trim(),
+    username: input.username,
+    passwordHash: hashPassword(input.password),
+    grade: input.grade,
+    parentUsername: input.parentUsername,
+    parentAccountId: parentAccount!.id,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  studentAccountStore.set(account.id, account);
+
+  // Link student to parent
+  parentAccount!.linkedStudentIds.push(account.id);
+
+  return { success: true, account };
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,37 +7,48 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {selectChapter, startNewChapter, ChapterSummary} from '../api/learningApi';
+import {selectChapter, ChapterSummary} from '../api/learningApi';
+import ChapterCreationForm from '../components/ChapterCreationForm';
 
 interface Props {
   navigation: any;
   route: {
     params: {
       subjectId: string;
+      textbookId: string;
       chapters: ChapterSummary[];
     };
   };
 }
 
 export default function ChapterSelectionScreen({navigation, route}: Props) {
-  const {subjectId, chapters} = route.params;
+  const {subjectId, textbookId, chapters} = route.params;
+  const [showCreationForm, setShowCreationForm] = useState(false);
 
   async function handleSelectChapter(chapterId: string) {
     try {
       await selectChapter(chapterId);
-      navigation.navigate('Learning', {subjectId, chapterId});
+      navigation.navigate('Learning', {subjectId, textbookId, chapterId});
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
   }
 
-  async function handleNewChapter() {
-    try {
-      await startNewChapter();
-      navigation.navigate('Learning', {subjectId, chapterId: null});
-    } catch (err: any) {
-      Alert.alert('Error', err.message);
-    }
+  function handleAddChapter() {
+    setShowCreationForm(true);
+  }
+
+  function handleChapterCreated(chapter: any) {
+    setShowCreationForm(false);
+    navigation.navigate('Learning', {
+      subjectId,
+      textbookId,
+      chapterId: chapter.id,
+    });
+  }
+
+  function handleCancelCreation() {
+    setShowCreationForm(false);
   }
 
   return (
@@ -47,8 +58,8 @@ export default function ChapterSelectionScreen({navigation, route}: Props) {
       </Text>
       <Text style={styles.subtitle}>
         {chapters.length > 0
-          ? 'Pick a chapter or start a new one'
-          : 'No chapters yet — start your first one!'}
+          ? 'Pick a chapter or add a new one'
+          : 'No chapters yet — add your first one!'}
       </Text>
 
       {chapters.length > 0 && (
@@ -61,11 +72,15 @@ export default function ChapterSelectionScreen({navigation, route}: Props) {
               style={styles.chapterCard}
               onPress={() => handleSelectChapter(item.id)}>
               <View style={styles.chapterNumber}>
-                <Text style={styles.chapterNumberText}>{item.chapterNumber}</Text>
+                <Text style={styles.chapterNumberText}>
+                  {item.chapterNumber}
+                </Text>
               </View>
               <View style={styles.chapterInfo}>
                 <Text style={styles.chapterTitle}>{item.textbookName}</Text>
-                <Text style={styles.chapterMeta}>Chapter {item.chapterNumber}</Text>
+                <Text style={styles.chapterMeta}>
+                  Chapter {item.chapterNumber}
+                </Text>
               </View>
               <Text style={styles.arrow}>→</Text>
             </TouchableOpacity>
@@ -73,10 +88,21 @@ export default function ChapterSelectionScreen({navigation, route}: Props) {
         />
       )}
 
-      <TouchableOpacity style={styles.newChapterButton} onPress={handleNewChapter}>
-        <Text style={styles.newChapterIcon}>+</Text>
-        <Text style={styles.newChapterText}>Start New Chapter</Text>
-      </TouchableOpacity>
+      {showCreationForm ? (
+        <ChapterCreationForm
+          textbookId={textbookId}
+          subjectId={subjectId}
+          onSuccess={handleChapterCreated}
+          onCancel={handleCancelCreation}
+        />
+      ) : (
+        <TouchableOpacity
+          style={styles.addChapterButton}
+          onPress={handleAddChapter}>
+          <Text style={styles.addChapterIcon}>+</Text>
+          <Text style={styles.addChapterText}>Add Chapter</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -113,7 +139,7 @@ const styles = StyleSheet.create({
   chapterTitle: {fontSize: 16, fontWeight: '600', color: '#2D2D2D'},
   chapterMeta: {fontSize: 13, color: '#999', marginTop: 3},
   arrow: {fontSize: 22, color: '#6C63FF'},
-  newChapterButton: {
+  addChapterButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -122,6 +148,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 16,
   },
-  newChapterIcon: {fontSize: 22, color: '#FFF', marginRight: 8, fontWeight: '700'},
-  newChapterText: {fontSize: 16, color: '#FFF', fontWeight: '600'},
+  addChapterIcon: {
+    fontSize: 22,
+    color: '#FFF',
+    marginRight: 8,
+    fontWeight: '700',
+  },
+  addChapterText: {fontSize: 16, color: '#FFF', fontWeight: '600'},
 });

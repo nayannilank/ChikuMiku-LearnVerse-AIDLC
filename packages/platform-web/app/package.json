@@ -5,10 +5,15 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "dev": "vite",
     "build": "tsc --build",
+    "preview": "vite preview",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@chikumiku/platform-contracts": "*"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
   }
 }

@@ -7,7 +7,12 @@
     "packages/services/*",
     "packages/platform-contracts",
     "packages/platform-web/*",
-    "packages/platform-mobile/*"
+    "packages/platform-mobile/app",
+    "packages/platform-mobile/audio",
+    "packages/platform-mobile/camera",
+    "packages/platform-mobile/filesystem",
+    "packages/platform-mobile/notifications",
+    "packages/platform-mobile/ui"
   ],
   "scripts": {
     "build": "npm run build:user-guide && tsc --build",
@@ -28,7 +33,7 @@
     "happy-dom": "^20.9.0",
     "marked": "14.1.4",
     "typescript": "5.6.3",
-    "vitest": "2.1.8"
+    "vitest": "^4.1.8"
   },
   "engines": {
     "node": ">=18.0.0"

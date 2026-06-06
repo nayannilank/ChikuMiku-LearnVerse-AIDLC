@@ -6,6 +6,9 @@
  * navigation, storage).
  */
 
+export { createHeaderLogo } from './components/HeaderLogo';
+export type { HeaderLogoOptions } from './components/HeaderLogo';
+
 import type {
   PlatformProvider,
   CameraInterface,

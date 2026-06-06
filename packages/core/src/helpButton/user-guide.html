@@ -3,14 +3,21 @@
     <li><a href="#welcome" class="ug-toc-h2">Welcome</a></li>
     <li><a href="#getting-started" class="ug-toc-h2">Getting Started</a>
       <ol>
+        <li><a href="#app-launch-and-splash-screen" class="ug-toc-h3">App Launch and Splash Screen</a></li>
         <li><a href="#creating-an-account" class="ug-toc-h3">Creating an Account</a></li>
+        <li><a href="#parent-and-student-account-relationship" class="ug-toc-h3">Parent and Student Account Relationship</a></li>
         <li><a href="#logging-in" class="ug-toc-h3">Logging In</a></li>
-        <li><a href="#linking-a-parent-account" class="ug-toc-h3">Linking a Parent Account</a></li>
+        <li><a href="#forgot-password" class="ug-toc-h3">Forgot Password</a></li>
+        <li><a href="#session-expiry" class="ug-toc-h3">Session Expiry</a></li>
       </ol>
     </li>
+    <li><a href="#branding" class="ug-toc-h2">Branding</a></li>
     <li><a href="#enrolling-in-subjects" class="ug-toc-h2">Enrolling in Subjects</a></li>
     <li><a href="#adding-textbook-content" class="ug-toc-h2">Adding Textbook Content</a>
       <ol>
+        <li><a href="#content-hierarchy" class="ug-toc-h3">Content Hierarchy</a></li>
+        <li><a href="#adding-a-textbook" class="ug-toc-h3">Adding a Textbook</a></li>
+        <li><a href="#creating-a-chapter" class="ug-toc-h3">Creating a Chapter</a></li>
         <li><a href="#uploading-pages" class="ug-toc-h3">Uploading Pages</a></li>
         <li><a href="#managing-pages" class="ug-toc-h3">Managing Pages</a></li>
       </ol>
@@ -66,31 +73,77 @@
 <h2 id="welcome">Welcome</h2>
 <p>ChikuMiku LearnVerse is a learning platform designed for children to study any subject — languages (Kannada, Hindi, English), Maths, Science, Computers, and more — using their own textbook content. Simply take photos of your textbook pages, and the app helps you learn through pronunciation practice, grammar exercises, comprehension questions, and revision tests.</p>
 <h2 id="getting-started">Getting Started</h2>
+<h3 id="app-launch-and-splash-screen">App Launch and Splash Screen</h3>
+<p>When you open ChikuMiku LearnVerse, you&#39;ll see the branded splash screen — the ChikuMiku LearnVerse logo centered on a white background. This displays for 1–5 seconds while the app initializes.</p>
+<ul>
+<li>If you&#39;re already logged in (session still active), you&#39;ll go straight to your subjects.</li>
+<li>If you&#39;re not logged in, you&#39;ll be taken to the login screen.</li>
+<li>If there&#39;s a connection issue during startup, you&#39;ll see the login screen with an error message.</li>
+</ul>
 <h3 id="creating-an-account">Creating an Account</h3>
+<p>ChikuMiku LearnVerse uses a two-step registration process: a <strong>parent</strong> creates their account first, then registers their <strong>student</strong> (child) linked to that parent account.</p>
+<h4>Step 1: Register as Parent</h4>
 <ol>
 <li>Open ChikuMiku LearnVerse on your Android device or web browser</li>
-<li>Tap <strong>Sign Up</strong></li>
-<li>Enter your email address or phone number</li>
-<li>Create a password (8 or more characters, must include at least one letter and one number)</li>
-<li>Select your current grade (1-12)</li>
-<li>Choose a display name</li>
+<li>Tap <strong>Sign Up</strong>, then select <strong>Register as Parent</strong></li>
+<li>Fill in the following:<ul>
+<li><strong>Name</strong> (up to 100 characters)</li>
+<li><strong>Username</strong> (5–15 characters; letters, numbers, underscores, and hyphens only)</li>
+<li><strong>Phone number</strong> (exactly 10 digits, without country code)</li>
+<li><strong>Email address</strong> (up to 254 characters, must be a valid email)</li>
+</ul>
+</li>
 <li>Tap <strong>Create Account</strong></li>
+<li>You&#39;ll see a confirmation message and a prompt to register your student</li>
 </ol>
-<p>If you make a mistake, the app will highlight which field needs fixing without clearing your other entries.</p>
+<p>If a username, email, or phone number is already taken, the app highlights exactly which field has the conflict without clearing your other entries.</p>
+<h4>Step 2: Register as Student</h4>
+<ol>
+<li>From the registration screen, select <strong>Register as Student</strong></li>
+<li>Fill in the following:<ul>
+<li><strong>Name</strong> (up to 100 characters)</li>
+<li><strong>Username</strong> (5–15 characters; letters, numbers, underscores, and hyphens only)</li>
+<li><strong>Password</strong> (8–20 characters; must include at least one uppercase letter, one lowercase letter, one digit, and one special character)</li>
+<li><strong>Grade</strong> (select from 1–12)</li>
+<li><strong>Parent Username</strong> (the username from Step 1)</li>
+</ul>
+</li>
+<li>Tap <strong>Create Account</strong></li>
+<li>On success, you&#39;re automatically logged in and taken to the subject selection screen</li>
+</ol>
+<p>If the parent username doesn&#39;t exist, the app will let you know — double-check the spelling from Step 1.</p>
+<h3 id="parent-and-student-account-relationship">Parent and Student Account Relationship</h3>
+<ul>
+<li>Each student account is linked to a parent account</li>
+<li>Parents can have multiple students linked to their account</li>
+<li>Parents can reset their student&#39;s password, view learning progress, and update profile information</li>
+<li>Password recovery uses the phone number or email registered to the parent account</li>
+</ul>
 <h3 id="logging-in">Logging In</h3>
 <ol>
-<li>Enter your email/phone and password</li>
+<li>Enter your <strong>username</strong> (5–15 characters) and <strong>password</strong> (masked by default)</li>
 <li>Tap <strong>Log In</strong></li>
 <li>Your session stays active for at least 30 days — no need to log in every time</li>
 </ol>
-<p><strong>Note</strong>: After 3 incorrect password attempts, your account will be locked for 15 minutes for security. Your parent/guardian will be notified.</p>
-<h3 id="linking-a-parent-account">Linking a Parent Account</h3>
-<p>A parent can link their account to monitor your progress:</p>
+<p><strong>Note</strong>: After 3 incorrect password attempts, your account will be locked for 15 minutes for security.</p>
+<h3 id="forgot-password">Forgot Password</h3>
+<p>If you forget your password, tap the <strong>Forgot Password</strong> link on the login screen. Password recovery is handled via the phone number or email registered to the parent account linked to the student.</p>
+<h3 id="session-expiry">Session Expiry</h3>
+<p>If your session expires while you&#39;re using the app:</p>
 <ul>
-<li>View learning progress across all subjects</li>
-<li>Reset your password if forgotten</li>
-<li>Update your grade and contact information</li>
+<li>You&#39;ll be redirected to the login screen with a &quot;Session ended&quot; message</li>
+<li>The app attempts to save any unsaved input before redirecting</li>
+<li>After logging back in, your progress is restored</li>
 </ul>
+<h2 id="branding">Branding</h2>
+<p>You&#39;ll notice the ChikuMiku LearnVerse logo throughout the app:</p>
+<ul>
+<li><strong>Splash screen</strong>: Centered logo on a white background at launch</li>
+<li><strong>Navigation bar</strong>: Logo displayed in the header as you navigate</li>
+<li><strong>Android app icon</strong>: The ChikuMiku LearnVerse logo</li>
+<li><strong>Web browser</strong>: Logo in the header/navigation area plus the browser favicon</li>
+</ul>
+<p>On the web, if the logo image can&#39;t load, the text &quot;ChikuMiku LearnVerse&quot; appears as a fallback.</p>
 <h2 id="enrolling-in-subjects">Enrolling in Subjects</h2>
 <p>You can study up to 10 subjects at the same time. Each subject has its own separate space for content and progress.</p>
 <ol>
@@ -100,21 +153,53 @@
 </ol>
 <p>Switch between subjects anytime using the subject selector at the top of the screen.</p>
 <h2 id="adding-textbook-content">Adding Textbook Content</h2>
-<h3 id="uploading-pages">Uploading Pages</h3>
+<h3 id="content-hierarchy">Content Hierarchy</h3>
+<p>Your study content is organized as: <strong>Subject → Textbook → Chapter → Pages</strong></p>
+<p>Each subject can have multiple textbooks, each textbook contains chapters, and each chapter holds the photos of your textbook pages.</p>
+<h3 id="adding-a-textbook">Adding a Textbook</h3>
 <ol>
 <li>Select your subject</li>
-<li>Tap <strong>Add Chapter</strong></li>
-<li>Choose your textbook and chapter number</li>
-<li>Upload photos of your textbook pages:<ul>
-<li><strong>Android</strong>: Use your camera to take a photo directly</li>
-<li><strong>Web</strong>: Click to upload image files from your computer</li>
-</ul>
-</li>
-<li>Supported formats: JPEG, PNG, HEIC (max 10 MB per image)</li>
-<li>The app extracts text from your photos automatically</li>
-<li>Review the extracted text and make any corrections</li>
-<li>Tap <strong>Save</strong> to store the chapter</li>
+<li>If no textbooks exist yet, the app immediately shows the textbook entry form</li>
+<li>Enter the textbook name (up to 200 characters)</li>
+<li>Tap <strong>Save</strong> to create the textbook</li>
 </ol>
+<p>If textbooks already exist for the subject, you&#39;ll see a list of your textbooks with an option to add a new one.</p>
+<h3 id="creating-a-chapter">Creating a Chapter</h3>
+<ol>
+<li>Select a textbook from the list</li>
+<li>Tap <strong>Add Chapter</strong></li>
+<li>Enter the chapter name (up to 200 characters)</li>
+<li>Tap <strong>Save</strong> to create the chapter and open the learning screen</li>
+</ol>
+<h3 id="uploading-pages">Uploading Pages</h3>
+<p>Once inside a chapter&#39;s learning screen, you&#39;ll see the page addition area with two options:</p>
+<ul>
+<li><strong>Camera</strong> (mobile): Take a photo directly with your device camera</li>
+<li><strong>Gallery</strong>: Select an image file from your device</li>
+</ul>
+<h4>Using the Camera (Mobile)</h4>
+<ol>
+<li>Tap the <strong>camera button</strong></li>
+<li>Grant camera permission if prompted</li>
+<li>Take a photo of your textbook page (captured as JPEG)</li>
+<li>Preview the image — tap <strong>Accept</strong> to save or <strong>Retake</strong> to try again</li>
+<li>The page is added to your chapter</li>
+</ol>
+<h4>Using the Gallery</h4>
+<ol>
+<li>Tap the <strong>gallery button</strong></li>
+<li>Grant storage/photo library permission if prompted</li>
+<li>Select an image file (JPEG or PNG, maximum 10 MB)</li>
+<li>Preview the image — tap <strong>Accept</strong> to save or choose a different image</li>
+<li>The page is uploaded and added to your chapter</li>
+</ol>
+<p><strong>Notes</strong>:</p>
+<ul>
+<li>If camera permission is denied, you&#39;ll see guidance on how to enable it in your device settings</li>
+<li>If the camera isn&#39;t available on your device, only the gallery option appears</li>
+<li>If an upload fails, the page is removed and you&#39;ll see an error — your existing pages remain safe</li>
+<li>Files larger than 10 MB will be rejected with a message about the size limit</li>
+</ul>
 <h3 id="managing-pages">Managing Pages</h3>
 <ul>
 <li>Add up to <strong>50 pages</strong> per chapter</li>
@@ -284,6 +369,7 @@
 <li><strong>Multiple subjects</strong>: Enroll in all your subjects to track everything in one place</li>
 <li><strong>Timed tests</strong>: Practice with timed tests before real exams to build speed</li>
 <li><strong>Use the help button</strong>: Tap the help icon anytime you need guidance — it&#39;s always there in the corner</li>
+<li><strong>Organize by textbook</strong>: Create separate textbooks for each physical book you study from</li>
 </ol>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <table>
@@ -321,11 +407,45 @@
 <td>Help guide not loading (web)</td>
 <td>Connect to the internet once to cache the guide for offline use</td>
 </tr>
+<tr>
+<td>&quot;Session ended&quot; message</td>
+<td>Your token expired — log in again and your unsaved work is restored</td>
+</tr>
+<tr>
+<td>Can&#39;t log in (network error)</td>
+<td>Check your internet connection and try again</td>
+</tr>
+<tr>
+<td>Parent username not found (registration)</td>
+<td>Verify the parent registered first and check the username spelling</td>
+</tr>
+<tr>
+<td>Camera permission denied</td>
+<td>Go to device Settings → App Permissions and enable camera access</td>
+</tr>
+<tr>
+<td>Gallery permission denied</td>
+<td>Go to device Settings → App Permissions and enable storage/photos access</td>
+</tr>
+<tr>
+<td>Image too large (&gt;10 MB)</td>
+<td>Use a smaller image or reduce the photo resolution before selecting</td>
+</tr>
+<tr>
+<td>Upload failed</td>
+<td>Check your connection; existing pages are not affected — try again</td>
+</tr>
+<tr>
+<td>Splash screen stuck</td>
+<td>Force-close the app and reopen; if persistent, check your internet connection</td>
+</tr>
 </tbody></table>
 <h2 id="privacy-and-safety">Privacy and Safety</h2>
 <ul>
 <li>Your data is private — no other learner can see your content or progress</li>
 <li>Parent accounts can monitor progress for child safety</li>
 <li>Local backups ensure you never lose work unexpectedly</li>
+<li>Login is required before any content can be accessed</li>
+<li>Student accounts are always linked to a parent for security and recovery</li>
 </ul>
 </article>

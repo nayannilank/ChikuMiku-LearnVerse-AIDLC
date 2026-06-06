@@ -1,19 +1,45 @@
-import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native';
 import {endChapter, endSession} from '../api/learningApi';
+import PageAdditionUI from '../components/PageAdditionUI';
+import type {PageImageFormat} from '../components/PageAdditionUI';
+import ImagePreview from '../components/ImagePreview';
+import type {
+  CameraInterface,
+  FileSystemInterface,
+} from '@chikumiku/platform-contracts';
 
 interface Props {
   navigation: any;
   route: {
     params: {
       subjectId: string;
+      textbookId: string;
       chapterId: string | null;
     };
   };
+  /** Platform camera interface (optional until platform provider wiring in task 9) */
+  camera?: CameraInterface;
+  /** Platform file system interface (optional until platform provider wiring in task 9) */
+  fileSystem?: FileSystemInterface;
 }
 
-export default function LearningScreen({navigation, route}: Props) {
-  const {subjectId, chapterId} = route.params;
+interface PreviewState {
+  imageData: ArrayBuffer;
+  imageFormat: 'jpeg' | 'png';
+  imageSizeBytes: number;
+}
+
+export default function LearningScreen({navigation, route, camera, fileSystem}: Props) {
+  const {subjectId, textbookId, chapterId} = route.params;
+  const [preview, setPreview] = useState<PreviewState | null>(null);
 
   async function handleEndChapter() {
     try {
@@ -33,8 +59,47 @@ export default function LearningScreen({navigation, route}: Props) {
     }
   }
 
+  function handleImageCaptured(
+    data: ArrayBuffer,
+    format: PageImageFormat,
+    sizeBytes: number,
+  ) {
+    setPreview({imageData: data, imageFormat: format, imageSizeBytes: sizeBytes});
+  }
+
+  function handlePreviewAccepted() {
+    setPreview(null);
+    Alert.alert('Success', 'Page added successfully!');
+  }
+
+  function handlePreviewRetake() {
+    setPreview(null);
+  }
+
+  function handlePreviewError(message: string) {
+    setPreview(null);
+    Alert.alert('Error', message);
+  }
+
+  // If in preview mode and chapter is active, show ImagePreview
+  if (preview && chapterId) {
+    return (
+      <ImagePreview
+        imageData={preview.imageData}
+        imageFormat={preview.imageFormat}
+        imageSizeBytes={preview.imageSizeBytes}
+        chapterId={chapterId}
+        onAccepted={handlePreviewAccepted}
+        onRetake={handlePreviewRetake}
+        onError={handlePreviewError}
+      />
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.scrollContainer}
+      contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <Text style={styles.subjectBadge}>
           {subjectId.charAt(0).toUpperCase() + subjectId.slice(1)}
@@ -54,6 +119,16 @@ export default function LearningScreen({navigation, route}: Props) {
         </Text>
       </View>
 
+      {/* Show PageAdditionUI when chapter is active and platform interfaces are available */}
+      {chapterId && camera && fileSystem && (
+        <PageAdditionUI
+          camera={camera}
+          fileSystem={fileSystem}
+          chapterId={chapterId}
+          onImageCaptured={handleImageCaptured}
+        />
+      )}
+
       <View style={styles.actions}>
         <TouchableOpacity style={styles.secondaryButton} onPress={handleEndChapter}>
           <Text style={styles.secondaryButtonText}>← Back to Chapters</Text>
@@ -63,12 +138,13 @@ export default function LearningScreen({navigation, route}: Props) {
           <Text style={styles.endButtonText}>End Session</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#F8F9FA', padding: 20},
+  scrollContainer: {flex: 1, backgroundColor: '#F8F9FA'},
+  scrollContent: {flexGrow: 1, padding: 20},
   header: {flexDirection: 'row', gap: 8, marginBottom: 32},
   subjectBadge: {
     backgroundColor: '#EDE9FE',
@@ -94,7 +170,7 @@ const styles = StyleSheet.create({
   emoji: {fontSize: 64, marginBottom: 16},
   title: {fontSize: 24, fontWeight: 'bold', color: '#2D2D2D', marginBottom: 12},
   description: {fontSize: 16, color: '#666', textAlign: 'center', lineHeight: 24},
-  actions: {gap: 12},
+  actions: {gap: 12, marginTop: 24},
   secondaryButton: {
     backgroundColor: '#FFF',
     padding: 16,
