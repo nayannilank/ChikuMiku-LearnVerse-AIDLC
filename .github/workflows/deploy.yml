@@ -51,17 +51,17 @@ jobs:
 
       - name: Deploy CDK stack
         working-directory: infra/cdk
-        run: npx cdk deploy ChikuMikuStack-${{ inputs.environment }} --require-approval never
+        run: npx cdk deploy LearnVerseStack-${{ inputs.environment }} --require-approval never
 
       - name: Get CDK stack outputs
         id: cdk-outputs
         run: |
           WEB_BUCKET=$(aws cloudformation describe-stacks \
-            --stack-name ChikuMikuStack-${{ inputs.environment }} \
+            --stack-name LearnVerseStack-${{ inputs.environment }} \
             --query "Stacks[0].Outputs[?OutputKey=='WebAppBucketName'].OutputValue" \
             --output text)
           CF_DIST_ID=$(aws cloudformation describe-stacks \
-            --stack-name ChikuMikuStack-${{ inputs.environment }} \
+            --stack-name LearnVerseStack-${{ inputs.environment }} \
             --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" \
             --output text)
           echo "web-app-bucket=$WEB_BUCKET" >> "$GITHUB_OUTPUT"

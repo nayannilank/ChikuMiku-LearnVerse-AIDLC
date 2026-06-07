@@ -128,7 +128,7 @@ describe('StorageStack', () => {
         'AWS::CloudFront::CloudFrontOriginAccessIdentity',
         {
           CloudFrontOriginAccessIdentityConfig: {
-            Comment: Match.stringLikeRegexp('OAI for chikumiku-qa-web-app'),
+            Comment: Match.stringLikeRegexp('OAI for learnverse-qa-web-app'),
           },
         }
       );

@@ -14,7 +14,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import * as fc from 'fast-check';
 import * as cdk from 'aws-cdk-lib';
 import { IConstruct } from 'constructs';
-import { ChikuMikuStack } from '../lib/ChikuMikuStack';
+import { LearnVerseStack } from '../lib/LearnVerseStack';
 
 /**
  * Resource types that MUST have Retain deletion policy in production.
@@ -91,7 +91,7 @@ describe('Property 6: Production Resources Use RETAIN Removal Policy', () => {
   beforeAll(() => {
     const app = new cdk.App();
 
-    const prodStack = new ChikuMikuStack(app, 'ChikuMikuStack-prod', {
+    const prodStack = new LearnVerseStack(app, 'LearnVerseStack-prod', {
       stageName: 'prod',
       env: { account: '123456789012', region: 'ap-south-1' },
     });

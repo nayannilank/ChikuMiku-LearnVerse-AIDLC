@@ -18,11 +18,11 @@ export class ObservabilityStack extends cdk.NestedStack {
     super(scope, id, props);
 
     const { stageName, functions } = props;
-    const apiName = `chikumiku-${stageName}-api`;
+    const apiName = `learnverse-${stageName}-api`;
 
     // --- SNS Topic for alarm notifications ---
     this.alarmTopic = new sns.Topic(this, 'AlarmTopic', {
-      topicName: `chikumiku-${stageName}-alarms`,
+      topicName: `learnverse-${stageName}-alarms`,
     });
 
     // --- Per-Lambda alarms: error rate > 1% (5-min period) ---
@@ -31,7 +31,7 @@ export class ObservabilityStack extends cdk.NestedStack {
     const invocationWidgets: cloudwatch.IWidget[] = [];
 
     for (const [serviceName, fn] of Object.entries(functions)) {
-      const functionName = `chikumiku-${stageName}-${serviceName}`;
+      const functionName = `learnverse-${stageName}-${serviceName}`;
 
       // Reference the existing log group created by SecureLambda
       const logGroup = logs.LogGroup.fromLogGroupName(
@@ -69,7 +69,7 @@ export class ObservabilityStack extends cdk.NestedStack {
         period: cdk.Duration.minutes(5),
         label: `${serviceName} Error Rate (%)`,
       }).createAlarm(this, `${serviceName}ErrorRateAlarm`, {
-        alarmName: `chikumiku-${stageName}-${serviceName}-error-rate`,
+        alarmName: `learnverse-${stageName}-${serviceName}-error-rate`,
         alarmDescription: `Lambda ${serviceName} error rate exceeds 1%`,
         threshold: 1,
         evaluationPeriods: 1,
@@ -110,7 +110,7 @@ export class ObservabilityStack extends cdk.NestedStack {
     });
 
     const apiLatencyAlarm = apiLatencyMetric.createAlarm(this, 'ApiLatencyAlarm', {
-      alarmName: `chikumiku-${stageName}-api-latency-p99`,
+      alarmName: `learnverse-${stageName}-api-latency-p99`,
       alarmDescription: `API Gateway p99 latency exceeds 2000ms`,
       threshold: 2000,
       evaluationPeriods: 1,
@@ -132,7 +132,7 @@ export class ObservabilityStack extends cdk.NestedStack {
     ]);
 
     new cloudwatch.Dashboard(this, 'Dashboard', {
-      dashboardName: `chikumiku-${stageName}-dashboard`,
+      dashboardName: `learnverse-${stageName}-dashboard`,
       widgets: dashboardWidgets,
     });
   }

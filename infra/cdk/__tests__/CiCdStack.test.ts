@@ -4,7 +4,7 @@ import { CiCdStack } from '../lib/CiCdStack';
 
 describe('CiCdStack', () => {
   let template: Template;
-  const githubRepo = 'NayanKhedkar/ChikuMiku-LearnVerse';
+  const githubRepo = 'NayanKhedkar/LearnVerse-LearnVerse';
 
   beforeAll(() => {
     const app = new cdk.App();
@@ -27,7 +27,7 @@ describe('CiCdStack', () => {
   describe('IAM Deploy Role (Requirement 4.1)', () => {
     it('creates an IAM role with the correct name', () => {
       template.hasResourceProperties('AWS::IAM::Role', {
-        RoleName: 'chikumiku-github-actions-deploy',
+        RoleName: 'learnverse-github-actions-deploy',
       });
     });
 
@@ -74,7 +74,7 @@ describe('CiCdStack', () => {
       });
     });
 
-    it('grants Lambda update permissions scoped to chikumiku functions', () => {
+    it('grants Lambda update permissions scoped to learnverse functions', () => {
       template.hasResourceProperties('AWS::IAM::Policy', {
         PolicyDocument: {
           Statement: Match.arrayWith([
@@ -85,7 +85,7 @@ describe('CiCdStack', () => {
                 'lambda:UpdateFunctionCode',
                 'lambda:UpdateFunctionConfiguration',
               ]),
-              Resource: 'arn:aws:lambda:ap-south-1:123456789012:function:chikumiku-*',
+              Resource: 'arn:aws:lambda:ap-south-1:123456789012:function:learnverse-*',
             }),
           ]),
         },
@@ -127,7 +127,7 @@ describe('CiCdStack', () => {
       });
     });
 
-    it('grants IAM permissions scoped to chikumiku and CDK roles', () => {
+    it('grants IAM permissions scoped to learnverse and CDK roles', () => {
       template.hasResourceProperties('AWS::IAM::Policy', {
         PolicyDocument: {
           Statement: Match.arrayWith([
@@ -149,7 +149,7 @@ describe('CiCdStack', () => {
     it('exports the deploy role ARN', () => {
       template.hasOutput('DeployRoleArn', {
         Export: {
-          Name: 'ChikuMiku-GitHubActionsDeployRoleArn',
+          Name: 'LearnVerse-GitHubActionsDeployRoleArn',
         },
       });
     });

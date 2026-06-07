@@ -31,8 +31,8 @@ export class CiCdStack extends cdk.Stack {
 
     // IAM role trusted by the GitHub Actions OIDC provider for this repository
     this.deployRole = new iam.Role(this, 'GitHubActionsDeployRole', {
-      roleName: 'chikumiku-github-actions-deploy',
-      description: 'IAM role for GitHub Actions CI/CD via OIDC (ChikuMiku LearnVerse)',
+      roleName: 'learnverse-github-actions-deploy',
+      description: 'IAM role for GitHub Actions CI/CD via OIDC (LearnVerse LearnVerse)',
       assumedBy: new iam.FederatedPrincipal(
         oidcProvider.openIdConnectProviderArn,
         {
@@ -91,7 +91,7 @@ export class CiCdStack extends cdk.Stack {
           'lambda:UpdateAlias',
         ],
         resources: [
-          `arn:aws:lambda:${this.region}:${this.account}:function:chikumiku-*`,
+          `arn:aws:lambda:${this.region}:${this.account}:function:learnverse-*`,
         ],
       }),
     );
@@ -109,8 +109,8 @@ export class CiCdStack extends cdk.Stack {
           's3:GetBucketLocation',
         ],
         resources: [
-          `arn:aws:s3:::chikumiku-*`,
-          `arn:aws:s3:::chikumiku-*/*`,
+          `arn:aws:s3:::learnverse-*`,
+          `arn:aws:s3:::learnverse-*/*`,
           // CDK bootstrap bucket
           `arn:aws:s3:::cdk-*-assets-${this.account}-${this.region}`,
           `arn:aws:s3:::cdk-*-assets-${this.account}-${this.region}/*`,
@@ -153,7 +153,7 @@ export class CiCdStack extends cdk.Stack {
           'iam:UntagRole',
         ],
         resources: [
-          `arn:aws:iam::${this.account}:role/chikumiku-*`,
+          `arn:aws:iam::${this.account}:role/learnverse-*`,
           `arn:aws:iam::${this.account}:role/cdk-*`,
         ],
       }),
@@ -193,7 +193,7 @@ export class CiCdStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'DeployRoleArn', {
       value: this.deployRole.roleArn,
       description: 'ARN of the GitHub Actions deploy role for use in CI/CD workflow',
-      exportName: 'ChikuMiku-GitHubActionsDeployRoleArn',
+      exportName: 'LearnVerse-GitHubActionsDeployRoleArn',
     });
   }
 }

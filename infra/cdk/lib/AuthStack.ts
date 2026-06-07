@@ -18,7 +18,7 @@ export class AuthStack extends cdk.NestedStack {
 
     // Cognito User Pool
     this.userPool = new cognito.UserPool(this, 'UserPool', {
-      userPoolName: `chikumiku-${stageName}-user-pool`,
+      userPoolName: `learnverse-${stageName}-user-pool`,
       signInAliases: {
         email: true,
         phone: true,
@@ -46,7 +46,7 @@ export class AuthStack extends cdk.NestedStack {
 
     // User Pool Client
     this.userPoolClient = this.userPool.addClient('UserPoolClient', {
-      userPoolClientName: `chikumiku-${stageName}-client`,
+      userPoolClientName: `learnverse-${stageName}-client`,
       authFlows: {
         userPassword: true,
         adminUserPassword: true,

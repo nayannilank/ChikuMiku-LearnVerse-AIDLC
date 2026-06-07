@@ -20,7 +20,7 @@ export class SecureLambda extends Construct {
   constructor(scope: Construct, id: string, props: SecureLambdaProps) {
     super(scope, id);
 
-    const functionName = `chikumiku-${props.stageName}-${props.serviceName}`;
+    const functionName = `learnverse-${props.stageName}-${props.serviceName}`;
 
     this.logGroup = new logs.LogGroup(this, 'LogGroup', {
       logGroupName: `/aws/lambda/${functionName}`,

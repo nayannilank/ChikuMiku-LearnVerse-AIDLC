@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
-import { ChikuMikuStack } from '../lib/ChikuMikuStack';
+import { LearnVerseStack } from '../lib/LearnVerseStack';
 import { CiCdStack } from '../lib/CiCdStack';
 
 const app = new cdk.App();
@@ -9,20 +9,20 @@ const env: cdk.Environment = {
   region: 'ap-south-1',
 };
 
-new ChikuMikuStack(app, 'ChikuMikuStack-qa', {
+new LearnVerseStack(app, 'LearnVerseStack-qa', {
   stageName: 'qa',
   env,
 });
 
-new ChikuMikuStack(app, 'ChikuMikuStack-prod', {
+new LearnVerseStack(app, 'LearnVerseStack-prod', {
   stageName: 'prod',
   env,
 });
 
 // CI/CD stack with GitHub OIDC role (shared across environments)
-new CiCdStack(app, 'ChikuMiku-CiCdStack', {
+new CiCdStack(app, 'LearnVerse-CiCdStack', {
   env,
-  githubRepo: app.node.tryGetContext('githubRepo') || 'NayanKhedkar/ChikuMiku-LearnVerse',
+  githubRepo: app.node.tryGetContext('githubRepo') || 'NayanKhedkar/LearnVerse-LearnVerse',
 });
 
 app.synth();

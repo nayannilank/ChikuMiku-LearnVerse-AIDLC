@@ -16,7 +16,7 @@ describe('ObservabilityStack', () => {
     const qaFunctions: Record<string, lambda.Function> = {};
     for (const name of serviceNames) {
       qaFunctions[name] = new lambda.Function(qaParent, `${name}Fn`, {
-        functionName: `chikumiku-qa-${name}`,
+        functionName: `learnverse-qa-${name}`,
         runtime: lambda.Runtime.NODEJS_22_X,
         handler: 'index.handler',
         code: lambda.Code.fromInline('exports.handler = async () => {}'),
@@ -34,7 +34,7 @@ describe('ObservabilityStack', () => {
     const prodFunctions: Record<string, lambda.Function> = {};
     for (const name of serviceNames) {
       prodFunctions[name] = new lambda.Function(prodParent, `${name}Fn`, {
-        functionName: `chikumiku-prod-${name}`,
+        functionName: `learnverse-prod-${name}`,
         runtime: lambda.Runtime.NODEJS_22_X,
         handler: 'index.handler',
         code: lambda.Code.fromInline('exports.handler = async () => {}'),
@@ -50,7 +50,7 @@ describe('ObservabilityStack', () => {
   describe('SNS Topic (Requirement 7.5)', () => {
     it('creates an SNS topic with correct naming convention', () => {
       qaTemplate.hasResourceProperties('AWS::SNS::Topic', {
-        TopicName: 'chikumiku-qa-alarms',
+        TopicName: 'learnverse-qa-alarms',
       });
     });
 
@@ -60,7 +60,7 @@ describe('ObservabilityStack', () => {
 
     it('prod SNS topic uses correct naming', () => {
       prodTemplate.hasResourceProperties('AWS::SNS::Topic', {
-        TopicName: 'chikumiku-prod-alarms',
+        TopicName: 'learnverse-prod-alarms',
       });
     });
   });
@@ -79,7 +79,7 @@ describe('ObservabilityStack', () => {
     for (const name of serviceNames) {
       it(`creates error rate alarm for ${name} Lambda`, () => {
         qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-          AlarmName: `chikumiku-qa-${name}-error-rate`,
+          AlarmName: `learnverse-qa-${name}-error-rate`,
           Threshold: 1,
           ComparisonOperator: 'GreaterThanThreshold',
           EvaluationPeriods: 1,
@@ -90,7 +90,7 @@ describe('ObservabilityStack', () => {
 
     it('error rate alarms use MathExpression with correct formula', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-auth-error-rate',
+        AlarmName: 'learnverse-qa-auth-error-rate',
         Metrics: Match.arrayWith([
           Match.objectLike({
             Expression: 'IF(invocations > 0, (errors / invocations) * 100, 0)',
@@ -102,7 +102,7 @@ describe('ObservabilityStack', () => {
 
     it('error rate alarms use 5-minute period (300s)', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-auth-error-rate',
+        AlarmName: 'learnverse-qa-auth-error-rate',
         Metrics: Match.arrayWith([
           Match.objectLike({
             Id: 'errors',
@@ -117,7 +117,7 @@ describe('ObservabilityStack', () => {
 
     it('error rate alarms reference Lambda function dimensions', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-auth-error-rate',
+        AlarmName: 'learnverse-qa-auth-error-rate',
         Metrics: Match.arrayWith([
           Match.objectLike({
             Id: 'errors',
@@ -139,7 +139,7 @@ describe('ObservabilityStack', () => {
   describe('API Latency Alarm (Requirement 7.3)', () => {
     it('creates API latency alarm with threshold 2000ms', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-api-latency-p99',
+        AlarmName: 'learnverse-qa-api-latency-p99',
         Threshold: 2000,
         ComparisonOperator: 'GreaterThanThreshold',
         EvaluationPeriods: 1,
@@ -149,14 +149,14 @@ describe('ObservabilityStack', () => {
 
     it('API latency alarm uses p99 statistic', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-api-latency-p99',
+        AlarmName: 'learnverse-qa-api-latency-p99',
         ExtendedStatistic: 'p99',
       });
     });
 
     it('API latency alarm targets AWS/ApiGateway namespace', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-api-latency-p99',
+        AlarmName: 'learnverse-qa-api-latency-p99',
         Namespace: 'AWS/ApiGateway',
         MetricName: 'Latency',
       });
@@ -164,16 +164,16 @@ describe('ObservabilityStack', () => {
 
     it('API latency alarm uses 5-minute period (300s)', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-api-latency-p99',
+        AlarmName: 'learnverse-qa-api-latency-p99',
         Period: 300,
       });
     });
 
     it('API latency alarm uses correct API dimension', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-        AlarmName: 'chikumiku-qa-api-latency-p99',
+        AlarmName: 'learnverse-qa-api-latency-p99',
         Dimensions: Match.arrayWith([
-          Match.objectLike({ Name: 'ApiName', Value: 'chikumiku-qa-api' }),
+          Match.objectLike({ Name: 'ApiName', Value: 'learnverse-qa-api' }),
         ]),
       });
     });
@@ -211,13 +211,13 @@ describe('ObservabilityStack', () => {
 
     it('dashboard has correct naming convention', () => {
       qaTemplate.hasResourceProperties('AWS::CloudWatch::Dashboard', {
-        DashboardName: 'chikumiku-qa-dashboard',
+        DashboardName: 'learnverse-qa-dashboard',
       });
     });
 
     it('prod dashboard has correct naming convention', () => {
       prodTemplate.hasResourceProperties('AWS::CloudWatch::Dashboard', {
-        DashboardName: 'chikumiku-prod-dashboard',
+        DashboardName: 'learnverse-prod-dashboard',
       });
     });
   });
@@ -234,7 +234,7 @@ describe('ObservabilityStack', () => {
       // by checking the alarm names follow the per-function pattern
       for (const name of serviceNames) {
         qaTemplate.hasResourceProperties('AWS::CloudWatch::Alarm', {
-          AlarmName: `chikumiku-qa-${name}-error-rate`,
+          AlarmName: `learnverse-qa-${name}-error-rate`,
         });
       }
     });

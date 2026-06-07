@@ -117,25 +117,25 @@ describe('Property 4: Least-Privilege IAM Per Lambda', () => {
     });
 
     const learnersTable = new dynamodb.Table(parentStack, 'LearnersTable', {
-      tableName: 'chikumiku-test-learners',
+      tableName: 'learnverse-test-learners',
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
     });
 
     const accountsTable = new dynamodb.Table(parentStack, 'AccountsTable', {
-      tableName: 'chikumiku-test-accounts',
+      tableName: 'learnverse-test-accounts',
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
     });
 
     const contentTable = new dynamodb.Table(parentStack, 'ContentTable', {
-      tableName: 'chikumiku-test-content',
+      tableName: 'learnverse-test-content',
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
     });
 
     const contentBucket = new s3.Bucket(parentStack, 'ContentBucket', {
-      bucketName: 'chikumiku-test-content-bucket',
+      bucketName: 'learnverse-test-content-bucket',
     });
 
     // Create ApiStack (provides api and authorizer)

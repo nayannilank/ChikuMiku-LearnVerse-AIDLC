@@ -19,7 +19,7 @@ export class DatabaseStack extends cdk.NestedStack {
 
     // Learners Table
     this.learnersTable = new dynamodb.Table(this, 'LearnersTable', {
-      tableName: `chikumiku-${stageName}-learners`,
+      tableName: `learnverse-${stageName}-learners`,
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -29,7 +29,7 @@ export class DatabaseStack extends cdk.NestedStack {
 
     // Accounts Table
     this.accountsTable = new dynamodb.Table(this, 'AccountsTable', {
-      tableName: `chikumiku-${stageName}-accounts`,
+      tableName: `learnverse-${stageName}-accounts`,
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -51,7 +51,7 @@ export class DatabaseStack extends cdk.NestedStack {
 
     // Content Table
     this.contentTable = new dynamodb.Table(this, 'ContentTable', {
-      tableName: `chikumiku-${stageName}-content`,
+      tableName: `learnverse-${stageName}-content`,
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,

@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node bin/chikumiku.ts",
+  "app": "npx ts-node bin/learnverse.ts",
   "watch": {
     "include": ["**"],
     "exclude": [
@@ -19,7 +19,7 @@
     "@aws-cdk/core:checkSecretUsage": true,
     "@aws-cdk/core:target-partitions": ["aws"],
     "region": "ap-south-1",
-    "projectName": "chikumiku",
-    "githubRepo": "NayanKhedkar/ChikuMiku-LearnVerse"
+    "projectName": "learnverse",
+    "githubRepo": "nayannilank/ChikuMiku-LearnVerse-AIDLC"
   }
 }

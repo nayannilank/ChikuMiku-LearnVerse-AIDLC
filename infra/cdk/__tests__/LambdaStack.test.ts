@@ -21,25 +21,25 @@ describe('LambdaStack', () => {
     });
 
     const learnersTable = new dynamodb.Table(parentStack, 'LearnersTable', {
-      tableName: 'chikumiku-qa-learners',
+      tableName: 'learnverse-qa-learners',
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
     });
 
     const accountsTable = new dynamodb.Table(parentStack, 'AccountsTable', {
-      tableName: 'chikumiku-qa-accounts',
+      tableName: 'learnverse-qa-accounts',
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
     });
 
     const contentTable = new dynamodb.Table(parentStack, 'ContentTable', {
-      tableName: 'chikumiku-qa-content',
+      tableName: 'learnverse-qa-content',
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
     });
 
     const contentBucket = new s3.Bucket(parentStack, 'ContentBucket', {
-      bucketName: 'chikumiku-qa-content-bucket',
+      bucketName: 'learnverse-qa-content-bucket',
     });
 
     // Create ApiStack (provides api and authorizer)
@@ -81,28 +81,28 @@ describe('LambdaStack', () => {
 
     it('creates auth Lambda with correct name', () => {
       lambdaTemplate.hasResourceProperties('AWS::Lambda::Function', {
-        FunctionName: 'chikumiku-qa-auth',
+        FunctionName: 'learnverse-qa-auth',
         Runtime: 'nodejs22.x',
       });
     });
 
     it('creates content Lambda with correct name', () => {
       lambdaTemplate.hasResourceProperties('AWS::Lambda::Function', {
-        FunctionName: 'chikumiku-qa-content',
+        FunctionName: 'learnverse-qa-content',
         Runtime: 'nodejs22.x',
       });
     });
 
     it('creates learning Lambda with correct name', () => {
       lambdaTemplate.hasResourceProperties('AWS::Lambda::Function', {
-        FunctionName: 'chikumiku-qa-learning',
+        FunctionName: 'learnverse-qa-learning',
         Runtime: 'nodejs22.x',
       });
     });
 
     it('creates sync Lambda with correct name', () => {
       lambdaTemplate.hasResourceProperties('AWS::Lambda::Function', {
-        FunctionName: 'chikumiku-qa-sync',
+        FunctionName: 'learnverse-qa-sync',
         Runtime: 'nodejs22.x',
       });
     });

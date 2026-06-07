@@ -21,7 +21,7 @@ export class StorageStack extends cdk.NestedStack {
 
     // Content Bucket
     this.contentBucket = new s3.Bucket(this, 'ContentBucket', {
-      bucketName: `chikumiku-${stageName}-content-${cdk.Stack.of(this).account}`,
+      bucketName: `learnverse-${stageName}-content-${cdk.Stack.of(this).account}`,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       cors: [
         {
@@ -55,7 +55,7 @@ export class StorageStack extends cdk.NestedStack {
 
     // Origin Access Identity for CloudFront → Web App Bucket
     const oai = new cloudfront.OriginAccessIdentity(this, 'WebAppOAI', {
-      comment: `OAI for chikumiku-${stageName}-web-app`,
+      comment: `OAI for learnverse-${stageName}-web-app`,
     });
     this.webAppBucket.grantRead(oai);
 

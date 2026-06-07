@@ -3,8 +3,8 @@
  *
  * Feature: infra-migration-to-cdk, Property 1
  *
- * For any resource provisioned by the ChikuMikuStack, if it has a user-defined
- * physical name, that name SHALL match the pattern `chikumiku-{stageName}-{resourceSuffix}`.
+ * For any resource provisioned by the LearnVerseStack, if it has a user-defined
+ * physical name, that name SHALL match the pattern `learnverse-{stageName}-{resourceSuffix}`.
  * As a consequence, for any two environments (qa, prod), no physical resource name in
  * one environment SHALL collide with a physical resource name in the other.
  *
@@ -14,7 +14,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import * as fc from 'fast-check';
 import * as cdk from 'aws-cdk-lib';
 import { IConstruct } from 'constructs';
-import { ChikuMikuStack } from '../lib/ChikuMikuStack';
+import { LearnVerseStack } from '../lib/LearnVerseStack';
 
 /**
  * Maps CloudFormation resource types to the property that holds
@@ -123,12 +123,12 @@ describe('Property 1: Resource Naming Convention Guarantees Environment Isolatio
   beforeAll(() => {
     const app = new cdk.App();
 
-    const qaStack = new ChikuMikuStack(app, 'ChikuMikuStack-qa', {
+    const qaStack = new LearnVerseStack(app, 'LearnVerseStack-qa', {
       stageName: 'qa',
       env: { account: '123456789012', region: 'ap-south-1' },
     });
 
-    const prodStack = new ChikuMikuStack(app, 'ChikuMikuStack-prod', {
+    const prodStack = new LearnVerseStack(app, 'LearnVerseStack-prod', {
       stageName: 'prod',
       env: { account: '123456789012', region: 'ap-south-1' },
     });
@@ -137,7 +137,7 @@ describe('Property 1: Resource Naming Convention Guarantees Environment Isolatio
     prodNames = extractPhysicalNamesFromStack(prodStack);
   });
 
-  it('every user-defined physical name in QA matches chikumiku-qa-{suffix} pattern', () => {
+  it('every user-defined physical name in QA matches learnverse-qa-{suffix} pattern', () => {
     // Verify we found resources (sanity check)
     expect(qaNames.length).toBeGreaterThan(0);
 
@@ -145,16 +145,16 @@ describe('Property 1: Resource Naming Convention Guarantees Environment Isolatio
       fc.property(
         fc.constantFrom(...qaNames),
         (name) => {
-          // Names must start with chikumiku-qa- (for flat names)
-          // or /aws/lambda/chikumiku-qa- (for log group names)
-          // or /aws/apigateway/chikumiku-qa- (for API GW log groups)
-          const isStandardName = name.startsWith('chikumiku-qa-');
-          const isLogGroupName = name.startsWith('/aws/lambda/chikumiku-qa-') ||
-                                 name.startsWith('/aws/apigateway/chikumiku-qa-');
+          // Names must start with learnverse-qa- (for flat names)
+          // or /aws/lambda/learnverse-qa- (for log group names)
+          // or /aws/apigateway/learnverse-qa- (for API GW log groups)
+          const isStandardName = name.startsWith('learnverse-qa-');
+          const isLogGroupName = name.startsWith('/aws/lambda/learnverse-qa-') ||
+                                 name.startsWith('/aws/apigateway/learnverse-qa-');
 
           expect(
             isStandardName || isLogGroupName,
-            `QA resource name "${name}" does not follow naming convention chikumiku-qa-{suffix}`
+            `QA resource name "${name}" does not follow naming convention learnverse-qa-{suffix}`
           ).toBe(true);
         }
       ),
@@ -162,7 +162,7 @@ describe('Property 1: Resource Naming Convention Guarantees Environment Isolatio
     );
   });
 
-  it('every user-defined physical name in Prod matches chikumiku-prod-{suffix} pattern', () => {
+  it('every user-defined physical name in Prod matches learnverse-prod-{suffix} pattern', () => {
     // Verify we found resources (sanity check)
     expect(prodNames.length).toBeGreaterThan(0);
 
@@ -170,13 +170,13 @@ describe('Property 1: Resource Naming Convention Guarantees Environment Isolatio
       fc.property(
         fc.constantFrom(...prodNames),
         (name) => {
-          const isStandardName = name.startsWith('chikumiku-prod-');
-          const isLogGroupName = name.startsWith('/aws/lambda/chikumiku-prod-') ||
-                                 name.startsWith('/aws/apigateway/chikumiku-prod-');
+          const isStandardName = name.startsWith('learnverse-prod-');
+          const isLogGroupName = name.startsWith('/aws/lambda/learnverse-prod-') ||
+                                 name.startsWith('/aws/apigateway/learnverse-prod-');
 
           expect(
             isStandardName || isLogGroupName,
-            `Prod resource name "${name}" does not follow naming convention chikumiku-prod-{suffix}`
+            `Prod resource name "${name}" does not follow naming convention learnverse-prod-{suffix}`
           ).toBe(true);
         }
       ),

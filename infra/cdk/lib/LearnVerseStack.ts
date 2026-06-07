@@ -7,21 +7,21 @@ import { ApiStack } from './ApiStack';
 import { LambdaStack } from './LambdaStack';
 import { ObservabilityStack } from './ObservabilityStack';
 
-export interface ChikuMikuStackProps extends cdk.StackProps {
+export interface LearnVerseStackProps extends cdk.StackProps {
   readonly stageName: 'qa' | 'prod';
 }
 
-export class ChikuMikuStack extends cdk.Stack {
+export class LearnVerseStack extends cdk.Stack {
   public readonly stageName: string;
 
-  constructor(scope: Construct, id: string, props: ChikuMikuStackProps) {
+  constructor(scope: Construct, id: string, props: LearnVerseStackProps) {
     super(scope, id, props);
 
     this.stageName = props.stageName;
 
     // Apply stack-level tags
-    cdk.Tags.of(this).add('chikumiku:stage', props.stageName);
-    cdk.Tags.of(this).add('chikumiku:stack', id);
+    cdk.Tags.of(this).add('learnverse:stage', props.stageName);
+    cdk.Tags.of(this).add('learnverse:stack', id);
 
     // --- Nested stacks composed in dependency order ---
 
@@ -76,9 +76,9 @@ export class ChikuMikuStack extends cdk.Stack {
 
   /**
    * Returns a standardized resource name following the convention:
-   * chikumiku-{stageName}-{suffix}
+   * learnverse-{stageName}-{suffix}
    */
   public resourceName(suffix: string): string {
-    return `chikumiku-${this.stageName}-${suffix}`;
+    return `learnverse-${this.stageName}-${suffix}`;
   }
 }

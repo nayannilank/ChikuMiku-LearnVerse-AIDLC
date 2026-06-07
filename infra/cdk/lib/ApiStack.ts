@@ -20,14 +20,14 @@ export class ApiStack extends cdk.NestedStack {
 
     // Access log group for API Gateway
     const accessLogGroup = new logs.LogGroup(this, 'ApiAccessLogs', {
-      logGroupName: `/aws/apigateway/chikumiku-${stageName}-api`,
+      logGroupName: `/aws/apigateway/learnverse-${stageName}-api`,
       retention: logs.RetentionDays.THREE_MONTHS,
       removalPolicy: stageName === 'prod' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
     });
 
     // REST API
     this.api = new apigateway.RestApi(this, 'RestApi', {
-      restApiName: `chikumiku-${stageName}-api`,
+      restApiName: `learnverse-${stageName}-api`,
       deployOptions: {
         tracingEnabled: true,
         metricsEnabled: true,
@@ -66,7 +66,7 @@ export class ApiStack extends cdk.NestedStack {
     this.authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
       cognitoUserPools: [userPool],
       identitySource: 'method.request.header.Authorization',
-      authorizerName: `chikumiku-${stageName}-cognito-authorizer`,
+      authorizerName: `learnverse-${stageName}-cognito-authorizer`,
     });
 
     // Define all resource paths under /api/v1 prefix

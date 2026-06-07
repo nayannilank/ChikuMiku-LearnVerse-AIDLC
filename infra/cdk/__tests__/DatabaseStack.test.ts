@@ -27,7 +27,7 @@ describe('DatabaseStack', () => {
   describe('Key Schema (Requirement 8.1, 8.2, 8.3)', () => {
     it('learners table has pk as partition key and sk as sort key', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-learners',
+        TableName: 'learnverse-qa-learners',
         KeySchema: Match.arrayWith([
           { AttributeName: 'pk', KeyType: 'HASH' },
           { AttributeName: 'sk', KeyType: 'RANGE' },
@@ -41,7 +41,7 @@ describe('DatabaseStack', () => {
 
     it('accounts table has pk as partition key and sk as sort key', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-accounts',
+        TableName: 'learnverse-qa-accounts',
         KeySchema: Match.arrayWith([
           { AttributeName: 'pk', KeyType: 'HASH' },
           { AttributeName: 'sk', KeyType: 'RANGE' },
@@ -55,7 +55,7 @@ describe('DatabaseStack', () => {
 
     it('content table has pk as partition key and sk as sort key', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-content',
+        TableName: 'learnverse-qa-content',
         KeySchema: Match.arrayWith([
           { AttributeName: 'pk', KeyType: 'HASH' },
           { AttributeName: 'sk', KeyType: 'RANGE' },
@@ -71,21 +71,21 @@ describe('DatabaseStack', () => {
   describe('PAY_PER_REQUEST Billing Mode (Requirement 8.1, 8.2, 8.3)', () => {
     it('learners table uses PAY_PER_REQUEST billing', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-learners',
+        TableName: 'learnverse-qa-learners',
         BillingMode: 'PAY_PER_REQUEST',
       });
     });
 
     it('accounts table uses PAY_PER_REQUEST billing', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-accounts',
+        TableName: 'learnverse-qa-accounts',
         BillingMode: 'PAY_PER_REQUEST',
       });
     });
 
     it('content table uses PAY_PER_REQUEST billing', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-content',
+        TableName: 'learnverse-qa-content',
         BillingMode: 'PAY_PER_REQUEST',
       });
     });
@@ -94,7 +94,7 @@ describe('DatabaseStack', () => {
   describe('GSIs on Accounts Table (Requirement 8.2)', () => {
     it('accounts table has username-index GSI with username partition key', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-accounts',
+        TableName: 'learnverse-qa-accounts',
         GlobalSecondaryIndexes: Match.arrayWith([
           Match.objectLike({
             IndexName: 'username-index',
@@ -108,7 +108,7 @@ describe('DatabaseStack', () => {
 
     it('accounts table has email-index GSI with email partition key', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-accounts',
+        TableName: 'learnverse-qa-accounts',
         GlobalSecondaryIndexes: Match.arrayWith([
           Match.objectLike({
             IndexName: 'email-index',
@@ -122,7 +122,7 @@ describe('DatabaseStack', () => {
 
     it('username and email attributes are defined as String type', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-accounts',
+        TableName: 'learnverse-qa-accounts',
         AttributeDefinitions: Match.arrayWith([
           { AttributeName: 'username', AttributeType: 'S' },
           { AttributeName: 'email', AttributeType: 'S' },
@@ -134,7 +134,7 @@ describe('DatabaseStack', () => {
   describe('Point-in-Time Recovery (Requirement 8.4)', () => {
     it('learners table has Point-in-Time Recovery enabled', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-learners',
+        TableName: 'learnverse-qa-learners',
         PointInTimeRecoverySpecification: {
           PointInTimeRecoveryEnabled: true,
         },
@@ -143,7 +143,7 @@ describe('DatabaseStack', () => {
 
     it('accounts table has Point-in-Time Recovery enabled', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-accounts',
+        TableName: 'learnverse-qa-accounts',
         PointInTimeRecoverySpecification: {
           PointInTimeRecoveryEnabled: true,
         },
@@ -152,7 +152,7 @@ describe('DatabaseStack', () => {
 
     it('content table has Point-in-Time Recovery enabled', () => {
       qaTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
-        TableName: 'chikumiku-qa-content',
+        TableName: 'learnverse-qa-content',
         PointInTimeRecoverySpecification: {
           PointInTimeRecoveryEnabled: true,
         },
@@ -163,19 +163,19 @@ describe('DatabaseStack', () => {
   describe('Removal Policy Per Environment (Requirement 8.5)', () => {
     it('sets DESTROY removal policy for all tables in qa', () => {
       qaTemplate.hasResource('AWS::DynamoDB::Table', {
-        Properties: { TableName: 'chikumiku-qa-learners' },
+        Properties: { TableName: 'learnverse-qa-learners' },
         DeletionPolicy: 'Delete',
         UpdateReplacePolicy: 'Delete',
       });
 
       qaTemplate.hasResource('AWS::DynamoDB::Table', {
-        Properties: { TableName: 'chikumiku-qa-accounts' },
+        Properties: { TableName: 'learnverse-qa-accounts' },
         DeletionPolicy: 'Delete',
         UpdateReplacePolicy: 'Delete',
       });
 
       qaTemplate.hasResource('AWS::DynamoDB::Table', {
-        Properties: { TableName: 'chikumiku-qa-content' },
+        Properties: { TableName: 'learnverse-qa-content' },
         DeletionPolicy: 'Delete',
         UpdateReplacePolicy: 'Delete',
       });
@@ -183,19 +183,19 @@ describe('DatabaseStack', () => {
 
     it('sets RETAIN removal policy for all tables in prod', () => {
       prodTemplate.hasResource('AWS::DynamoDB::Table', {
-        Properties: { TableName: 'chikumiku-prod-learners' },
+        Properties: { TableName: 'learnverse-prod-learners' },
         DeletionPolicy: 'Retain',
         UpdateReplacePolicy: 'Retain',
       });
 
       prodTemplate.hasResource('AWS::DynamoDB::Table', {
-        Properties: { TableName: 'chikumiku-prod-accounts' },
+        Properties: { TableName: 'learnverse-prod-accounts' },
         DeletionPolicy: 'Retain',
         UpdateReplacePolicy: 'Retain',
       });
 
       prodTemplate.hasResource('AWS::DynamoDB::Table', {
-        Properties: { TableName: 'chikumiku-prod-content' },
+        Properties: { TableName: 'learnverse-prod-content' },
         DeletionPolicy: 'Retain',
         UpdateReplacePolicy: 'Retain',
       });
