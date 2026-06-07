@@ -1,5 +1,4 @@
 import * as cdk from 'aws-cdk-lib';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -17,8 +16,6 @@ export interface LambdaStackProps extends cdk.NestedStackProps {
     readonly contentTable: dynamodb.Table;
   };
   readonly contentBucket: s3.Bucket;
-  readonly api: apigateway.RestApi;
-  readonly authorizer: apigateway.CognitoUserPoolsAuthorizer;
   readonly userPool: cognito.IUserPool;
   readonly userPoolClientId: string;
 }
@@ -29,7 +26,7 @@ export class LambdaStack extends cdk.NestedStack {
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
 
-    const { stageName, tables, contentBucket, api, authorizer, userPool, userPoolClientId } = props;
+    const { stageName, tables, contentBucket, userPool, userPoolClientId } = props;
     const codePath = path.join(__dirname, '../../../packages/services/api');
 
     // Common environment variables
@@ -43,7 +40,7 @@ export class LambdaStack extends cdk.NestedStack {
       STAGE_NAME: stageName,
     };
 
-    // --- 7.1: Create 4 SecureLambda constructs ---
+    // --- Create 4 SecureLambda constructs ---
 
     const authLambda = new SecureLambda(this, 'AuthLambda', {
       serviceName: 'auth',
@@ -85,7 +82,7 @@ export class LambdaStack extends cdk.NestedStack {
       sync: syncLambda.function,
     };
 
-    // --- 7.3: Configure least-privilege IAM policies ---
+    // --- Configure least-privilege IAM policies ---
 
     // Auth Lambda: accounts + learners tables R/W, Cognito admin actions
     tables.accountsTable.grantReadWriteData(authLambda.function);
@@ -114,85 +111,5 @@ export class LambdaStack extends cdk.NestedStack {
     // Sync Lambda: learners + content tables R/W
     tables.learnersTable.grantReadWriteData(syncLambda.function);
     tables.contentTable.grantReadWriteData(syncLambda.function);
-
-    // --- 7.2: Wire API Gateway routes to Lambda integrations ---
-
-    const authIntegration = new apigateway.LambdaIntegration(authLambda.function);
-    const contentIntegration = new apigateway.LambdaIntegration(contentLambda.function);
-    const learningIntegration = new apigateway.LambdaIntegration(learningLambda.function);
-    const syncIntegration = new apigateway.LambdaIntegration(syncLambda.function);
-
-    const publicMethodOptions: apigateway.MethodOptions = {
-      authorizationType: apigateway.AuthorizationType.NONE,
-    };
-
-    const protectedMethodOptions: apigateway.MethodOptions = {
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-      authorizer,
-    };
-
-    // Navigate the API resource tree
-    const v1 = api.root.getResource('api')!.getResource('v1')!;
-
-    // --- Auth routes ---
-    const authResource = v1.getResource('auth')!;
-    authResource.getResource('login')!.addMethod('POST', authIntegration, publicMethodOptions);
-    authResource.getResource('register')!.getResource('parent')!.addMethod('POST', authIntegration, publicMethodOptions);
-    authResource.getResource('register')!.getResource('student')!.addMethod('POST', authIntegration, publicMethodOptions);
-    authResource.getResource('forgot-password')!.addMethod('POST', authIntegration, publicMethodOptions);
-    authResource.getResource('validate')!.addMethod('GET', authIntegration, protectedMethodOptions);
-    authResource.getResource('refresh')!.addMethod('POST', authIntegration, publicMethodOptions);
-
-    // --- Content routes ---
-    // /subjects
-    const subjectsResource = v1.getResource('subjects')!;
-    subjectsResource.addMethod('GET', contentIntegration, protectedMethodOptions);
-
-    const subjectIdResource = subjectsResource.getResource('{subjectId}')!;
-    subjectIdResource.getResource('enroll')!.addMethod('POST', contentIntegration, protectedMethodOptions);
-    subjectIdResource.getResource('textbooks')!.addMethod('GET', contentIntegration, protectedMethodOptions);
-    subjectIdResource.getResource('textbooks')!.addMethod('POST', contentIntegration, protectedMethodOptions);
-    subjectIdResource.getResource('chapters')!.addMethod('GET', contentIntegration, protectedMethodOptions);
-
-    // /textbooks
-    const textbooksResource = v1.getResource('textbooks')!;
-    const textbookIdResource = textbooksResource.getResource('{textbookId}')!;
-    textbookIdResource.getResource('chapters')!.addMethod('GET', contentIntegration, protectedMethodOptions);
-    textbookIdResource.getResource('chapters')!.addMethod('POST', contentIntegration, protectedMethodOptions);
-
-    // /chapters
-    const chaptersResource = v1.getResource('chapters')!;
-    chaptersResource.addMethod('POST', contentIntegration, protectedMethodOptions);
-    const chapterIdResource = chaptersResource.getResource('{chapterId}')!;
-    chapterIdResource.addMethod('GET', contentIntegration, protectedMethodOptions);
-    chapterIdResource.getResource('pages')!.addMethod('POST', contentIntegration, protectedMethodOptions);
-
-    // /progress
-    const progressResource = v1.getResource('progress')!;
-    progressResource.addMethod('GET', contentIntegration, protectedMethodOptions);
-    progressResource.addMethod('POST', contentIntegration, protectedMethodOptions);
-
-    // /revision
-    const revisionResource = v1.getResource('revision')!;
-    const sessionsResource = revisionResource.getResource('sessions')!;
-    sessionsResource.addMethod('POST', contentIntegration, protectedMethodOptions);
-    const sessionIdResource = sessionsResource.getResource('{sessionId}')!;
-    sessionIdResource.getResource('answers')!.addMethod('POST', contentIntegration, protectedMethodOptions);
-    sessionIdResource.getResource('summary')!.addMethod('GET', contentIntegration, protectedMethodOptions);
-
-    // --- Learning routes ---
-    const learningResource = v1.getResource('learning')!;
-    learningResource.getResource('start')!.addMethod('POST', learningIntegration, protectedMethodOptions);
-    learningResource.getResource('select-subject')!.addMethod('POST', learningIntegration, protectedMethodOptions);
-    learningResource.getResource('select-chapter')!.addMethod('POST', learningIntegration, protectedMethodOptions);
-    learningResource.getResource('new-chapter')!.addMethod('POST', learningIntegration, protectedMethodOptions);
-    learningResource.getResource('end-chapter')!.addMethod('POST', learningIntegration, protectedMethodOptions);
-    learningResource.getResource('end')!.addMethod('POST', learningIntegration, protectedMethodOptions);
-    learningResource.getResource('session')!.addMethod('GET', learningIntegration, protectedMethodOptions);
-
-    // --- Sync routes ---
-    const syncResource = v1.getResource('sync')!;
-    syncResource.getResource('push')!.addMethod('POST', syncIntegration, protectedMethodOptions);
-    syncResource.getResource('pull')!.addMethod('GET', syncIntegration, protectedMethodOptions);
   }
 }

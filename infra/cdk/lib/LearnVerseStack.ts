@@ -40,14 +40,7 @@ export class LearnVerseStack extends cdk.Stack {
       stageName: props.stageName,
     });
 
-    // ApiStack (depends on AuthStack.userPool)
-    const apiStack = new ApiStack(this, 'ApiStack', {
-      stageName: props.stageName,
-      userPool: authStack.userPool,
-    });
-    apiStack.addDependency(authStack);
-
-    // LambdaStack (depends on DatabaseStack, StorageStack, ApiStack, AuthStack)
+    // LambdaStack (depends on DatabaseStack, StorageStack, AuthStack)
     const lambdaStack = new LambdaStack(this, 'LambdaStack', {
       stageName: props.stageName,
       tables: {
@@ -56,15 +49,21 @@ export class LearnVerseStack extends cdk.Stack {
         contentTable: databaseStack.contentTable,
       },
       contentBucket: storageStack.contentBucket,
-      api: apiStack.api,
-      authorizer: apiStack.authorizer,
       userPool: authStack.userPool,
       userPoolClientId: authStack.userPoolClient.userPoolClientId,
     });
     lambdaStack.addDependency(databaseStack);
     lambdaStack.addDependency(storageStack);
-    lambdaStack.addDependency(apiStack);
     lambdaStack.addDependency(authStack);
+
+    // ApiStack (depends on AuthStack.userPool and LambdaStack.functions)
+    const apiStack = new ApiStack(this, 'ApiStack', {
+      stageName: props.stageName,
+      userPool: authStack.userPool,
+      functions: lambdaStack.functions,
+    });
+    apiStack.addDependency(authStack);
+    apiStack.addDependency(lambdaStack);
 
     // ObservabilityStack (depends on LambdaStack.functions)
     const observabilityStack = new ObservabilityStack(this, 'ObservabilityStack', {

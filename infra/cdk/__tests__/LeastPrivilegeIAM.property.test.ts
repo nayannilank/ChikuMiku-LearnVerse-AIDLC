@@ -16,7 +16,6 @@ import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Template } from 'aws-cdk-lib/assertions';
-import { ApiStack } from '../lib/ApiStack';
 import { LambdaStack } from '../lib/LambdaStack';
 
 /**
@@ -138,19 +137,11 @@ describe('Property 4: Least-Privilege IAM Per Lambda', () => {
       bucketName: 'learnverse-test-content-bucket',
     });
 
-    // Create ApiStack (provides api and authorizer)
-    const apiStack = new ApiStack(parentStack, 'ApiStack', {
-      stageName: 'test',
-      userPool,
-    });
-
-    // Create LambdaStack
+    // Create LambdaStack first (functions only)
     const lambdaStack = new LambdaStack(parentStack, 'LambdaStack', {
       stageName: 'test',
       tables: { learnersTable, accountsTable, contentTable },
       contentBucket,
-      api: apiStack.api,
-      authorizer: apiStack.authorizer,
       userPool,
       userPoolClientId: userPoolClient.userPoolClientId,
     });

@@ -70,21 +70,20 @@ describe('Property 5: API Contract Preservation', () => {
       bucketName: 'learnverse-test-content-bucket',
     });
 
-    // Create ApiStack (provides api and authorizer)
-    const apiStack = new ApiStack(parentStack, 'ApiStack', {
-      stageName: 'test',
-      userPool,
-    });
-
-    // Create LambdaStack (wires methods to api resources)
-    new LambdaStack(parentStack, 'LambdaStack', {
+    // Create LambdaStack first (functions only)
+    const lambdaStack = new LambdaStack(parentStack, 'LambdaStack', {
       stageName: 'test',
       tables: { learnersTable, accountsTable, contentTable },
       contentBucket,
-      api: apiStack.api,
-      authorizer: apiStack.authorizer,
       userPool,
       userPoolClientId: userPoolClient.userPoolClientId,
+    });
+
+    // Create ApiStack with the functions from LambdaStack
+    const apiStack = new ApiStack(parentStack, 'ApiStack', {
+      stageName: 'test',
+      userPool,
+      functions: lambdaStack.functions,
     });
 
     // API Gateway methods are synthesized in the ApiStack

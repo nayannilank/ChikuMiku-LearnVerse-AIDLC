@@ -1,41 +1,76 @@
 import * as cdk from 'aws-cdk-lib';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Template, Match } from 'aws-cdk-lib/assertions';
 import { ApiStack } from '../lib/ApiStack';
+import { LambdaStack } from '../lib/LambdaStack';
 
 describe('ApiStack', () => {
   let qaTemplate: Template;
   let prodTemplate: Template;
 
   beforeAll(() => {
+    // Helper to create dependencies for a given stack
+    function createDependencies(parent: cdk.Stack, prefix: string) {
+      const userPool = new cognito.UserPool(parent, 'UserPool');
+      const userPoolClient = new cognito.UserPoolClient(parent, 'UserPoolClient', { userPool });
+
+      const learnersTable = new dynamodb.Table(parent, 'LearnersTable', {
+        tableName: `learnverse-${prefix}-learners`,
+        partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
+      });
+      const accountsTable = new dynamodb.Table(parent, 'AccountsTable', {
+        tableName: `learnverse-${prefix}-accounts`,
+        partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
+      });
+      const contentTable = new dynamodb.Table(parent, 'ContentTable', {
+        tableName: `learnverse-${prefix}-content`,
+        partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
+      });
+      const contentBucket = new s3.Bucket(parent, 'ContentBucket', {
+        bucketName: `learnverse-${prefix}-content-bucket`,
+      });
+
+      return { userPool, userPoolClient, learnersTable, accountsTable, contentTable, contentBucket };
+    }
+
     // QA environment stack
     const qaApp = new cdk.App();
     const qaParent = new cdk.Stack(qaApp, 'QaParent');
-    const qaUserPool = new cognito.UserPool(qaParent, 'UserPool');
+    const qaDeps = createDependencies(qaParent, 'qa');
+    const qaLambdaStack = new LambdaStack(qaParent, 'LambdaStack', {
+      stageName: 'qa',
+      tables: { learnersTable: qaDeps.learnersTable, accountsTable: qaDeps.accountsTable, contentTable: qaDeps.contentTable },
+      contentBucket: qaDeps.contentBucket,
+      userPool: qaDeps.userPool,
+      userPoolClientId: qaDeps.userPoolClient.userPoolClientId,
+    });
     const qaApiStack = new ApiStack(qaParent, 'ApiStack', {
       stageName: 'qa',
-      userPool: qaUserPool,
-    });
-    // Attach a mock integration to trigger authorizer resolution
-    qaApiStack.api.root.addMethod('GET', new apigateway.MockIntegration(), {
-      authorizer: qaApiStack.authorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+      userPool: qaDeps.userPool,
+      functions: qaLambdaStack.functions,
     });
     qaTemplate = Template.fromStack(qaApiStack);
 
     // Prod environment stack
     const prodApp = new cdk.App();
     const prodParent = new cdk.Stack(prodApp, 'ProdParent');
-    const prodUserPool = new cognito.UserPool(prodParent, 'UserPool');
+    const prodDeps = createDependencies(prodParent, 'prod');
+    const prodLambdaStack = new LambdaStack(prodParent, 'LambdaStack', {
+      stageName: 'prod',
+      tables: { learnersTable: prodDeps.learnersTable, accountsTable: prodDeps.accountsTable, contentTable: prodDeps.contentTable },
+      contentBucket: prodDeps.contentBucket,
+      userPool: prodDeps.userPool,
+      userPoolClientId: prodDeps.userPoolClient.userPoolClientId,
+    });
     const prodApiStack = new ApiStack(prodParent, 'ApiStack', {
       stageName: 'prod',
-      userPool: prodUserPool,
-    });
-    // Attach a mock integration to trigger authorizer resolution
-    prodApiStack.api.root.addMethod('GET', new apigateway.MockIntegration(), {
-      authorizer: prodApiStack.authorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+      userPool: prodDeps.userPool,
+      functions: prodLambdaStack.functions,
     });
     prodTemplate = Template.fromStack(prodApiStack);
   });

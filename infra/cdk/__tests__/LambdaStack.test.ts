@@ -42,21 +42,20 @@ describe('LambdaStack', () => {
       bucketName: 'learnverse-qa-content-bucket',
     });
 
-    // Create ApiStack (provides api and authorizer)
-    const apiStack = new ApiStack(parentStack, 'ApiStack', {
-      stageName: 'qa',
-      userPool,
-    });
-
-    // Create LambdaStack
+    // Create LambdaStack first (functions only)
     const lambdaStack = new LambdaStack(parentStack, 'LambdaStack', {
       stageName: 'qa',
       tables: { learnersTable, accountsTable, contentTable },
       contentBucket,
-      api: apiStack.api,
-      authorizer: apiStack.authorizer,
       userPool,
       userPoolClientId: userPoolClient.userPoolClientId,
+    });
+
+    // Create ApiStack with the functions from LambdaStack
+    const apiStack = new ApiStack(parentStack, 'ApiStack', {
+      stageName: 'qa',
+      userPool,
+      functions: lambdaStack.functions,
     });
 
     lambdaTemplate = Template.fromStack(lambdaStack);
@@ -223,7 +222,7 @@ describe('LambdaStack', () => {
       // Methods are synthesized in the ApiStack since resources belong there
       const methods = apiTemplate.findResources('AWS::ApiGateway::Method');
       const methodCount = Object.keys(methods).length;
-      // Auth: 6, Content: 15, Learning: 7, Sync: 2 = 30, plus 1 root GET for authorizer attachment in test
+      // Auth: 6, Content: 15, Learning: 7, Sync: 2 = 30 routes (excluding CORS OPTIONS methods)
       expect(methodCount).toBeGreaterThanOrEqual(30);
     });
 
