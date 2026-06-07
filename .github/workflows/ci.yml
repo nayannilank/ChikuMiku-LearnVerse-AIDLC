@@ -79,7 +79,7 @@ jobs:
           aws-region: ap-south-1
 
       - name: Deploy to QA
-        run: cd infra/cdk && npx cdk deploy LearVerse-qa --require-approval never
+        run: cd infra/cdk && npx cdk deploy LearnVerse-qa --require-approval never
 
   deploy-prod:
     name: Deploy to Production
