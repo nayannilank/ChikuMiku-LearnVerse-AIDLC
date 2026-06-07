@@ -1,8 +1,8 @@
-# ChikuMiku LearnVerse — Developer Guide
+# LearnVerse LearnVerse — Developer Guide
 
 ## Introduction
 
-ChikuMiku LearnVerse is a multi-subject learning platform for children built as a TypeScript monorepo with a layered architecture. This guide covers the project structure, development workflow, architecture, and conventions for contributors.
+LearnVerse LearnVerse is a multi-subject learning platform for children built as a TypeScript monorepo with a layered architecture. This guide covers the project structure, development workflow, architecture, and conventions for contributors.
 
 ## Tech Stack
 
@@ -41,7 +41,7 @@ ChikuMiku LearnVerse is a multi-subject learning platform for children built as 
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd "ChikuMiku LearnVerse"
+cd "LearnVerse LearnVerse"
 
 # Install dependencies
 npm install
@@ -91,7 +91,7 @@ cd packages/platform-web/app
 npx vite
 
 # Or if a dev script is configured:
-npm run dev --workspace=@chikumiku/web-app
+npm run dev --workspace=@learnverse/web-app
 ```
 
 The dev server starts at `http://localhost:5173` by default. It supports hot module replacement (HMR) — changes to web platform packages and UI components reflect instantly in the browser.
@@ -179,7 +179,7 @@ Set the API URL in both clients to `http://localhost:3000` (or your machine's lo
 ## Project Structure
 
 ```
-ChikuMiku LearnVerse/
+LearnVerse LearnVerse/
 ├── packages/
 │   ├── core/                        # Shared cross-cutting features (help button)
 │   │   └── src/helpButton/          # In-app help button & User Guide viewer
@@ -215,7 +215,7 @@ ChikuMiku LearnVerse/
 │   └── validate-boundaries.ts       # Validates dependency boundary rules
 ├── docs/                            # Documentation (this guide, user guide, deployment guide)
 ├── .kiro/specs/                     # Spec-driven development artifacts
-├── ChikuMiku-LearnVerse-Logo.png    # Brand logo asset (used for app icon, splash, nav header, favicon)
+├── LearnVerse-LearnVerse-Logo.png    # Brand logo asset (used for app icon, splash, nav header, favicon)
 ├── package.json                     # Root workspace configuration
 ├── tsconfig.json                    # Root TypeScript project references
 ├── tsconfig.base.json               # Shared TypeScript compiler options
@@ -252,7 +252,7 @@ rn-app/
 │       ├── HeaderLogo.tsx               # Logo in navigation bar header
 │       └── ... (existing components)
 ├── android/
-│   └── app/src/main/res/               # App icon (generated from ChikuMiku-LearnVerse-Logo.png)
+│   └── app/src/main/res/               # App icon (generated from LearnVerse-LearnVerse-Logo.png)
 └── package.json
 ```
 
@@ -293,22 +293,22 @@ The platform follows a **layered architecture** with strict dependency boundarie
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Platform Web (packages/platform-web/*)                      │
-│  @chikumiku/web-app, web-camera, web-filesystem, etc.       │
+│  @learnverse/web-app, web-camera, web-filesystem, etc.       │
 └──────────────────────────────┬──────────────────────────────┘
                                │ depends on
 ┌──────────────────────────────▼──────────────────────────────┐
 │  Platform Contracts (packages/platform-contracts)             │
-│  @chikumiku/platform-contracts                               │
+│  @learnverse/platform-contracts                               │
 └──────────────────────────────┬──────────────────────────────┘
                                │ depends on
 ┌──────────────────────────────▼──────────────────────────────┐
 │  Services (packages/services/*)                               │
-│  @chikumiku/service-core, service-auth, service-sync, etc.   │
+│  @learnverse/service-core, service-auth, service-sync, etc.   │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
 │  Platform Mobile (packages/platform-mobile/*)                │
-│  @chikumiku/mobile-app, rn-app, mobile-camera, etc.          │
+│  @learnverse/mobile-app, rn-app, mobile-camera, etc.          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -339,10 +339,10 @@ Mid-session token expiry: API returns 401 → app attempts to save unsaved input
 
 | Layer | Can depend on |
 |-------|---------------|
-| `@chikumiku/service-*` | Other service packages, `@chikumiku/platform-contracts` |
-| `@chikumiku/platform-contracts` | `@chikumiku/service-core` only |
-| `@chikumiku/web-*` | `@chikumiku/platform-contracts`, any service package |
-| `@chikumiku/mobile-*` | `@chikumiku/platform-contracts`, any service package |
+| `@learnverse/service-*` | Other service packages, `@learnverse/platform-contracts` |
+| `@learnverse/platform-contracts` | `@learnverse/service-core` only |
+| `@learnverse/web-*` | `@learnverse/platform-contracts`, any service package |
+| `@learnverse/mobile-*` | `@learnverse/platform-contracts`, any service package |
 
 **Forbidden**: Services cannot import from web or mobile packages. Web and mobile packages cannot import from each other.
 
@@ -517,10 +517,10 @@ All packages follow a strict naming pattern based on their layer:
 
 | Layer | Pattern | Example |
 |-------|---------|---------|
-| Services | `@chikumiku/service-{name}` | `@chikumiku/service-core`, `@chikumiku/service-auth` |
-| Platform Contracts | `@chikumiku/platform-contracts` | — |
-| Web Platform | `@chikumiku/web-{name}` | `@chikumiku/web-app`, `@chikumiku/web-camera` |
-| Mobile Platform | `@chikumiku/mobile-{name}` | `@chikumiku/mobile-app`, `@chikumiku/mobile-camera` |
+| Services | `@learnverse/service-{name}` | `@learnverse/service-core`, `@learnverse/service-auth` |
+| Platform Contracts | `@learnverse/platform-contracts` | — |
+| Web Platform | `@learnverse/web-{name}` | `@learnverse/web-app`, `@learnverse/web-camera` |
+| Mobile Platform | `@learnverse/mobile-{name}` | `@learnverse/mobile-app`, `@learnverse/mobile-camera` |
 
 The `validate:naming` script enforces these conventions.
 
@@ -631,7 +631,7 @@ describe('Property: Username validation', () => {
 - Interfaces: `PascalCase` (e.g., `SubjectModule`)
 - Functions: `camelCase` (e.g., `validatePassword`)
 - Constants: `UPPER_SNAKE_CASE` for true constants
-- Packages: `@chikumiku/{layer}-{name}` (see naming convention above)
+- Packages: `@learnverse/{layer}-{name}` (see naming convention above)
 
 ### Error Handling
 
@@ -666,7 +666,7 @@ interface ErrorResponse {
 ## Validation Scripts
 
 ```bash
-# Validate package naming follows @chikumiku/{layer}-{name} convention
+# Validate package naming follows @learnverse/{layer}-{name} convention
 npm run validate:naming
 
 # Validate dependency boundaries between layers
@@ -682,7 +682,7 @@ These validators run in CI on every pull request and must pass before merge.
 
 This project uses spec-driven development. Specs live in `.kiro/specs/`:
 
-- `.kiro/specs/chikumiku-learnverse/` — Core platform spec
+- `.kiro/specs/learnverse/` — Core platform spec
 - `.kiro/specs/source-code-restructuring/` — Package restructuring spec
 - `.kiro/specs/help-button-user-guide/` — Help button & User Guide viewer spec
 - `.kiro/specs/mobile-app-ux-improvements/` — Authentication, textbook hierarchy, camera/gallery page capture, branding

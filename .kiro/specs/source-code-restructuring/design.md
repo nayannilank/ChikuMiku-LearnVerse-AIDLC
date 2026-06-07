@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design restructures the ChikuMiku LearnVerse monorepo to clearly segregate web-specific code, mobile-specific code, and platform-agnostic service logic. The current codebase has 9 packages (`api`, `auth`, `comprehension`, `content-ingestion`, `content-store`, `core`, `grammar`, `pronunciation`, `sync`) that are largely platform-agnostic but lack explicit boundaries for platform-specific implementations. The existing `PlatformProvider` interface in `@chikumiku/api` already defines abstractions for camera, file system, notifications, and audio — but platform implementations (web, mobile) don't yet exist as separate packages.
+This design restructures the LearnVerse LearnVerse monorepo to clearly segregate web-specific code, mobile-specific code, and platform-agnostic service logic. The current codebase has 9 packages (`api`, `auth`, `comprehension`, `content-ingestion`, `content-store`, `core`, `grammar`, `pronunciation`, `sync`) that are largely platform-agnostic but lack explicit boundaries for platform-specific implementations. The existing `PlatformProvider` interface in `@learnverse/api` already defines abstractions for camera, file system, notifications, and audio — but platform implementations (web, mobile) don't yet exist as separate packages.
 
 The restructuring introduces a layered architecture with three top-level package groups: `packages/services/*` for domain logic, `packages/platform-web/*` for web-specific implementations, and `packages/platform-mobile/*` for mobile-specific implementations. A shared `packages/platform-contracts` package defines the interface boundary between service logic and platform code.
 
@@ -122,7 +122,7 @@ sequenceDiagram
 
 ### Component 1: Platform Contracts (`packages/platform-contracts`)
 
-**Purpose**: Defines the interface boundary between service logic and platform-specific code. Extracted from the current `@chikumiku/api/platformInterface.ts`.
+**Purpose**: Defines the interface boundary between service logic and platform-specific code. Extracted from the current `@learnverse/api/platformInterface.ts`.
 
 **Interface**:
 ```typescript
@@ -181,7 +181,7 @@ export { ApiRouter, ApiRoute, ApiRequest, ApiResponse } from './endpoints';
 **Responsibilities**:
 - All domain logic, data models, validation, scoring
 - No direct imports of browser APIs, React Native APIs, or device APIs
-- Depend only on `@chikumiku/platform-contracts` for platform capabilities
+- Depend only on `@learnverse/platform-contracts` for platform capabilities
 - Remain fully testable without platform mocks
 
 ### Component 3: Web Platform (`packages/platform-web/*`)
@@ -289,37 +289,37 @@ interface WorkspaceConfig {
 }
 
 // Package naming convention
-type ServicePackageName = `@chikumiku/service-${string}`;
-type PlatformContractsName = '@chikumiku/platform-contracts';
-type WebPackageName = `@chikumiku/web-${string}`;
-type MobilePackageName = `@chikumiku/mobile-${string}`;
+type ServicePackageName = `@learnverse/service-${string}`;
+type PlatformContractsName = '@learnverse/platform-contracts';
+type WebPackageName = `@learnverse/web-${string}`;
+type MobilePackageName = `@learnverse/mobile-${string}`;
 ```
 
 **Validation Rules**:
-- Service packages may only depend on other service packages or `@chikumiku/platform-contracts`
-- Platform packages may depend on `@chikumiku/platform-contracts` and service packages
+- Service packages may only depend on other service packages or `@learnverse/platform-contracts`
+- Platform packages may depend on `@learnverse/platform-contracts` and service packages
 - Platform packages must NOT depend on each other (web cannot import mobile, vice versa)
-- `@chikumiku/platform-contracts` may only depend on `@chikumiku/service-core` (for shared types)
+- `@learnverse/platform-contracts` may only depend on `@learnverse/service-core` (for shared types)
 
 ### Dependency Matrix
 
 ```typescript
 interface DependencyRules {
-  '@chikumiku/platform-contracts': {
-    allowed: ['@chikumiku/service-core'];
-    forbidden: ['@chikumiku/web-*', '@chikumiku/mobile-*'];
+  '@learnverse/platform-contracts': {
+    allowed: ['@learnverse/service-core'];
+    forbidden: ['@learnverse/web-*', '@learnverse/mobile-*'];
   };
-  '@chikumiku/service-*': {
-    allowed: ['@chikumiku/service-*', '@chikumiku/platform-contracts'];
-    forbidden: ['@chikumiku/web-*', '@chikumiku/mobile-*'];
+  '@learnverse/service-*': {
+    allowed: ['@learnverse/service-*', '@learnverse/platform-contracts'];
+    forbidden: ['@learnverse/web-*', '@learnverse/mobile-*'];
   };
-  '@chikumiku/web-*': {
-    allowed: ['@chikumiku/platform-contracts', '@chikumiku/service-*'];
-    forbidden: ['@chikumiku/mobile-*'];
+  '@learnverse/web-*': {
+    allowed: ['@learnverse/platform-contracts', '@learnverse/service-*'];
+    forbidden: ['@learnverse/mobile-*'];
   };
-  '@chikumiku/mobile-*': {
-    allowed: ['@chikumiku/platform-contracts', '@chikumiku/service-*'];
-    forbidden: ['@chikumiku/web-*'];
+  '@learnverse/mobile-*': {
+    allowed: ['@learnverse/platform-contracts', '@learnverse/service-*'];
+    forbidden: ['@learnverse/web-*'];
   };
 }
 ```
@@ -375,7 +375,7 @@ function extractPlatformContracts(): void {
 
 // Step 3: Update package.json files
 function updatePackageManifests(): void {
-  // Rename packages: @chikumiku/core → @chikumiku/service-core
+  // Rename packages: @learnverse/core → @learnverse/service-core
   // Update all internal dependency references
   // Update workspace glob patterns in root package.json
 }
@@ -509,8 +509,8 @@ function validateDependencyBoundaries(packages: PackageInfo[]): ValidationResult
 
 ```typescript
 // === Platform Registration (Web) ===
-import { createWebPlatformProvider } from '@chikumiku/web-app';
-import { PlatformRegistry } from '@chikumiku/platform-contracts';
+import { createWebPlatformProvider } from '@learnverse/web-app';
+import { PlatformRegistry } from '@learnverse/platform-contracts';
 
 const registry = new PlatformRegistry();
 const webProvider = createWebPlatformProvider();
@@ -518,7 +518,7 @@ registry.register(webProvider);
 registry.setActive('web');
 
 // === Service Logic Using Platform Abstraction ===
-import { PlatformRegistry } from '@chikumiku/platform-contracts';
+import { PlatformRegistry } from '@learnverse/platform-contracts';
 
 async function captureTextbookPage(registry: PlatformRegistry) {
   const provider = registry.getActive();
@@ -545,7 +545,7 @@ async function captureTextbookPage(registry: PlatformRegistry) {
 }
 
 // === Dependency Validation in CI ===
-import { validateDependencyBoundaries } from '@chikumiku/build-tools';
+import { validateDependencyBoundaries } from '@learnverse/build-tools';
 
 const result = validateDependencyBoundaries(allPackages);
 if (!result.valid) {
@@ -563,7 +563,7 @@ if (!result.valid) {
 
 ### Property 1: Package naming matches layer convention
 
-*For any* package in the monorepo, its `name` field in `package.json` matches the naming pattern for its layer: service packages use `@chikumiku/service-{name}`, web packages use `@chikumiku/web-{name}`, and mobile packages use `@chikumiku/mobile-{name}`.
+*For any* package in the monorepo, its `name` field in `package.json` matches the naming pattern for its layer: service packages use `@learnverse/service-{name}`, web packages use `@learnverse/web-{name}`, and mobile packages use `@learnverse/mobile-{name}`.
 
 **Validates: Requirements 2.1, 2.3, 2.4**
 
@@ -587,7 +587,7 @@ if (!result.valid) {
 
 ### Property 5: Migration updates all import paths
 
-*For any* source file in the migrated codebase, no import statement SHALL reference old package names (e.g., `@chikumiku/core`, `@chikumiku/auth`). All internal imports SHALL use the new naming convention (`@chikumiku/service-core`, `@chikumiku/service-auth`, etc.).
+*For any* source file in the migrated codebase, no import statement SHALL reference old package names (e.g., `@learnverse/core`, `@learnverse/auth`). All internal imports SHALL use the new naming convention (`@learnverse/service-core`, `@learnverse/service-auth`, etc.).
 
 **Validates: Requirements 4.3**
 
@@ -637,7 +637,7 @@ if (!result.valid) {
 
 ### Error Scenario 3: Import Path Breakage After Move
 
-**Condition**: A file references an old import path (e.g., `@chikumiku/core` instead of `@chikumiku/service-core`)
+**Condition**: A file references an old import path (e.g., `@learnverse/core` instead of `@learnverse/service-core`)
 **Response**: TypeScript compiler error at build time — module not found
 **Recovery**: Run a codemod/find-replace to update all import paths. Use TypeScript path aliases during transition.
 

@@ -2,7 +2,7 @@
  * Authentication API Handlers.
  *
  * Handles login, registration (parent + student), forgot-password, and token validation.
- * Integrates with @chikumiku/service-auth for JWT issuance, lockout logic, and session management.
+ * Integrates with @learnverse/service-auth for JWT issuance, lockout logic, and session management.
  *
  * Requirements: 1.1, 2.2, 2.3, 2.5, 3.4, 3.10, 3.11
  */
@@ -16,7 +16,7 @@ import {
   validateEmail,
   validatePhone,
   validateRegistrationInput,
-} from '@chikumiku/service-auth';
+} from '@learnverse/service-auth';
 
 import type { ApiRequest, ApiResponse } from './endpoints';
 

@@ -11,8 +11,8 @@
  * - Task 9.4: Score 0-100 percentage, identify weak grammar rules (below 60%).
  */
 
-import type { Grade } from '@chikumiku/service-core';
-import { GrammarRuleSet, GrammarAnalysisResult } from '@chikumiku/service-core';
+import type { Grade } from '@learnverse/service-core';
+import { GrammarRuleSet, GrammarAnalysisResult } from '@learnverse/service-core';
 
 // --- Types ---
 

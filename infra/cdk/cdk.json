@@ -20,6 +20,6 @@
     "@aws-cdk/core:target-partitions": ["aws"],
     "region": "ap-south-1",
     "projectName": "learnverse",
-    "githubRepo": "nayannilank/ChikuMiku-LearnVerse-AIDLC"
+    "githubRepo": "nayannilank/LearnVerse-LearnVerse-AIDLC"
   }
 }

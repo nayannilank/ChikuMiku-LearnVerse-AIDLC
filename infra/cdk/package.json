@@ -1,5 +1,5 @@
 {
-  "name": "@chikumiku/infra-cdk",
+  "name": "@learnverse/infra-cdk",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "deploy": "cdk deploy"
   },
   "dependencies": {
-    "@chikumiku/service-api": "0.1.0",
+    "@learnverse/service-api": "0.1.0",
     "aws-cdk-lib": "^2.175.0",
     "constructs": "^10.4.2"
   },

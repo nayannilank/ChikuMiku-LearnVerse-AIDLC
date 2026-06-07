@@ -4,7 +4,7 @@ import type {
   AudioRecordingResult,
   AudioPlaybackOptions,
   AudioError,
-} from '@chikumiku/platform-contracts';
+} from '@learnverse/platform-contracts';
 
 /**
  * Mobile platform implementation of AudioInterface.

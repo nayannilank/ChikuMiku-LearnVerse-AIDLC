@@ -1,5 +1,5 @@
 /**
- * @chikumiku/service-sync
+ * @learnverse/service-sync
  *
  * Cross-platform data synchronization, conflict resolution, offline queue management.
  */

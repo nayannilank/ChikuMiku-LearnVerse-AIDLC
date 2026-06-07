@@ -5,7 +5,7 @@ import {
   handlePlaybackFailure,
   loadPronunciationAssets,
 } from './errorHandling';
-import { PronunciationAssetConfig } from '@chikumiku/service-core';
+import { PronunciationAssetConfig } from '@learnverse/service-core';
 
 // --- Test Helpers ---
 

@@ -1,5 +1,5 @@
 /**
- * Local development server for the ChikuMiku LearnVerse API.
+ * Local development server for the LearnVerse LearnVerse API.
  *
  * Runs the API router on a local HTTP server for testing the
  * learning session workflow and other endpoints.
@@ -109,7 +109,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 });
 
 server.listen(PORT, () => {
-  console.log(`\n🚀 ChikuMiku LearnVerse API running at http://localhost:${PORT}\n`);
+  console.log(`\n🚀 LearnVerse LearnVerse API running at http://localhost:${PORT}\n`);
   console.log('Available learning session endpoints:');
   console.log('  POST /api/v1/subjects/:subjectId/enroll  — Enroll in a subject');
   console.log('  GET  /api/v1/subjects                    — List enrolled subjects');

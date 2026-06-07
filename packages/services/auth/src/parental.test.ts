@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Learner, Grade, ProgressRecord } from '@chikumiku/service-core';
+import { Learner, Grade, ProgressRecord } from '@learnverse/service-core';
 import {
   ParentalAccount,
   clearParentalStore,

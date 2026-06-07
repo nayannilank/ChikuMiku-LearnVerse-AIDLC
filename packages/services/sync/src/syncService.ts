@@ -9,7 +9,7 @@
  * Requirements: 7.3, 7.6, 13.5
  */
 
-import { QueuedAction } from '@chikumiku/service-core';
+import { QueuedAction } from '@learnverse/service-core';
 import { getQueuedActions, dequeueAction, clearQueue } from './offlineQueue';
 
 // --- Types ---

@@ -1,8 +1,8 @@
-# Design Document: ChikuMiku LearnVerse
+# Design Document: LearnVerse LearnVerse
 
 ## Overview
 
-ChikuMiku LearnVerse is a multi-subject learning platform for children, delivered as a SaaS application on Android and web. The system enables learners to ingest textbook content via photos, practice pronunciation and grammar for language subjects, answer chapter-based questions, and revise for tests. The architecture is designed around pluggable Subject Modules that define subject-specific behavior (extraction rules, question generation, rendering) while core platform services (auth, storage, progress tracking) remain subject-agnostic.
+LearnVerse LearnVerse is a multi-subject learning platform for children, delivered as a SaaS application on Android and web. The system enables learners to ingest textbook content via photos, practice pronunciation and grammar for language subjects, answer chapter-based questions, and revise for tests. The architecture is designed around pluggable Subject Modules that define subject-specific behavior (extraction rules, question generation, rendering) while core platform services (auth, storage, progress tracking) remain subject-agnostic.
 
 The platform uses a client-server architecture with:
 - A reactive frontend (Android + Web) using shared business logic
@@ -665,7 +665,7 @@ This project uses both unit/example-based tests and property-based tests for com
 **Configuration**:
 - Minimum 100 iterations per property test
 - Each property test references its design document property
-- Tag format: `Feature: chikumiku-learnverse, Property {number}: {property_text}`
+- Tag format: `Feature: learnverse, Property {number}: {property_text}`
 
 **Applicable Properties** (35 properties defined above covering):
 - Content ingestion validation and page management (Properties 1-4)

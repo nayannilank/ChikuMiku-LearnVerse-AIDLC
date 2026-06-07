@@ -9,7 +9,7 @@ import {
   MAX_EXERCISES,
   WEAK_RULE_THRESHOLD,
 } from './grammarEngine';
-import type { GrammarRuleSet, GrammarAnalysisResult } from '@chikumiku/service-core';
+import type { GrammarRuleSet, GrammarAnalysisResult } from '@learnverse/service-core';
 
 // --- Test Helpers ---
 

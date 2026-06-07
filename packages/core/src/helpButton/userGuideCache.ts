@@ -9,7 +9,7 @@
 import type { UserGuideCacheEntry } from './types';
 
 /** localStorage key for the cached user guide HTML */
-const STORAGE_KEY = 'chikumiku:user-guide:html';
+const STORAGE_KEY = 'learnverse:user-guide:html';
 
 /**
  * Generate a simple hash string from content for change detection.
@@ -39,7 +39,7 @@ export interface IUserGuideCache {
  * UserGuideCache implementation using localStorage.
  *
  * Stores the user guide HTML content with metadata (timestamp and version hash)
- * under the key `chikumiku:user-guide:html`. All operations are wrapped in
+ * under the key `learnverse:user-guide:html`. All operations are wrapped in
  * try/catch to handle environments where localStorage is unavailable or full.
  */
 export class UserGuideCache implements IUserGuideCache {

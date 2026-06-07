@@ -8,7 +8,7 @@ import {
   MAX_SCORE,
   MIN_SCORE,
 } from './pronunciationScoring';
-import { SubjectModule, PronunciationAssetConfig } from '@chikumiku/service-core';
+import { SubjectModule, PronunciationAssetConfig } from '@learnverse/service-core';
 
 // --- Test Helpers ---
 

@@ -1,5 +1,5 @@
 /**
- * @chikumiku/service-grammar
+ * @learnverse/service-grammar
  *
  * Sentence analysis, grammar exercise generation, and scoring.
  */

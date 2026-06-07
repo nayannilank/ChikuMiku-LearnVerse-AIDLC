@@ -10,7 +10,7 @@ import {
   SubjectModuleRegistry,
   SubjectModule,
   ExtractionOutput,
-} from '@chikumiku/service-core';
+} from '@learnverse/service-core';
 
 function createMockModule(extractResult: ExtractionOutput | Error): SubjectModule {
   return {

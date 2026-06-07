@@ -2,13 +2,13 @@
 
 ## Overview
 
-Restructure the ChikuMiku LearnVerse monorepo into a layered architecture with `packages/services/*` for domain logic, `packages/platform-contracts` for interface boundaries, `packages/platform-web/*` for web implementations, and `packages/platform-mobile/*` for mobile implementations. The migration preserves all existing functionality and tests while introducing enforceable dependency boundaries.
+Restructure the LearnVerse LearnVerse monorepo into a layered architecture with `packages/services/*` for domain logic, `packages/platform-contracts` for interface boundaries, `packages/platform-web/*` for web implementations, and `packages/platform-mobile/*` for mobile implementations. The migration preserves all existing functionality and tests while introducing enforceable dependency boundaries.
 
 ## Tasks
 
 - [x] 1. Create platform-contracts package and extract interfaces
   - [x] 1.1 Create `packages/platform-contracts` package with `package.json`, `tsconfig.json`, and `src/index.ts`
-    - Create `packages/platform-contracts/package.json` with name `@chikumiku/platform-contracts`
+    - Create `packages/platform-contracts/package.json` with name `@learnverse/platform-contracts`
     - Create `packages/platform-contracts/tsconfig.json` with composite mode enabled
     - Extract all interfaces and types from `packages/api/src/platformInterface.ts` into `packages/platform-contracts/src/index.ts`
     - Add new `NavigationInterface` and `DeviceStorageInterface` as defined in the design
@@ -32,26 +32,26 @@ Restructure the ChikuMiku LearnVerse monorepo into a layered architecture with `
     - Move `packages/grammar` → `packages/services/grammar`
     - Move `packages/pronunciation` → `packages/services/pronunciation`
     - Move `packages/sync` → `packages/services/sync`
-    - Update each `package.json` name field to `@chikumiku/service-{name}` pattern
+    - Update each `package.json` name field to `@learnverse/service-{name}` pattern
     - _Requirements: 1.2, 2.1, 4.4_
 
   - [x] 2.2 Update all internal import paths across service packages
-    - Replace all `@chikumiku/core` imports with `@chikumiku/service-core`
-    - Replace all `@chikumiku/auth` imports with `@chikumiku/service-auth`
-    - Replace all `@chikumiku/comprehension` imports with `@chikumiku/service-comprehension`
-    - Replace all `@chikumiku/content-ingestion` imports with `@chikumiku/service-content-ingestion`
-    - Replace all `@chikumiku/content-store` imports with `@chikumiku/service-content-store`
-    - Replace all `@chikumiku/grammar` imports with `@chikumiku/service-grammar`
-    - Replace all `@chikumiku/pronunciation` imports with `@chikumiku/service-pronunciation`
-    - Replace all `@chikumiku/sync` imports with `@chikumiku/service-sync`
-    - Replace all `@chikumiku/api` imports with `@chikumiku/service-api`
+    - Replace all `@learnverse/core` imports with `@learnverse/service-core`
+    - Replace all `@learnverse/auth` imports with `@learnverse/service-auth`
+    - Replace all `@learnverse/comprehension` imports with `@learnverse/service-comprehension`
+    - Replace all `@learnverse/content-ingestion` imports with `@learnverse/service-content-ingestion`
+    - Replace all `@learnverse/content-store` imports with `@learnverse/service-content-store`
+    - Replace all `@learnverse/grammar` imports with `@learnverse/service-grammar`
+    - Replace all `@learnverse/pronunciation` imports with `@learnverse/service-pronunciation`
+    - Replace all `@learnverse/sync` imports with `@learnverse/service-sync`
+    - Replace all `@learnverse/api` imports with `@learnverse/service-api`
     - Update dependency references in each package's `package.json`
     - _Requirements: 4.3, 4.5_
 
-  - [x] 2.3 Remove `platformInterface.ts` from `packages/services/api` and add dependency on `@chikumiku/platform-contracts`
+  - [x] 2.3 Remove `platformInterface.ts` from `packages/services/api` and add dependency on `@learnverse/platform-contracts`
     - Delete `packages/services/api/src/platformInterface.ts`
-    - Add `@chikumiku/platform-contracts` as a dependency in `packages/services/api/package.json`
-    - Update any imports of platform types in service-api to reference `@chikumiku/platform-contracts`
+    - Add `@learnverse/platform-contracts` as a dependency in `packages/services/api/package.json`
+    - Update any imports of platform types in service-api to reference `@learnverse/platform-contracts`
     - _Requirements: 5.5_
 
 - [x] 3. Update workspace configuration and TypeScript project references
@@ -77,76 +77,76 @@ Restructure the ChikuMiku LearnVerse monorepo into a layered architecture with `
 
 - [x] 5. Create platform-web scaffold packages
   - [x] 5.1 Create `packages/platform-web/app` package with `createWebPlatformProvider`
-    - Create `package.json` with name `@chikumiku/web-app`
+    - Create `package.json` with name `@learnverse/web-app`
     - Create `tsconfig.json` referencing `platform-contracts` and service packages
     - Create `src/index.ts` exporting `createWebPlatformProvider()` function
     - Implement stub that returns a `PlatformProvider` with `platform: 'web'` and all interface properties assigned
     - _Requirements: 8.1, 2.3_
 
   - [x] 5.2 Create `packages/platform-web/camera` package
-    - Create `package.json` with name `@chikumiku/web-camera`
+    - Create `package.json` with name `@learnverse/web-camera`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `WebCameraAdapter` class implementing `CameraInterface`
     - _Requirements: 1.4, 2.3_
 
   - [x] 5.3 Create `packages/platform-web/filesystem` package
-    - Create `package.json` with name `@chikumiku/web-filesystem`
+    - Create `package.json` with name `@learnverse/web-filesystem`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `WebFileSystemAdapter` class implementing `FileSystemInterface`
     - _Requirements: 1.4, 2.3_
 
   - [x] 5.4 Create `packages/platform-web/notifications` package
-    - Create `package.json` with name `@chikumiku/web-notifications`
+    - Create `package.json` with name `@learnverse/web-notifications`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `WebNotificationAdapter` class implementing `PushNotificationInterface`
     - _Requirements: 1.4, 2.3_
 
   - [x] 5.5 Create `packages/platform-web/audio` package
-    - Create `package.json` with name `@chikumiku/web-audio`
+    - Create `package.json` with name `@learnverse/web-audio`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `WebAudioAdapter` class implementing `AudioInterface`
     - _Requirements: 1.4, 2.3_
 
   - [x] 5.6 Create `packages/platform-web/ui` package
-    - Create `package.json` with name `@chikumiku/web-ui`
+    - Create `package.json` with name `@learnverse/web-ui`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` with placeholder exports for web UI components
     - _Requirements: 1.4, 2.3_
 
 - [x] 6. Create platform-mobile scaffold packages
   - [x] 6.1 Create `packages/platform-mobile/app` package with `createMobilePlatformProvider`
-    - Create `package.json` with name `@chikumiku/mobile-app`
+    - Create `package.json` with name `@learnverse/mobile-app`
     - Create `tsconfig.json` referencing `platform-contracts` and service packages
     - Create `src/index.ts` exporting `createMobilePlatformProvider()` function
     - Implement stub that returns a `PlatformProvider` with `platform` based on runtime OS and all interface properties assigned
     - _Requirements: 8.2, 2.4_
 
   - [x] 6.2 Create `packages/platform-mobile/camera` package
-    - Create `package.json` with name `@chikumiku/mobile-camera`
+    - Create `package.json` with name `@learnverse/mobile-camera`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `MobileCameraAdapter` class implementing `CameraInterface`
     - _Requirements: 1.5, 2.4_
 
   - [x] 6.3 Create `packages/platform-mobile/filesystem` package
-    - Create `package.json` with name `@chikumiku/mobile-filesystem`
+    - Create `package.json` with name `@learnverse/mobile-filesystem`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `MobileFileSystemAdapter` class implementing `FileSystemInterface`
     - _Requirements: 1.5, 2.4_
 
   - [x] 6.4 Create `packages/platform-mobile/notifications` package
-    - Create `package.json` with name `@chikumiku/mobile-notifications`
+    - Create `package.json` with name `@learnverse/mobile-notifications`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `MobileNotificationAdapter` class implementing `PushNotificationInterface`
     - _Requirements: 1.5, 2.4_
 
   - [x] 6.5 Create `packages/platform-mobile/audio` package
-    - Create `package.json` with name `@chikumiku/mobile-audio`
+    - Create `package.json` with name `@learnverse/mobile-audio`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` exporting `MobileAudioAdapter` class implementing `AudioInterface`
     - _Requirements: 1.5, 2.4_
 
   - [x] 6.6 Create `packages/platform-mobile/ui` package
-    - Create `package.json` with name `@chikumiku/mobile-ui`
+    - Create `package.json` with name `@learnverse/mobile-ui`
     - Create `tsconfig.json` referencing `platform-contracts`
     - Create `src/index.ts` with placeholder exports for mobile UI components
     - _Requirements: 1.5, 2.4_
@@ -161,8 +161,8 @@ Restructure the ChikuMiku LearnVerse monorepo into a layered architecture with `
   - [x] 8.1 Finalize the dependency boundary validator in `scripts/validate-boundaries.ts`
     - Verify `classifyPackageLayer(name)` correctly categorizes packages into `services`, `contracts`, `web`, or `mobile` layers
     - Verify `validateDependencyBoundaries(packages)` reads each package's `package.json` and checks `dependencies` and `devDependencies` against the allowed/forbidden rules
-    - Ensure service packages may only depend on other service packages or `@chikumiku/platform-contracts`
-    - Ensure platform-contracts may only depend on `@chikumiku/service-core`
+    - Ensure service packages may only depend on other service packages or `@learnverse/platform-contracts`
+    - Ensure platform-contracts may only depend on `@learnverse/service-core`
     - Ensure web packages may depend on platform-contracts and service packages, but NOT mobile packages
     - Ensure mobile packages may depend on platform-contracts and service packages, but NOT web packages
     - Ensure packages whose names don't match any known layer pattern are skipped without error
@@ -192,10 +192,10 @@ Restructure the ChikuMiku LearnVerse monorepo into a layered architecture with `
 - [x] 9. Implement package naming validation
   - [x] 9.1 Finalize the package naming convention validator in `scripts/validate-naming.ts`
     - Verify the validator checks that each package's `name` field matches the expected pattern for its directory location
-    - Ensure service packages match `@chikumiku/service-{name}` with `{name}` being `[a-z][a-z0-9-]*` (1-50 chars)
-    - Ensure web packages match `@chikumiku/web-{name}` with the same name constraints
-    - Ensure mobile packages match `@chikumiku/mobile-{name}` with the same name constraints
-    - Ensure platform-contracts is exactly `@chikumiku/platform-contracts`
+    - Ensure service packages match `@learnverse/service-{name}` with `{name}` being `[a-z][a-z0-9-]*` (1-50 chars)
+    - Ensure web packages match `@learnverse/web-{name}` with the same name constraints
+    - Ensure mobile packages match `@learnverse/mobile-{name}` with the same name constraints
+    - Ensure platform-contracts is exactly `@learnverse/platform-contracts`
     - Ensure validation errors are reported for non-conforming names with the package directory, actual name, and expected pattern
     - Ensure the script exits with non-zero code when violations are found
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_

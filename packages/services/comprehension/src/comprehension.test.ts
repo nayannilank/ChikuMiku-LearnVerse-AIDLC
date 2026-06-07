@@ -28,7 +28,7 @@ import {
   Chapter,
   SubjectModuleRegistry,
   SubjectModule,
-} from '@chikumiku/service-core';
+} from '@learnverse/service-core';
 
 // --- Test Helpers ---
 

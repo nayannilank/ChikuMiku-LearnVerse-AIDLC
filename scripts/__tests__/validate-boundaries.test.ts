@@ -7,31 +7,31 @@ import * as path from 'node:path';
 
 describe('classifyPackageLayer', () => {
   it('classifies service packages correctly', () => {
-    expect(classifyPackageLayer('@chikumiku/service-core')).toBe('services');
-    expect(classifyPackageLayer('@chikumiku/service-auth')).toBe('services');
-    expect(classifyPackageLayer('@chikumiku/service-content-ingestion')).toBe('services');
+    expect(classifyPackageLayer('@learnverse/service-core')).toBe('services');
+    expect(classifyPackageLayer('@learnverse/service-auth')).toBe('services');
+    expect(classifyPackageLayer('@learnverse/service-content-ingestion')).toBe('services');
   });
 
   it('classifies platform-contracts correctly', () => {
-    expect(classifyPackageLayer('@chikumiku/platform-contracts')).toBe('contracts');
+    expect(classifyPackageLayer('@learnverse/platform-contracts')).toBe('contracts');
   });
 
   it('classifies web packages correctly', () => {
-    expect(classifyPackageLayer('@chikumiku/web-app')).toBe('web');
-    expect(classifyPackageLayer('@chikumiku/web-camera')).toBe('web');
-    expect(classifyPackageLayer('@chikumiku/web-ui')).toBe('web');
+    expect(classifyPackageLayer('@learnverse/web-app')).toBe('web');
+    expect(classifyPackageLayer('@learnverse/web-camera')).toBe('web');
+    expect(classifyPackageLayer('@learnverse/web-ui')).toBe('web');
   });
 
   it('classifies mobile packages correctly', () => {
-    expect(classifyPackageLayer('@chikumiku/mobile-app')).toBe('mobile');
-    expect(classifyPackageLayer('@chikumiku/mobile-camera')).toBe('mobile');
-    expect(classifyPackageLayer('@chikumiku/mobile-ui')).toBe('mobile');
+    expect(classifyPackageLayer('@learnverse/mobile-app')).toBe('mobile');
+    expect(classifyPackageLayer('@learnverse/mobile-camera')).toBe('mobile');
+    expect(classifyPackageLayer('@learnverse/mobile-ui')).toBe('mobile');
   });
 
   it('returns undefined for packages that do not match any known layer pattern', () => {
     expect(classifyPackageLayer('lodash')).toBeUndefined();
     expect(classifyPackageLayer('@types/node')).toBeUndefined();
-    expect(classifyPackageLayer('@chikumiku/unknown-thing')).toBeUndefined();
+    expect(classifyPackageLayer('@learnverse/unknown-thing')).toBeUndefined();
     expect(classifyPackageLayer('vitest')).toBeUndefined();
   });
 });
@@ -42,7 +42,7 @@ describe('validateDependencyBoundaries', () => {
   describe('service packages', () => {
     it('allows service packages to depend on other service packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/service-auth', dir: '/fake', dependencies: ['@chikumiku/service-core'] },
+        { name: '@learnverse/service-auth', dir: '/fake', dependencies: ['@learnverse/service-core'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -50,7 +50,7 @@ describe('validateDependencyBoundaries', () => {
 
     it('allows service packages to depend on platform-contracts', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/service-api', dir: '/fake', dependencies: ['@chikumiku/platform-contracts'] },
+        { name: '@learnverse/service-api', dir: '/fake', dependencies: ['@learnverse/platform-contracts'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -58,31 +58,31 @@ describe('validateDependencyBoundaries', () => {
 
     it('rejects service packages that depend on web packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/service-core', dir: '/fake', dependencies: ['@chikumiku/web-camera'] },
+        { name: '@learnverse/service-core', dir: '/fake', dependencies: ['@learnverse/web-camera'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].package).toBe('@chikumiku/service-core');
-      expect(result.violations[0].dependency).toBe('@chikumiku/web-camera');
+      expect(result.violations[0].package).toBe('@learnverse/service-core');
+      expect(result.violations[0].dependency).toBe('@learnverse/web-camera');
       expect(result.violations[0].reason).toContain('Service packages cannot depend on web packages');
     });
 
     it('rejects service packages that depend on mobile packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/service-core', dir: '/fake', dependencies: ['@chikumiku/mobile-app'] },
+        { name: '@learnverse/service-core', dir: '/fake', dependencies: ['@learnverse/mobile-app'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].package).toBe('@chikumiku/service-core');
-      expect(result.violations[0].dependency).toBe('@chikumiku/mobile-app');
+      expect(result.violations[0].package).toBe('@learnverse/service-core');
+      expect(result.violations[0].dependency).toBe('@learnverse/mobile-app');
       expect(result.violations[0].reason).toContain('Service packages cannot depend on mobile packages');
     });
   });
 
   describe('platform-contracts', () => {
-    it('allows platform-contracts to depend on @chikumiku/service-core', () => {
+    it('allows platform-contracts to depend on @learnverse/service-core', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/platform-contracts', dir: '/fake', dependencies: ['@chikumiku/service-core'] },
+        { name: '@learnverse/platform-contracts', dir: '/fake', dependencies: ['@learnverse/service-core'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -90,18 +90,18 @@ describe('validateDependencyBoundaries', () => {
 
     it('rejects platform-contracts depending on other service packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/platform-contracts', dir: '/fake', dependencies: ['@chikumiku/service-auth'] },
+        { name: '@learnverse/platform-contracts', dir: '/fake', dependencies: ['@learnverse/service-auth'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].package).toBe('@chikumiku/platform-contracts');
-      expect(result.violations[0].dependency).toBe('@chikumiku/service-auth');
-      expect(result.violations[0].reason).toContain('Platform-contracts may only depend on @chikumiku/service-core');
+      expect(result.violations[0].package).toBe('@learnverse/platform-contracts');
+      expect(result.violations[0].dependency).toBe('@learnverse/service-auth');
+      expect(result.violations[0].reason).toContain('Platform-contracts may only depend on @learnverse/service-core');
     });
 
     it('rejects platform-contracts depending on web packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/platform-contracts', dir: '/fake', dependencies: ['@chikumiku/web-app'] },
+        { name: '@learnverse/platform-contracts', dir: '/fake', dependencies: ['@learnverse/web-app'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(1);
@@ -110,16 +110,16 @@ describe('validateDependencyBoundaries', () => {
 
     it('rejects platform-contracts depending on mobile packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/platform-contracts', dir: '/fake', dependencies: ['@chikumiku/mobile-camera'] },
+        { name: '@learnverse/platform-contracts', dir: '/fake', dependencies: ['@learnverse/mobile-camera'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(1);
       expect(result.violations[0].reason).toContain('Platform-contracts cannot depend on mobile packages');
     });
 
-    it('allows platform-contracts to depend on external (non-@chikumiku) packages', () => {
+    it('allows platform-contracts to depend on external (non-@learnverse) packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/platform-contracts', dir: '/fake', dependencies: ['typescript', 'vitest'] },
+        { name: '@learnverse/platform-contracts', dir: '/fake', dependencies: ['typescript', 'vitest'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -129,7 +129,7 @@ describe('validateDependencyBoundaries', () => {
   describe('web packages', () => {
     it('allows web packages to depend on platform-contracts', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/web-app', dir: '/fake', dependencies: ['@chikumiku/platform-contracts'] },
+        { name: '@learnverse/web-app', dir: '/fake', dependencies: ['@learnverse/platform-contracts'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -137,7 +137,7 @@ describe('validateDependencyBoundaries', () => {
 
     it('allows web packages to depend on service packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/web-app', dir: '/fake', dependencies: ['@chikumiku/service-core', '@chikumiku/service-auth'] },
+        { name: '@learnverse/web-app', dir: '/fake', dependencies: ['@learnverse/service-core', '@learnverse/service-auth'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -145,12 +145,12 @@ describe('validateDependencyBoundaries', () => {
 
     it('rejects web packages that depend on mobile packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/web-app', dir: '/fake', dependencies: ['@chikumiku/mobile-camera'] },
+        { name: '@learnverse/web-app', dir: '/fake', dependencies: ['@learnverse/mobile-camera'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].package).toBe('@chikumiku/web-app');
-      expect(result.violations[0].dependency).toBe('@chikumiku/mobile-camera');
+      expect(result.violations[0].package).toBe('@learnverse/web-app');
+      expect(result.violations[0].dependency).toBe('@learnverse/mobile-camera');
       expect(result.violations[0].reason).toContain('Web packages cannot depend on mobile packages');
     });
   });
@@ -158,7 +158,7 @@ describe('validateDependencyBoundaries', () => {
   describe('mobile packages', () => {
     it('allows mobile packages to depend on platform-contracts', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/mobile-app', dir: '/fake', dependencies: ['@chikumiku/platform-contracts'] },
+        { name: '@learnverse/mobile-app', dir: '/fake', dependencies: ['@learnverse/platform-contracts'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -166,7 +166,7 @@ describe('validateDependencyBoundaries', () => {
 
     it('allows mobile packages to depend on service packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/mobile-app', dir: '/fake', dependencies: ['@chikumiku/service-core', '@chikumiku/service-api'] },
+        { name: '@learnverse/mobile-app', dir: '/fake', dependencies: ['@learnverse/service-core', '@learnverse/service-api'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -174,12 +174,12 @@ describe('validateDependencyBoundaries', () => {
 
     it('rejects mobile packages that depend on web packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/mobile-app', dir: '/fake', dependencies: ['@chikumiku/web-ui'] },
+        { name: '@learnverse/mobile-app', dir: '/fake', dependencies: ['@learnverse/web-ui'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].package).toBe('@chikumiku/mobile-app');
-      expect(result.violations[0].dependency).toBe('@chikumiku/web-ui');
+      expect(result.violations[0].package).toBe('@learnverse/mobile-app');
+      expect(result.violations[0].dependency).toBe('@learnverse/web-ui');
       expect(result.violations[0].reason).toContain('Mobile packages cannot depend on web packages');
     });
   });
@@ -187,8 +187,8 @@ describe('validateDependencyBoundaries', () => {
   describe('unknown layer packages', () => {
     it('skips packages whose names do not match any known layer pattern', () => {
       const result = validateDependencyBoundaries([
-        { name: 'lodash', dir: '/fake', dependencies: ['@chikumiku/web-app', '@chikumiku/mobile-app'] },
-        { name: '@types/node', dir: '/fake', dependencies: ['@chikumiku/service-core'] },
+        { name: 'lodash', dir: '/fake', dependencies: ['@learnverse/web-app', '@learnverse/mobile-app'] },
+        { name: '@types/node', dir: '/fake', dependencies: ['@learnverse/service-core'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);
@@ -198,33 +198,33 @@ describe('validateDependencyBoundaries', () => {
   describe('violation reports', () => {
     it('reports offending package name, forbidden dependency, and human-readable reason', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/service-auth', dir: '/fake', dependencies: ['@chikumiku/web-camera'] },
+        { name: '@learnverse/service-auth', dir: '/fake', dependencies: ['@learnverse/web-camera'] },
       ]);
       expect(result.violations).toHaveLength(1);
       const v = result.violations[0];
-      expect(v.package).toBe('@chikumiku/service-auth');
-      expect(v.dependency).toBe('@chikumiku/web-camera');
+      expect(v.package).toBe('@learnverse/service-auth');
+      expect(v.dependency).toBe('@learnverse/web-camera');
       expect(v.reason).toBeTruthy();
       expect(v.reason.length).toBeGreaterThan(0);
     });
 
     it('reports multiple violations when multiple forbidden dependencies exist', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/service-core', dir: '/fake', dependencies: ['@chikumiku/web-app', '@chikumiku/mobile-camera'] },
+        { name: '@learnverse/service-core', dir: '/fake', dependencies: ['@learnverse/web-app', '@learnverse/mobile-camera'] },
       ]);
       expect(result.valid).toBe(false);
       expect(result.violations).toHaveLength(2);
-      expect(result.violations[0].dependency).toBe('@chikumiku/web-app');
-      expect(result.violations[1].dependency).toBe('@chikumiku/mobile-camera');
+      expect(result.violations[0].dependency).toBe('@learnverse/web-app');
+      expect(result.violations[1].dependency).toBe('@learnverse/mobile-camera');
     });
   });
 
   describe('external dependencies', () => {
-    it('allows all layers to depend on external (non-@chikumiku) packages', () => {
+    it('allows all layers to depend on external (non-@learnverse) packages', () => {
       const result = validateDependencyBoundaries([
-        { name: '@chikumiku/service-core', dir: '/fake', dependencies: ['typescript', 'vitest', 'lodash'] },
-        { name: '@chikumiku/web-app', dir: '/fake', dependencies: ['react', 'react-dom'] },
-        { name: '@chikumiku/mobile-app', dir: '/fake', dependencies: ['react-native', 'expo'] },
+        { name: '@learnverse/service-core', dir: '/fake', dependencies: ['typescript', 'vitest', 'lodash'] },
+        { name: '@learnverse/web-app', dir: '/fake', dependencies: ['react', 'react-dom'] },
+        { name: '@learnverse/mobile-app', dir: '/fake', dependencies: ['react-native', 'expo'] },
       ]);
       expect(result.valid).toBe(true);
       expect(result.violations).toHaveLength(0);

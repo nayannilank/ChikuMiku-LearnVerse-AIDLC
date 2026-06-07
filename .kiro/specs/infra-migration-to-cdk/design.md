@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design migrates ChikuMiku LearnVerse's infrastructure from Serverless Framework to AWS CDK v2 (TypeScript), following the proven architecture patterns from the BlipZo Shopping project. The migration delivers seven interconnected capabilities:
+This design migrates LearnVerse LearnVerse's infrastructure from Serverless Framework to AWS CDK v2 (TypeScript), following the proven architecture patterns from the BlipZo Shopping project. The migration delivers seven interconnected capabilities:
 
 1. **CDK Stack Composition** — Typed, modular nested stacks replacing `serverless.yml`
 2. **Cognito Authentication** — Managed auth replacing custom JWT authorizer Lambda
@@ -33,9 +33,9 @@ The existing API contract (all 30+ routes under `/api/v1`), the 929 test suite, 
 
 ```mermaid
 graph TD
-    CDKApp["CDK App (bin/chikumiku.ts)"]
-    CDKApp --> QA["ChikuMikuStack-qa"]
-    CDKApp --> Prod["ChikuMikuStack-prod"]
+    CDKApp["CDK App (bin/learnverse.ts)"]
+    CDKApp --> QA["LearnVerseStack-qa"]
+    CDKApp --> Prod["LearnVerseStack-prod"]
 
     QA --> AuthStack_QA["Auth Stack"]
     QA --> DatabaseStack_QA["Database Stack"]
@@ -96,9 +96,9 @@ graph LR
 infra/
 └── cdk/
     ├── bin/
-    │   └── chikumiku.ts              # CDK App entry point
+    │   └── learnverse.ts              # CDK App entry point
     ├── lib/
-    │   ├── ChikuMikuStack.ts         # Root stack (composes nested)
+    │   ├── LearnVerseStack.ts         # Root stack (composes nested)
     │   ├── AuthStack.ts              # Cognito User Pool + Client
     │   ├── DatabaseStack.ts          # DynamoDB tables
     │   ├── StorageStack.ts           # S3 buckets + CloudFront
@@ -120,32 +120,32 @@ turbo.json                            # Turborepo pipeline config
 
 ## Components and Interfaces
 
-### 1. CDK App Entry Point (`bin/chikumiku.ts`)
+### 1. CDK App Entry Point (`bin/learnverse.ts`)
 
-Instantiates one `ChikuMikuStack` per environment with isolated resources.
+Instantiates one `LearnVerseStack` per environment with isolated resources.
 
 ```typescript
-interface ChikuMikuStackProps extends cdk.StackProps {
+interface LearnVerseStackProps extends cdk.StackProps {
   readonly stageName: 'qa' | 'prod';
 }
 ```
 
 **Responsibilities:**
 - Parse environment from CDK context or environment variable
-- Instantiate `ChikuMikuStack-qa` and `ChikuMikuStack-prod`
-- Apply stack-level tags: `chikumiku:stage`, `chikumiku:stack`
+- Instantiate `LearnVerseStack-qa` and `LearnVerseStack-prod`
+- Apply stack-level tags: `learnverse:stage`, `learnverse:stack`
 
 ---
 
-### 2. ChikuMikuStack (Root Stack)
+### 2. LearnVerseStack (Root Stack)
 
 Composes all nested stacks with proper dependency ordering.
 
 ```typescript
-export class ChikuMikuStack extends cdk.Stack {
+export class LearnVerseStack extends cdk.Stack {
   public readonly stageName: string;
-  constructor(scope: Construct, id: string, props: ChikuMikuStackProps);
-  public resourceName(suffix: string): string; // `chikumiku-{stage}-{suffix}`
+  constructor(scope: Construct, id: string, props: LearnVerseStackProps);
+  public resourceName(suffix: string): string; // `learnverse-{stage}-{suffix}`
 }
 ```
 
@@ -221,7 +221,7 @@ export class StorageStack extends cdk.NestedStack {
 ```
 
 **Content Bucket:**
-- Name: `chikumiku-{stage}-content-{accountId}`
+- Name: `learnverse-{stage}-content-{accountId}`
 - Block all public access
 - CORS: GET, PUT from all origins, max-age 3600
 - Lifecycle: STANDARD_IA after 30 days, GLACIER_INSTANT_RETRIEVAL after 90 days
@@ -254,7 +254,7 @@ export class ApiStack extends cdk.NestedStack {
 ```
 
 **REST API Configuration:**
-- Name: `chikumiku-{stage}-api`
+- Name: `learnverse-{stage}-api`
 - X-Ray tracing enabled
 - CloudWatch metrics enabled
 - Access logging (JSON format)
@@ -326,11 +326,11 @@ export class ObservabilityStack extends cdk.NestedStack {
 ```
 
 **Resources:**
-- Log group per Lambda: `/aws/lambda/chikumiku-{stage}-{service}`, 90-day retention
+- Log group per Lambda: `/aws/lambda/learnverse-{stage}-{service}`, 90-day retention
 - Alarm: Lambda error rate > 1% per function (5-min period)
 - Alarm: API latency p99 > 2000ms (5-min period)
 - Dashboard: error rates, invocation counts, API latency
-- SNS topic: `chikumiku-{stage}-alarms`
+- SNS topic: `learnverse-{stage}-alarms`
 - Prod log groups: RETAIN removal policy
 
 ---
@@ -359,7 +359,7 @@ export class SecureLambda extends Construct {
 - X-Ray active tracing
 - Structured CloudWatch log group (90-day retention)
 - Standard env vars: `STAGE_NAME`, `AWS_NODEJS_CONNECTION_REUSE_ENABLED=1`
-- Function name: `chikumiku-{stage}-{serviceName}`
+- Function name: `learnverse-{stage}-{serviceName}`
 
 ---
 
@@ -425,11 +425,11 @@ jobs:
   deploy-qa:
     needs: validate
     if: github.ref == 'refs/heads/main'
-    # Configure AWS via OIDC, build, cdk deploy ChikuMikuStack-qa
+    # Configure AWS via OIDC, build, cdk deploy LearnVerseStack-qa
   deploy-prod:
     needs: deploy-qa
     environment: production  # Manual approval gate
-    # Configure AWS via OIDC, build, cdk deploy ChikuMikuStack-prod
+    # Configure AWS via OIDC, build, cdk deploy LearnVerseStack-prod
     # Sync web assets to S3, invalidate CloudFront
 ```
 
@@ -444,7 +444,7 @@ jobs:
 
 ### DynamoDB Table Schemas
 
-#### Learners Table (`chikumiku-{stage}-learners`)
+#### Learners Table (`learnverse-{stage}-learners`)
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
@@ -455,7 +455,7 @@ jobs:
 | subjectsEnrolled | List | Subject IDs |
 | createdAt | String | ISO 8601 timestamp |
 
-#### Accounts Table (`chikumiku-{stage}-accounts`)
+#### Accounts Table (`learnverse-{stage}-accounts`)
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
@@ -473,7 +473,7 @@ jobs:
 - `username-index`: PK=`username`, Projection=ALL
 - `email-index`: PK=`email`, Projection=ALL
 
-#### Content Table (`chikumiku-{stage}-content`)
+#### Content Table (`learnverse-{stage}-content`)
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
@@ -540,7 +540,7 @@ All routes under `/api/v1` prefix:
 
 ### Property 1: Resource Naming Convention Guarantees Environment Isolation
 
-*For any* resource provisioned by the ChikuMikuStack, if it has a user-defined physical name, that name SHALL match the pattern `chikumiku-{stageName}-{resourceSuffix}`. As a consequence, *for any* two environments (qa, prod), no physical resource name in one environment SHALL collide with a physical resource name in the other.
+*For any* resource provisioned by the LearnVerseStack, if it has a user-defined physical name, that name SHALL match the pattern `learnverse-{stageName}-{resourceSuffix}`. As a consequence, *for any* two environments (qa, prod), no physical resource name in one environment SHALL collide with a physical resource name in the other.
 
 **Validates: Requirements 1.6, 5.6**
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan implements authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding across the ChikuMiku LearnVerse mobile and web applications. Tasks are organized to build foundational validation and data models first, then backend API endpoints, followed by mobile screens/navigation, content management UI, page capture, branding, and finally end-to-end wiring.
+This plan implements authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding across the LearnVerse LearnVerse mobile and web applications. Tasks are organized to build foundational validation and data models first, then backend API endpoints, followed by mobile screens/navigation, content management UI, page capture, branding, and finally end-to-end wiring.
 
 ## Tasks
 
@@ -63,7 +63,7 @@ This plan implements authentication gating, textbook/chapter content hierarchy, 
 - [x] 2. Implement backend API endpoints for auth and content
   - [x] 2.1 Create authentication API endpoints
     - Create `packages/services/api/src/authHandlers.ts` with handlers for POST `/api/v1/auth/login`, POST `/api/v1/auth/register/parent`, POST `/api/v1/auth/register/student`, POST `/api/v1/auth/forgot-password`, GET `/api/v1/auth/validate`
-    - Integrate with `@chikumiku/service-auth` for JWT issuance (30-day minimum expiry) and lockout logic (3 failures → 15-minute lock)
+    - Integrate with `@learnverse/service-auth` for JWT issuance (30-day minimum expiry) and lockout logic (3 failures → 15-minute lock)
     - Register routes in `packages/services/api/src/endpoints.ts`
     - _Requirements: 1.1, 2.2, 2.3, 2.5, 3.4, 3.10, 3.11_
 
@@ -113,7 +113,7 @@ This plan implements authentication gating, textbook/chapter content hierarchy, 
 
   - [x] 4.5 Implement SplashScreen with timeout clamping
     - Create `packages/platform-mobile/rn-app/src/screens/SplashScreen.tsx`
-    - Display `ChikuMiku-LearnVerse-Logo.png` centered on white background
+    - Display `LearnVerse-LearnVerse-Logo.png` centered on white background
     - Validate stored token; clamp visibility to min 1s, max 5s using `max(1, min(d, 5))` logic
     - On timeout or initialization failure, transition to Auth screen with error message
     - _Requirements: 6.1, 6.2, 6.5_
@@ -211,7 +211,7 @@ This plan implements authentication gating, textbook/chapter content hierarchy, 
   - [x] 7.3 Integrate PageAdditionUI into LearningScreen
     - Modify `packages/platform-mobile/rn-app/src/screens/LearningScreen.tsx`
     - Display PageAdditionUI when a chapter is active
-    - Wire camera via `CameraInterface` and gallery via `FileSystemInterface` from `@chikumiku/platform-contracts`
+    - Wire camera via `CameraInterface` and gallery via `FileSystemInterface` from `@learnverse/platform-contracts`
     - Open camera in JPEG format; open file picker filtered to JPEG and PNG
     - _Requirements: 5.1, 5.3, 5.5_
 
@@ -219,14 +219,14 @@ This plan implements authentication gating, textbook/chapter content hierarchy, 
   - [x] 8.1 Add mobile branding components
     - Create `packages/platform-mobile/rn-app/src/components/HeaderLogo.tsx` displaying logo scaled to nav bar height without cropping
     - Update App.tsx `screenOptions` to include HeaderLogo in navigation bar header
-    - Configure Android app icon using `ChikuMiku-LearnVerse-Logo.png` in `rn-app/android/app/src/main/res/` (generate mipmap resources)
+    - Configure Android app icon using `LearnVerse-LearnVerse-Logo.png` in `rn-app/android/app/src/main/res/` (generate mipmap resources)
     - _Requirements: 6.3, 6.4_
 
   - [x] 8.2 Add web branding components
     - Create `packages/platform-web/app/src/components/HeaderLogo.tsx` displaying logo in header/navigation area, scaled proportionally without cropping
-    - Generate favicon from `ChikuMiku-LearnVerse-Logo.png` to `packages/platform-web/app/public/favicon.ico`
+    - Generate favicon from `LearnVerse-LearnVerse-Logo.png` to `packages/platform-web/app/public/favicon.ico`
     - Display logo on login page and all authenticated pages within the navigation area
-    - Implement text fallback "ChikuMiku LearnVerse" on image load error
+    - Implement text fallback "LearnVerse LearnVerse" on image load error
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
 - [x] 9. Wire navigation and integration

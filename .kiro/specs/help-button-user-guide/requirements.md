@@ -2,16 +2,16 @@
 
 ## Introduction
 
-This feature adds a help icon/button to the ChikuMiku LearnVerse platform on both web and Android interfaces. When activated, the help button opens the existing User Guide (docs/USER_GUIDE.md) so learners can quickly access instructions and troubleshooting information without leaving the app context.
+This feature adds a help icon/button to the LearnVerse LearnVerse platform on both web and Android interfaces. When activated, the help button opens the existing User Guide (docs/USER_GUIDE.md) so learners can quickly access instructions and troubleshooting information without leaving the app context.
 
 ## Glossary
 
 - **Help_Button**: A persistent UI element (icon or button) displayed on the platform interface that provides access to the User Guide
 - **User_Guide**: The existing documentation at docs/USER_GUIDE.md that describes platform features, usage instructions, and troubleshooting steps
-- **Web_App**: The ChikuMiku LearnVerse application running in supported web browsers (Chrome, Firefox, Safari, Edge — latest 2 versions)
-- **Android_App**: The ChikuMiku LearnVerse application running on Android devices (8.0 and above)
+- **Web_App**: The LearnVerse LearnVerse application running in supported web browsers (Chrome, Firefox, Safari, Edge — latest 2 versions)
+- **Android_App**: The LearnVerse LearnVerse application running on Android devices (8.0 and above)
 - **Help_Viewer**: The component responsible for rendering and displaying the User Guide content to the learner
-- **Learner**: A child user of the ChikuMiku LearnVerse platform
+- **Learner**: A child user of the LearnVerse LearnVerse platform
 
 ## Requirements
 

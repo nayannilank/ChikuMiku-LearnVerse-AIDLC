@@ -16,7 +16,7 @@ import {
   SubjectModuleNotFoundError,
   ExtractionOutput,
   Region,
-} from '@chikumiku/service-core';
+} from '@learnverse/service-core';
 
 // --- Types ---
 

@@ -7,7 +7,7 @@
  * Requirements: 13.4
  */
 
-import { QueuedAction, QueuedActionType, MAX_QUEUED_ACTIONS } from '@chikumiku/service-core';
+import { QueuedAction, QueuedActionType, MAX_QUEUED_ACTIONS } from '@learnverse/service-core';
 
 /** Error thrown when the offline queue is full */
 export class QueueFullError extends Error {

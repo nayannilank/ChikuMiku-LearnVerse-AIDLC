@@ -8,10 +8,10 @@
  * Requirements: 4.1, 4.3, 4.4, 4.5, 4.7, 4.9
  */
 
-import { validateContentName } from '@chikumiku/service-core';
-import { addPageToChapter } from '@chikumiku/service-core';
-import type { Textbook, Chapter, Page } from '@chikumiku/service-core/src/textbook';
-import type { ChapterPage } from '@chikumiku/service-core';
+import { validateContentName } from '@learnverse/service-core';
+import { addPageToChapter } from '@learnverse/service-core';
+import type { Textbook, Chapter, Page } from '@learnverse/service-core/src/textbook';
+import type { ChapterPage } from '@learnverse/service-core';
 import type { ApiRequest, ApiResponse } from './endpoints';
 import { randomUUID } from 'crypto';
 

@@ -8,7 +8,7 @@
  * Requirements: 2.1, 2.2, 2.3, 2.8
  */
 
-import { PronunciationAssetConfig, SubjectModule } from '@chikumiku/service-core';
+import { PronunciationAssetConfig, SubjectModule } from '@learnverse/service-core';
 
 // --- Constants ---
 

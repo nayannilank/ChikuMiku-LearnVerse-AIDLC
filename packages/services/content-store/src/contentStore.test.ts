@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ContentStore, WEAK_ACTIVITY_THRESHOLD } from './contentStore';
-import type { Chapter, ActivityType } from '@chikumiku/service-core';
+import type { Chapter, ActivityType } from '@learnverse/service-core';
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
   return {

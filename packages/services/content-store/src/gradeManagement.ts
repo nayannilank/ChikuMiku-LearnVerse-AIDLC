@@ -7,7 +7,7 @@
  * - Task 13.3: Academic year notification (Requirement 9.6)
  */
 
-import type { Grade, GradeArchive } from '@chikumiku/service-core';
+import type { Grade, GradeArchive } from '@learnverse/service-core';
 
 // --- Types ---
 

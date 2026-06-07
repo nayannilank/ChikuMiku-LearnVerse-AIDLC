@@ -2,12 +2,12 @@
 
 ## Introduction
 
-Migrate the ChikuMiku LearnVerse project's infrastructure from Serverless Framework to AWS CDK, modeled after the BlipZo Shopping project's architecture. This is a major infrastructure overhaul covering seven areas: CDK adoption, Cognito authentication, Lambda decomposition, GitHub OIDC, environment gates, Turborepo build pipeline, and observability infrastructure. The migration preserves the existing API contract, all 929 tests, and local development workflow while delivering improved security, modularity, and operational visibility.
+Migrate the LearnVerse LearnVerse project's infrastructure from Serverless Framework to AWS CDK, modeled after the BlipZo Shopping project's architecture. This is a major infrastructure overhaul covering seven areas: CDK adoption, Cognito authentication, Lambda decomposition, GitHub OIDC, environment gates, Turborepo build pipeline, and observability infrastructure. The migration preserves the existing API contract, all 929 tests, and local development workflow while delivering improved security, modularity, and operational visibility.
 
 ## Glossary
 
-- **CDK_App**: The AWS CDK v2 application entry point located at `infra/cdk/bin/chikumiku.ts` that instantiates per-environment stacks
-- **ChikuMiku_Stack**: The root CDK stack that composes all nested stacks for a single deployment environment
+- **CDK_App**: The AWS CDK v2 application entry point located at `infra/cdk/bin/learnverse.ts` that instantiates per-environment stacks
+- **LearnVerse_Stack**: The root CDK stack that composes all nested stacks for a single deployment environment
 - **Auth_Stack**: The CDK nested stack responsible for Cognito User Pool and User Pool Client resources
 - **Database_Stack**: The CDK nested stack responsible for DynamoDB table definitions
 - **Storage_Stack**: The CDK nested stack responsible for S3 bucket resources
@@ -33,12 +33,12 @@ Migrate the ChikuMiku LearnVerse project's infrastructure from Serverless Framew
 
 #### Acceptance Criteria
 
-1. THE CDK_App SHALL instantiate one ChikuMiku_Stack per deployment environment (qa, prod) with fully isolated AWS resources
-2. THE ChikuMiku_Stack SHALL compose the following nested stacks: Auth_Stack, Database_Stack, Storage_Stack, Api_Stack, Lambda_Stack, and Observability_Stack
+1. THE CDK_App SHALL instantiate one LearnVerse_Stack per deployment environment (qa, prod) with fully isolated AWS resources
+2. THE LearnVerse_Stack SHALL compose the following nested stacks: Auth_Stack, Database_Stack, Storage_Stack, Api_Stack, Lambda_Stack, and Observability_Stack
 3. THE CDK_App SHALL reside in the directory `infra/cdk/` within the monorepo root
 4. THE CDK_App SHALL use AWS CDK v2 with TypeScript and target the ap-south-1 region
 5. WHEN `cdk synth` is executed, THE CDK_App SHALL produce a valid CloudFormation template without errors
-6. THE ChikuMiku_Stack SHALL apply a resource naming convention of `chikumiku-{stageName}-{resource}` to all provisioned resources
+6. THE LearnVerse_Stack SHALL apply a resource naming convention of `learnverse-{stageName}-{resource}` to all provisioned resources
 7. THE CDK_App SHALL define a `cdk.json` configuration file specifying the app entry point and context values
 
 ### Requirement 2: Cognito Authentication
@@ -92,8 +92,8 @@ Migrate the ChikuMiku LearnVerse project's infrastructure from Serverless Framew
 
 1. THE CI/CD workflow SHALL implement three sequential stages: validate, deploy-qa, and deploy-prod
 2. THE validate stage SHALL execute type checking, linting, unit tests, property tests, integration tests, security audit, and CDK synthesis validation
-3. THE deploy-qa stage SHALL deploy the ChikuMiku_Stack to the qa environment after validate passes on the main branch
-4. THE deploy-prod stage SHALL deploy the ChikuMiku_Stack to the prod environment only after deploy-qa succeeds
+3. THE deploy-qa stage SHALL deploy the LearnVerse_Stack to the qa environment after validate passes on the main branch
+4. THE deploy-prod stage SHALL deploy the LearnVerse_Stack to the prod environment only after deploy-qa succeeds
 5. THE deploy-prod stage SHALL require manual approval via a GitHub Actions environment protection rule on the `production` environment
 6. WHEN CDK deploys to qa, THE provisioned resources SHALL be fully isolated from prod resources (separate DynamoDB tables, S3 buckets, Cognito User Pool, API Gateway, and Lambda functions)
 
@@ -132,9 +132,9 @@ Migrate the ChikuMiku LearnVerse project's infrastructure from Serverless Framew
 
 #### Acceptance Criteria
 
-1. THE Database_Stack SHALL create a DynamoDB table named `chikumiku-{stageName}-learners` with partition key `pk` (String) and sort key `sk` (String) using PAY_PER_REQUEST billing
-2. THE Database_Stack SHALL create a DynamoDB table named `chikumiku-{stageName}-accounts` with partition key `pk` (String), sort key `sk` (String), a GSI on `username`, and a GSI on `email`, using PAY_PER_REQUEST billing
-3. THE Database_Stack SHALL create a DynamoDB table named `chikumiku-{stageName}-content` with partition key `pk` (String) and sort key `sk` (String) using PAY_PER_REQUEST billing
+1. THE Database_Stack SHALL create a DynamoDB table named `learnverse-{stageName}-learners` with partition key `pk` (String) and sort key `sk` (String) using PAY_PER_REQUEST billing
+2. THE Database_Stack SHALL create a DynamoDB table named `learnverse-{stageName}-accounts` with partition key `pk` (String), sort key `sk` (String), a GSI on `username`, and a GSI on `email`, using PAY_PER_REQUEST billing
+3. THE Database_Stack SHALL create a DynamoDB table named `learnverse-{stageName}-content` with partition key `pk` (String) and sort key `sk` (String) using PAY_PER_REQUEST billing
 4. THE Database_Stack SHALL enable Point-in-Time Recovery on all tables
 5. WHILE the deployment environment is prod, THE Database_Stack SHALL set the removal policy on all tables to RETAIN
 
@@ -144,7 +144,7 @@ Migrate the ChikuMiku LearnVerse project's infrastructure from Serverless Framew
 
 #### Acceptance Criteria
 
-1. THE Storage_Stack SHALL create an S3 bucket named `chikumiku-{stageName}-content-{accountId}` with all public access blocked
+1. THE Storage_Stack SHALL create an S3 bucket named `learnverse-{stageName}-content-{accountId}` with all public access blocked
 2. THE Storage_Stack SHALL configure CORS rules allowing GET and PUT methods from all origins with a 3600-second max age
 3. THE Storage_Stack SHALL configure lifecycle rules transitioning objects to STANDARD_IA after 30 days and GLACIER_INSTANT_RETRIEVAL after 90 days
 4. WHILE the deployment environment is prod, THE Storage_Stack SHALL set the bucket removal policy to RETAIN

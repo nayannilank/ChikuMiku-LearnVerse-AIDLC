@@ -9,7 +9,7 @@
  * Requirements: 1.7, 1.9, 12.5
  */
 
-import { ImageFormat, MAX_IMAGE_SIZE_BYTES } from '@chikumiku/service-core';
+import { ImageFormat, MAX_IMAGE_SIZE_BYTES } from '@learnverse/service-core';
 
 // --- Constants ---
 

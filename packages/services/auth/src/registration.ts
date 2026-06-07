@@ -7,8 +7,8 @@
  * Requirements: 8.1, 8.8, 3.1, 3.6, 3.7, 3.10, 3.12, 3.14
  */
 
-import { Grade, ContactType } from '@chikumiku/service-core';
-import { validateGrade, ValidationResult } from '@chikumiku/service-core';
+import { Grade, ContactType } from '@learnverse/service-core';
+import { validateGrade, ValidationResult } from '@learnverse/service-core';
 import { randomUUID } from 'crypto';
 import { validateUsername, validatePassword as validatePasswordStrict, validateEmail as validateEmailStrict, validatePhone } from './validation';
 import { hashPassword } from './session';

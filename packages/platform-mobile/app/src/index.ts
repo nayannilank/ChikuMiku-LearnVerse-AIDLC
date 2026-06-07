@@ -28,7 +28,7 @@ import type {
   AudioError,
   NavigationInterface,
   DeviceStorageInterface,
-} from '@chikumiku/platform-contracts';
+} from '@learnverse/platform-contracts';
 
 /**
  * Stub mobile camera adapter implementing CameraInterface.

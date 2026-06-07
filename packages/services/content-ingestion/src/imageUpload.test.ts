@@ -8,7 +8,7 @@ import {
   MAX_COMPRESSED_SIZE_BYTES,
   SUPPORTED_FORMATS,
 } from './imageUpload';
-import { MAX_IMAGE_SIZE_BYTES } from '@chikumiku/service-core';
+import { MAX_IMAGE_SIZE_BYTES } from '@learnverse/service-core';
 
 describe('imageUpload', () => {
   describe('isValidFormat', () => {

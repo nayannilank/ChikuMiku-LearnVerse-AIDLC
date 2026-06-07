@@ -16,7 +16,7 @@ import {
   Chapter,
   SubjectModuleRegistry,
   SubjectModuleNotFoundError,
-} from '@chikumiku/service-core';
+} from '@learnverse/service-core';
 
 // --- Types ---
 

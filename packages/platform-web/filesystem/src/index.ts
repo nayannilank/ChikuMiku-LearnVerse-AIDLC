@@ -4,7 +4,7 @@ import type {
   FileMetadata,
   FileReadResult,
   FileSystemError,
-} from '@chikumiku/platform-contracts';
+} from '@learnverse/platform-contracts';
 
 /**
  * Web platform implementation of FileSystemInterface.

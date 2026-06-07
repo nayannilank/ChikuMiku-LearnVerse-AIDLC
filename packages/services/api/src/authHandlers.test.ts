@@ -5,9 +5,9 @@ import {
   clearSessionStore,
   addLearnerToStore,
   hashPassword,
-} from '@chikumiku/service-auth';
-import { clearLockoutStore } from '@chikumiku/service-auth';
-import type { Learner } from '@chikumiku/service-core';
+} from '@learnverse/service-auth';
+import { clearLockoutStore } from '@learnverse/service-auth';
+import type { Learner } from '@learnverse/service-core';
 
 describe('Auth API Handlers (Integration)', () => {
   let router: ApiRouter;

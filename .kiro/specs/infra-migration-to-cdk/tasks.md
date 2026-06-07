@@ -2,7 +2,7 @@
 
 ## Overview
 
-Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK v2 (TypeScript). The implementation follows a bottom-up approach: project scaffolding → nested stacks (auth, database, storage, API, Lambda, observability) → CI/CD pipeline → Turborepo integration. All 929 existing tests continue to pass, the local dev server remains functional, and the API contract is preserved.
+Migrate LearnVerse LearnVerse infrastructure from Serverless Framework to AWS CDK v2 (TypeScript). The implementation follows a bottom-up approach: project scaffolding → nested stacks (auth, database, storage, API, Lambda, observability) → CI/CD pipeline → Turborepo integration. All 929 existing tests continue to pass, the local dev server remains functional, and the API contract is preserved.
 
 ## Tasks
 
@@ -11,15 +11,15 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
     - Create `infra/cdk/` directory with `bin/`, `lib/`, `lib/constructs/`, and `__tests__/` subdirectories
     - Create `infra/cdk/package.json` with aws-cdk-lib, constructs, aws-cdk devDependencies
     - Create `infra/cdk/tsconfig.json` targeting ES2022, Node.js module resolution
-    - Create `infra/cdk/cdk.json` with app entry point `npx ts-node bin/chikumiku.ts` and context values
+    - Create `infra/cdk/cdk.json` with app entry point `npx ts-node bin/learnverse.ts` and context values
     - Add `infra/cdk` to the root `package.json` workspaces array
     - _Requirements: 1.3, 1.4, 1.7_
 
-  - [x] 1.2 Implement CDK App entry point and root ChikuMikuStack
-    - Create `infra/cdk/bin/chikumiku.ts` that instantiates `ChikuMikuStack-qa` and `ChikuMikuStack-prod`
-    - Create `infra/cdk/lib/ChikuMikuStack.ts` with `ChikuMikuStackProps` interface (stageName: 'qa' | 'prod')
-    - Implement `resourceName(suffix)` helper returning `chikumiku-{stage}-{suffix}`
-    - Apply stack-level tags: `chikumiku:stage`, `chikumiku:stack`
+  - [x] 1.2 Implement CDK App entry point and root LearnVerseStack
+    - Create `infra/cdk/bin/learnverse.ts` that instantiates `LearnVerseStack-qa` and `LearnVerseStack-prod`
+    - Create `infra/cdk/lib/LearnVerseStack.ts` with `LearnVerseStackProps` interface (stageName: 'qa' | 'prod')
+    - Implement `resourceName(suffix)` helper returning `learnverse-{stage}-{suffix}`
+    - Apply stack-level tags: `learnverse:stage`, `learnverse:stack`
     - Target `ap-south-1` region
     - _Requirements: 1.1, 1.2, 1.4, 1.6_
 
@@ -27,7 +27,7 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
     - Create `infra/cdk/lib/constructs/SecureLambda.ts` implementing `SecureLambdaProps` interface
     - Configure Node.js 22 runtime (`NODEJS_22_X`), X-Ray active tracing, structured CloudWatch log group (90-day retention)
     - Set standard environment variables: `STAGE_NAME`, `AWS_NODEJS_CONNECTION_REUSE_ENABLED=1`
-    - Function naming: `chikumiku-{stage}-{serviceName}`
+    - Function naming: `learnverse-{stage}-{serviceName}`
     - Default memory 256 MB, timeout 30 seconds
     - _Requirements: 3.2, 7.1_
 
@@ -53,9 +53,9 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
 - [x] 3. Implement DatabaseStack (DynamoDB)
   - [x] 3.1 Create DatabaseStack nested stack
     - Create `infra/cdk/lib/DatabaseStack.ts` with `DatabaseStackProps` interface
-    - Create `chikumiku-{stage}-learners` table: pk (String), sk (String), PAY_PER_REQUEST
-    - Create `chikumiku-{stage}-accounts` table: pk (String), sk (String), PAY_PER_REQUEST, GSI on `username`, GSI on `email`
-    - Create `chikumiku-{stage}-content` table: pk (String), sk (String), PAY_PER_REQUEST
+    - Create `learnverse-{stage}-learners` table: pk (String), sk (String), PAY_PER_REQUEST
+    - Create `learnverse-{stage}-accounts` table: pk (String), sk (String), PAY_PER_REQUEST, GSI on `username`, GSI on `email`
+    - Create `learnverse-{stage}-content` table: pk (String), sk (String), PAY_PER_REQUEST
     - Enable Point-in-Time Recovery on all tables
     - Set removal policy: RETAIN in prod, DESTROY in qa
     - Export `learnersTable`, `accountsTable`, `contentTable` properties
@@ -91,7 +91,7 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
 - [x] 5. Implement ApiStack (API Gateway + Cognito Authorizer)
   - [x] 5.1 Create ApiStack nested stack
     - Create `infra/cdk/lib/ApiStack.ts` with `ApiStackProps` interface
-    - Create REST API: `chikumiku-{stage}-api`, X-Ray tracing, CloudWatch metrics, access logging (JSON)
+    - Create REST API: `learnverse-{stage}-api`, X-Ray tracing, CloudWatch metrics, access logging (JSON)
     - Configure CORS: all origins, all methods
     - Add gateway responses with CORS headers for 4XX/5XX
     - Create Cognito User Pools Authorizer with identity source `method.request.header.Authorization`
@@ -158,11 +158,11 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
 - [x] 8. Implement ObservabilityStack
   - [x] 8.1 Create ObservabilityStack nested stack
     - Create `infra/cdk/lib/ObservabilityStack.ts` with `ObservabilityStackProps` interface
-    - Create CloudWatch log group per Lambda: `/aws/lambda/chikumiku-{stage}-{service}`, 90-day retention
+    - Create CloudWatch log group per Lambda: `/aws/lambda/learnverse-{stage}-{service}`, 90-day retention
     - Create alarm per Lambda: error rate > 1% (5-min period)
     - Create API latency alarm: p99 > 2000ms (5-min period)
     - Create CloudWatch dashboard: error rates, invocation counts, API latency
-    - Create SNS topic: `chikumiku-{stage}-alarms`, configure alarm actions
+    - Create SNS topic: `learnverse-{stage}-alarms`, configure alarm actions
     - Set prod log groups to RETAIN removal policy
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
@@ -174,7 +174,7 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
 - [x] 9. Wire root stack composition and cross-stack references
-  - [x] 9.1 Complete ChikuMikuStack composition with all nested stacks
+  - [x] 9.1 Complete LearnVerseStack composition with all nested stacks
     - Wire AuthStack → DatabaseStack → StorageStack → ApiStack → LambdaStack → ObservabilityStack in dependency order
     - Pass cross-stack references (userPool, tables, bucket, api, authorizer, functions)
     - Verify `cdk synth` produces valid CloudFormation templates for both qa and prod
@@ -182,7 +182,7 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
 
   - [x] 9.2 Write property test for resource naming isolation (Property 1)
     - **Property 1: Resource Naming Convention Guarantees Environment Isolation**
-    - For any resource with a user-defined physical name, verify it matches `chikumiku-{stageName}-{resourceSuffix}`
+    - For any resource with a user-defined physical name, verify it matches `learnverse-{stageName}-{resourceSuffix}`
     - No name collisions between qa and prod stacks
     - **Validates: Requirements 1.6, 5.6**
 
@@ -246,8 +246,8 @@ Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK
   - [x] 13.2 Create CI/CD workflow (`ci.yml`) with environment gates
     - Replace existing `ci.yml` with three-stage pipeline: validate → deploy-qa → deploy-prod
     - Validate stage: typecheck, lint, unit tests, property tests, integration tests, security audit, `cdk synth`
-    - Deploy-qa: configure AWS via OIDC (`aws-actions/configure-aws-credentials@v4`), `cdk deploy ChikuMikuStack-qa`
-    - Deploy-prod: require `environment: production` manual approval, `cdk deploy ChikuMikuStack-prod`
+    - Deploy-qa: configure AWS via OIDC (`aws-actions/configure-aws-credentials@v4`), `cdk deploy LearnVerseStack-qa`
+    - Deploy-prod: require `environment: production` manual approval, `cdk deploy LearnVerseStack-prod`
     - Post-deploy: sync web assets to S3, invalidate CloudFront cache
     - No `AWS_ACCESS_KEY_ID` or `AWS_SECRET_ACCESS_KEY` secrets
     - _Requirements: 4.3, 4.4, 5.1, 5.2, 5.3, 5.4, 5.5, 10.4_

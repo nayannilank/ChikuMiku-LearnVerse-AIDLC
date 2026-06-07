@@ -1,5 +1,5 @@
 /**
- * @chikumiku/service-pronunciation
+ * @learnverse/service-pronunciation
  *
  * Audio playback of correct pronunciations, speech recognition, syllable breakdown.
  */

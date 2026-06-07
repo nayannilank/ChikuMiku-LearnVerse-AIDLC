@@ -1,14 +1,14 @@
-# ChikuMiku LearnVerse — User Guide
+# LearnVerse LearnVerse — User Guide
 
 ## Welcome
 
-ChikuMiku LearnVerse is a learning platform designed for children to study any subject — languages (Kannada, Hindi, English), Maths, Science, Computers, and more — using their own textbook content. Simply take photos of your textbook pages, and the app helps you learn through pronunciation practice, grammar exercises, comprehension questions, and revision tests.
+LearnVerse LearnVerse is a learning platform designed for children to study any subject — languages (Kannada, Hindi, English), Maths, Science, Computers, and more — using their own textbook content. Simply take photos of your textbook pages, and the app helps you learn through pronunciation practice, grammar exercises, comprehension questions, and revision tests.
 
 ## Getting Started
 
 ### App Launch and Splash Screen
 
-When you open ChikuMiku LearnVerse, you'll see the branded splash screen — the ChikuMiku LearnVerse logo centered on a white background. This displays for 1–5 seconds while the app initializes.
+When you open LearnVerse LearnVerse, you'll see the branded splash screen — the LearnVerse LearnVerse logo centered on a white background. This displays for 1–5 seconds while the app initializes.
 
 - If you're already logged in (session still active), you'll go straight to your subjects.
 - If you're not logged in, you'll be taken to the login screen.
@@ -16,11 +16,11 @@ When you open ChikuMiku LearnVerse, you'll see the branded splash screen — the
 
 ### Creating an Account
 
-ChikuMiku LearnVerse uses a two-step registration process: a **parent** creates their account first, then registers their **student** (child) linked to that parent account.
+LearnVerse LearnVerse uses a two-step registration process: a **parent** creates their account first, then registers their **student** (child) linked to that parent account.
 
 #### Step 1: Register as Parent
 
-1. Open ChikuMiku LearnVerse on your Android device or web browser
+1. Open LearnVerse LearnVerse on your Android device or web browser
 2. Tap **Sign Up**, then select **Register as Parent**
 3. Fill in the following:
    - **Name** (up to 100 characters)
@@ -74,13 +74,13 @@ If your session expires while you're using the app:
 
 ## Branding
 
-You'll notice the ChikuMiku LearnVerse logo throughout the app:
+You'll notice the LearnVerse LearnVerse logo throughout the app:
 - **Splash screen**: Centered logo on a white background at launch
 - **Navigation bar**: Logo displayed in the header as you navigate
-- **Android app icon**: The ChikuMiku LearnVerse logo
+- **Android app icon**: The LearnVerse LearnVerse logo
 - **Web browser**: Logo in the header/navigation area plus the browser favicon
 
-On the web, if the logo image can't load, the text "ChikuMiku LearnVerse" appears as a fallback.
+On the web, if the logo image can't load, the text "LearnVerse LearnVerse" appears as a fallback.
 
 ## Enrolling in Subjects
 
@@ -284,7 +284,7 @@ A help button (question mark icon) is always visible in the bottom-right corner 
 
 ## Using Multiple Devices
 
-ChikuMiku LearnVerse works on:
+LearnVerse LearnVerse works on:
 - **Android** (8.0 and above)
 - **Web browsers** (Chrome, Firefox, Safari, Edge — latest 2 versions)
 

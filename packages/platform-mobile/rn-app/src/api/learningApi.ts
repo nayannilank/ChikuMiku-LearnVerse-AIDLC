@@ -1,5 +1,5 @@
 /**
- * API client for the ChikuMiku LearnVerse learning session workflow.
+ * API client for the LearnVerse LearnVerse learning session workflow.
  *
  * Points to localhost:3000 by default (use 10.0.2.2 for Android emulator).
  * Auth token is managed externally via setAuthToken() — called by AuthContext
@@ -9,7 +9,7 @@
 // For Android emulator, use 10.0.2.2 to reach host's localhost
 const BASE_URL = __DEV__
   ? 'http://10.0.2.2:3000'
-  : 'https://api.chikumiku.example.com';
+  : 'https://api.learnverse.example.com';
 
 // --- Token management ---
 

@@ -10,7 +10,7 @@
  * Requirements: 1.3, 1.4, 1.5
  */
 
-import { Chapter, Page, MAX_PAGES_PER_CHAPTER } from '@chikumiku/service-core';
+import { Chapter, Page, MAX_PAGES_PER_CHAPTER } from '@learnverse/service-core';
 
 // --- Types ---
 

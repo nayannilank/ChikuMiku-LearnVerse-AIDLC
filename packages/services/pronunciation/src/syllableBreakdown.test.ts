@@ -4,7 +4,7 @@ import {
   transliterateSyllable,
   isSyllableAudioAvailable,
 } from './syllableBreakdown';
-import { SubjectModule, PronunciationAssetConfig } from '@chikumiku/service-core';
+import { SubjectModule, PronunciationAssetConfig } from '@learnverse/service-core';
 
 // --- Test Helpers ---
 

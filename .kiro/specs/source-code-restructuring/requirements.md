@@ -2,14 +2,14 @@
 
 ## Introduction
 
-This document defines the requirements for restructuring the ChikuMiku LearnVerse monorepo into a layered architecture that clearly separates service logic, platform contracts, web-specific implementations, and mobile-specific implementations. The restructuring preserves all existing functionality and tests while introducing enforceable dependency boundaries between layers.
+This document defines the requirements for restructuring the LearnVerse LearnVerse monorepo into a layered architecture that clearly separates service logic, platform contracts, web-specific implementations, and mobile-specific implementations. The restructuring preserves all existing functionality and tests while introducing enforceable dependency boundaries between layers.
 
 ## Glossary
 
-- **Service_Package**: A package located under `packages/services/*` containing platform-agnostic domain logic (e.g., `@chikumiku/service-core`, `@chikumiku/service-auth`)
-- **Platform_Contracts**: The `packages/platform-contracts` package that defines interface boundaries between service logic and platform-specific code (`@chikumiku/platform-contracts`)
-- **Web_Package**: A package located under `packages/platform-web/*` implementing platform contracts using browser APIs (`@chikumiku/web-*`)
-- **Mobile_Package**: A package located under `packages/platform-mobile/*` implementing platform contracts using native device APIs (`@chikumiku/mobile-*`)
+- **Service_Package**: A package located under `packages/services/*` containing platform-agnostic domain logic (e.g., `@learnverse/service-core`, `@learnverse/service-auth`)
+- **Platform_Contracts**: The `packages/platform-contracts` package that defines interface boundaries between service logic and platform-specific code (`@learnverse/platform-contracts`)
+- **Web_Package**: A package located under `packages/platform-web/*` implementing platform contracts using browser APIs (`@learnverse/web-*`)
+- **Mobile_Package**: A package located under `packages/platform-mobile/*` implementing platform contracts using native device APIs (`@learnverse/mobile-*`)
 - **Dependency_Boundary_Validator**: A tool or script that analyzes package dependency graphs and reports violations of the layered architecture rules
 - **Migration**: The process of relocating existing packages from `packages/*` to `packages/services/*` while updating all import paths and package names
 - **PlatformProvider**: The aggregate interface that combines all platform-specific capability interfaces (camera, file system, notifications, audio, navigation, storage)
@@ -36,11 +36,11 @@ This document defines the requirements for restructuring the ChikuMiku LearnVers
 
 #### Acceptance Criteria
 
-1. THE Build_System SHALL set the `name` field in each service package's `package.json` using the pattern `@chikumiku/service-{name}`, where `{name}` is a lowercase kebab-case identifier of 1 to 50 characters matching `[a-z][a-z0-9-]*` (e.g., `@chikumiku/service-core`, `@chikumiku/service-auth`, `@chikumiku/service-content-ingestion`)
-2. THE Build_System SHALL set the `name` field in the platform contracts package's `package.json` as `@chikumiku/platform-contracts`
-3. THE Build_System SHALL set the `name` field in each web platform package's `package.json` using the pattern `@chikumiku/web-{name}`, where `{name}` is a lowercase kebab-case identifier of 1 to 50 characters matching `[a-z][a-z0-9-]*` (e.g., `@chikumiku/web-camera`, `@chikumiku/web-app`)
-4. THE Build_System SHALL set the `name` field in each mobile platform package's `package.json` using the pattern `@chikumiku/mobile-{name}`, where `{name}` is a lowercase kebab-case identifier of 1 to 50 characters matching `[a-z][a-z0-9-]*` (e.g., `@chikumiku/mobile-camera`, `@chikumiku/mobile-app`)
-5. IF a package's `name` field does not match any of the defined layer patterns (`@chikumiku/service-{name}`, `@chikumiku/platform-contracts`, `@chikumiku/web-{name}`, `@chikumiku/mobile-{name}`), THEN THE Build_System SHALL report a validation error identifying the non-conforming package name and the expected pattern for its directory location
+1. THE Build_System SHALL set the `name` field in each service package's `package.json` using the pattern `@learnverse/service-{name}`, where `{name}` is a lowercase kebab-case identifier of 1 to 50 characters matching `[a-z][a-z0-9-]*` (e.g., `@learnverse/service-core`, `@learnverse/service-auth`, `@learnverse/service-content-ingestion`)
+2. THE Build_System SHALL set the `name` field in the platform contracts package's `package.json` as `@learnverse/platform-contracts`
+3. THE Build_System SHALL set the `name` field in each web platform package's `package.json` using the pattern `@learnverse/web-{name}`, where `{name}` is a lowercase kebab-case identifier of 1 to 50 characters matching `[a-z][a-z0-9-]*` (e.g., `@learnverse/web-camera`, `@learnverse/web-app`)
+4. THE Build_System SHALL set the `name` field in each mobile platform package's `package.json` using the pattern `@learnverse/mobile-{name}`, where `{name}` is a lowercase kebab-case identifier of 1 to 50 characters matching `[a-z][a-z0-9-]*` (e.g., `@learnverse/mobile-camera`, `@learnverse/mobile-app`)
+5. IF a package's `name` field does not match any of the defined layer patterns (`@learnverse/service-{name}`, `@learnverse/platform-contracts`, `@learnverse/web-{name}`, `@learnverse/mobile-{name}`), THEN THE Build_System SHALL report a validation error identifying the non-conforming package name and the expected pattern for its directory location
 
 ### Requirement 3: Dependency Boundary Enforcement
 
@@ -52,12 +52,12 @@ This document defines the requirements for restructuring the ChikuMiku LearnVers
 2. THE Dependency_Boundary_Validator SHALL reject any Web_Package that imports from a Mobile_Package
 3. THE Dependency_Boundary_Validator SHALL reject any Mobile_Package that imports from a Web_Package
 4. THE Dependency_Boundary_Validator SHALL allow Service_Package imports from other Service_Packages and from Platform_Contracts
-5. THE Dependency_Boundary_Validator SHALL allow Platform_Contracts imports only from `@chikumiku/service-core`
+5. THE Dependency_Boundary_Validator SHALL allow Platform_Contracts imports only from `@learnverse/service-core`
 6. THE Dependency_Boundary_Validator SHALL allow Web_Package imports from Platform_Contracts and any Service_Package
 7. THE Dependency_Boundary_Validator SHALL allow Mobile_Package imports from Platform_Contracts and any Service_Package
 8. WHEN a dependency boundary violation is detected, THE Dependency_Boundary_Validator SHALL report the offending package name, the forbidden dependency, and a human-readable reason describing which layer rule was violated
 9. WHEN one or more dependency boundary violations are detected, THE Dependency_Boundary_Validator SHALL exit with a non-zero exit code so that the build or CI pipeline fails
-10. IF a package name does not match any known layer pattern (`@chikumiku/service-*`, `@chikumiku/platform-contracts`, `@chikumiku/web-*`, `@chikumiku/mobile-*`), THEN THE Dependency_Boundary_Validator SHALL skip that package without reporting a violation and without failing the validation run
+10. IF a package name does not match any known layer pattern (`@learnverse/service-*`, `@learnverse/platform-contracts`, `@learnverse/web-*`, `@learnverse/mobile-*`), THEN THE Dependency_Boundary_Validator SHALL skip that package without reporting a violation and without failing the validation run
 11. THE Dependency_Boundary_Validator SHALL determine dependency relationships by inspecting the `dependencies` and `devDependencies` fields of each package's `package.json` file within the monorepo workspace
 
 ### Requirement 4: Migration of Existing Packages
@@ -68,7 +68,7 @@ This document defines the requirements for restructuring the ChikuMiku LearnVers
 
 1. WHEN the migration is complete, THE Build_System SHALL compile all relocated packages without errors using `tsc --build`, producing a zero exit code with no type errors or module resolution failures
 2. WHEN the migration is complete, THE Test_Runner SHALL execute all existing tests using `vitest run` and produce the same number of total tests, the same number of passing tests, and the same number of failing tests as the test run recorded immediately before the migration
-3. WHEN the migration is complete, THE Migration SHALL have updated all internal import paths so that no source file contains references to the old package names (`@chikumiku/core`, `@chikumiku/auth`, `@chikumiku/comprehension`, `@chikumiku/content-ingestion`, `@chikumiku/content-store`, `@chikumiku/grammar`, `@chikumiku/pronunciation`, `@chikumiku/sync`, `@chikumiku/api`), and all internal imports use the new `@chikumiku/service-{name}` naming convention
+3. WHEN the migration is complete, THE Migration SHALL have updated all internal import paths so that no source file contains references to the old package names (`@learnverse/core`, `@learnverse/auth`, `@learnverse/comprehension`, `@learnverse/content-ingestion`, `@learnverse/content-store`, `@learnverse/grammar`, `@learnverse/pronunciation`, `@learnverse/sync`, `@learnverse/api`), and all internal imports use the new `@learnverse/service-{name}` naming convention
 4. WHEN the migration is complete, THE Migration SHALL have preserved every source file (`.ts`), test file (`.test.ts`), and configuration file (`package.json`, `tsconfig.json`) from each of the 9 original packages (`api`, `auth`, `comprehension`, `content-ingestion`, `content-store`, `core`, `grammar`, `pronunciation`, `sync`) in their corresponding `packages/services/{name}/` location with identical file content except for import path updates
 5. THE Migration SHALL not modify any service logic, type definitions, exported function signatures, or test assertions during the relocation process; only import/export path statements and package name references in `package.json` files SHALL be changed
 6. WHEN the migration is complete, THE Build_System SHALL resolve all workspace packages from the updated root `package.json` workspaces configuration, and `npm ls` SHALL report zero missing or invalid internal package links
@@ -84,7 +84,7 @@ This document defines the requirements for restructuring the ChikuMiku LearnVers
 2. THE Platform_Contracts package SHALL define a NavigationInterface with the following methods: `navigate(route: string, params?: Record<string, string>): void`, `goBack(): void`, `getCurrentRoute(): string`, and `canGoBack(): boolean`
 3. THE Platform_Contracts package SHALL define a DeviceStorageInterface with the following methods: `getItem(key: string): Promise<string | null>`, `setItem(key: string, value: string): Promise<void>`, `removeItem(key: string): Promise<void>`, `clear(): Promise<void>`, and `getAllKeys(): Promise<string[]>`
 4. THE Platform_Contracts package SHALL export only TypeScript type definitions (interfaces, type aliases, enums) and the PlatformRegistry class, and SHALL contain no references to browser APIs (window, document, navigator, localStorage, IndexedDB), native mobile APIs (React Native modules, Expo modules), or any runtime platform-specific code
-5. WHEN the extraction is complete, THE Service_Package `@chikumiku/service-api` SHALL no longer contain `platformInterface.ts` and SHALL import platform types from `@chikumiku/platform-contracts`
+5. WHEN the extraction is complete, THE Service_Package `@learnverse/service-api` SHALL no longer contain `platformInterface.ts` and SHALL import platform types from `@learnverse/platform-contracts`
 6. WHEN the extraction is complete, THE Platform_Contracts package SHALL compile successfully with `tsc --build` as a standalone TypeScript package with no compilation errors
 
 ### Requirement 6: Build System Configuration
@@ -119,8 +119,8 @@ This document defines the requirements for restructuring the ChikuMiku LearnVers
 
 #### Acceptance Criteria
 
-1. THE Web_Package `@chikumiku/web-app` SHALL export a `createWebPlatformProvider` function that returns a PlatformProvider with `platform` set to `'web'` and all four interface properties (`camera`, `fileSystem`, `notifications`, `audio`) assigned to non-null objects implementing their respective interfaces
-2. THE Mobile_Package `@chikumiku/mobile-app` SHALL export a `createMobilePlatformProvider` function that returns a PlatformProvider with `platform` set to `'android'` or `'ios'` based on the runtime operating system, and all four interface properties (`camera`, `fileSystem`, `notifications`, `audio`) assigned to non-null objects implementing their respective interfaces
+1. THE Web_Package `@learnverse/web-app` SHALL export a `createWebPlatformProvider` function that returns a PlatformProvider with `platform` set to `'web'` and all four interface properties (`camera`, `fileSystem`, `notifications`, `audio`) assigned to non-null objects implementing their respective interfaces
+2. THE Mobile_Package `@learnverse/mobile-app` SHALL export a `createMobilePlatformProvider` function that returns a PlatformProvider with `platform` set to `'android'` or `'ios'` based on the runtime operating system, and all four interface properties (`camera`, `fileSystem`, `notifications`, `audio`) assigned to non-null objects implementing their respective interfaces
 3. IF `PlatformRegistry.getActive()` is called without a prior successful `setActive()` call, THEN THE PlatformRegistry SHALL throw an error with the message `'No active platform provider. Call setActive() first.'`
 4. THE PlatformProvider implementations SHALL NOT request device permissions during provider construction; permissions SHALL be requested only when a method that requires device access (`capture`, `pickFiles`, `readFile`, `writeFile`, `startRecording`, `registerForPush`, `showLocalNotification`) is first invoked
 5. IF a PlatformProvider capability method is invoked and the underlying platform API is unavailable, THEN THE PlatformProvider SHALL reject the returned Promise with the corresponding error type defined in the interface (e.g., `CAMERA_UNAVAILABLE`, `MICROPHONE_UNAVAILABLE`, `NOT_SUPPORTED`) without throwing an unhandled exception

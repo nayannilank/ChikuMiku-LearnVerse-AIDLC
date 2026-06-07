@@ -1,5 +1,5 @@
 /**
- * @chikumiku/service-content-ingestion
+ * @learnverse/service-content-ingestion
  *
  * Image capture/upload, text extraction via Subject Module pipelines, chapter assembly.
  */

@@ -12,7 +12,7 @@ import type {
   CameraCaptureOptions,
   CameraCaptureResult,
   CameraError,
-} from '@chikumiku/platform-contracts';
+} from '@learnverse/platform-contracts';
 
 /**
  * Mobile-specific implementation of CameraInterface.

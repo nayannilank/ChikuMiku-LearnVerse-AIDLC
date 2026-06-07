@@ -1,5 +1,5 @@
 /**
- * @chikumiku/service-auth
+ * @learnverse/service-auth
  *
  * Authentication service: registration, login, session management, parental account linking.
  */

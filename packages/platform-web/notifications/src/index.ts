@@ -11,7 +11,7 @@ import type {
   NotificationPayload,
   NotificationPermission,
   NotificationError,
-} from '@chikumiku/platform-contracts';
+} from '@learnverse/platform-contracts';
 
 /**
  * Web-specific implementation of PushNotificationInterface.

@@ -1,11 +1,11 @@
 {
-  "name": "@chikumiku/service-sync",
+  "name": "@learnverse/service-sync",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@chikumiku/service-core": "0.1.0"
+    "@learnverse/service-core": "0.1.0"
   },
   "scripts": {
     "build": "tsc --build",

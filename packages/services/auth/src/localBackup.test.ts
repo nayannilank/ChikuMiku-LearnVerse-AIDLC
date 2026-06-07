@@ -10,7 +10,7 @@ import {
   BACKUP_RETENTION_MS,
   LocalBackup,
 } from './localBackup';
-import { ProgressRecord } from '@chikumiku/service-core';
+import { ProgressRecord } from '@learnverse/service-core';
 
 // --- Test Helpers ---
 

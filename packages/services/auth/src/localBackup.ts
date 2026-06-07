@@ -8,7 +8,7 @@
  * Requirements: 8.7, 8.10
  */
 
-import { ProgressRecord } from '@chikumiku/service-core';
+import { ProgressRecord } from '@learnverse/service-core';
 
 // --- Constants ---
 

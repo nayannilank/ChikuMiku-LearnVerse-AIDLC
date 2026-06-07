@@ -1,19 +1,19 @@
 {
-  "name": "@chikumiku/service-api",
+  "name": "@learnverse/service-api",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@chikumiku/platform-contracts": "0.1.0",
-    "@chikumiku/service-core": "0.1.0",
-    "@chikumiku/service-auth": "0.1.0",
-    "@chikumiku/service-content-store": "0.1.0",
-    "@chikumiku/service-content-ingestion": "0.1.0",
-    "@chikumiku/service-pronunciation": "0.1.0",
-    "@chikumiku/service-grammar": "0.1.0",
-    "@chikumiku/service-comprehension": "0.1.0",
-    "@chikumiku/service-sync": "0.1.0"
+    "@learnverse/platform-contracts": "0.1.0",
+    "@learnverse/service-core": "0.1.0",
+    "@learnverse/service-auth": "0.1.0",
+    "@learnverse/service-content-store": "0.1.0",
+    "@learnverse/service-content-ingestion": "0.1.0",
+    "@learnverse/service-pronunciation": "0.1.0",
+    "@learnverse/service-grammar": "0.1.0",
+    "@learnverse/service-comprehension": "0.1.0",
+    "@learnverse/service-sync": "0.1.0"
   },
   "devDependencies": {},
   "scripts": {

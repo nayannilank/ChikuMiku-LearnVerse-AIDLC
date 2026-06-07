@@ -7,7 +7,7 @@ import {
   isAtPageLimit,
   AddPageInput,
 } from './chapterPageManager';
-import { Chapter, MAX_PAGES_PER_CHAPTER } from '@chikumiku/service-core';
+import { Chapter, MAX_PAGES_PER_CHAPTER } from '@learnverse/service-core';
 
 function makePageInput(id: string, text: string = `Text for ${id}`): AddPageInput {
   return {

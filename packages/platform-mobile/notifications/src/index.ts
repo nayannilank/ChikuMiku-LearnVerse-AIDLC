@@ -12,7 +12,7 @@ import type {
   NotificationPayload,
   NotificationPermission,
   NotificationError,
-} from '@chikumiku/platform-contracts';
+} from '@learnverse/platform-contracts';
 
 /**
  * Mobile-specific implementation of PushNotificationInterface.

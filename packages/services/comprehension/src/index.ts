@@ -1,5 +1,5 @@
 /**
- * @chikumiku/service-comprehension
+ * @learnverse/service-comprehension
  *
  * Question generation from chapter content, answer evaluation, revision mode, timed tests.
  */

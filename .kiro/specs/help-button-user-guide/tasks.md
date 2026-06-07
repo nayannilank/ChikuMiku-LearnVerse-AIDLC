@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan implements a persistent help button and in-app User Guide viewer for the ChikuMiku LearnVerse platform. A build-time script converts `docs/USER_GUIDE.md` to static HTML with an embedded TOC. The viewer loads and displays this pre-built HTML, with offline caching support and full accessibility compliance.
+This plan implements a persistent help button and in-app User Guide viewer for the LearnVerse LearnVerse platform. A build-time script converts `docs/USER_GUIDE.md` to static HTML with an embedded TOC. The viewer loads and displays this pre-built HTML, with offline caching support and full accessibility compliance.
 
 ## Tasks
 
@@ -39,7 +39,7 @@ This plan implements a persistent help button and in-app User Guide viewer for t
 
   - [x] 2.2 Implement `UserGuideCache` in `packages/core/src/helpButton/userGuideCache.ts`
     - Implement `get()`, `set()`, `has()`, `clear()` methods
-    - Use localStorage with key `chikumiku:user-guide:html`
+    - Use localStorage with key `learnverse:user-guide:html`
     - Store content with `cachedAt` timestamp and `version` hash
     - _Requirements: 6.2, 6.4_
 

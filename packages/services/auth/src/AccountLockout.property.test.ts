@@ -27,7 +27,7 @@ import {
   clearSessionStore,
   hashPassword,
 } from './session';
-import { Learner } from '@chikumiku/service-core';
+import { Learner } from '@learnverse/service-core';
 
 // --- Arbitraries ---
 

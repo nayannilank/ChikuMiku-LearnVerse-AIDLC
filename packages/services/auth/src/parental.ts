@@ -8,7 +8,7 @@
  * Requirements: 8.6
  */
 
-import { Learner, Grade, ContactType, ProgressRecord } from '@chikumiku/service-core';
+import { Learner, Grade, ContactType, ProgressRecord } from '@learnverse/service-core';
 import { addLearnerToStore, findLearnerByContact, hashPassword } from './session';
 
 // --- Parental Account Types ---

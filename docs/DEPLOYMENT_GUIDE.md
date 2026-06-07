@@ -1,8 +1,8 @@
-# ChikuMiku LearnVerse — Deployment Guide
+# LearnVerse LearnVerse — Deployment Guide
 
 ## Overview
 
-ChikuMiku LearnVerse is deployed as a cloud-hosted multi-tenant SaaS application with a layered monorepo architecture. This guide covers infrastructure setup, deployment procedures, scaling configuration, and operational concerns.
+LearnVerse LearnVerse is deployed as a cloud-hosted multi-tenant SaaS application with a layered monorepo architecture. This guide covers infrastructure setup, deployment procedures, scaling configuration, and operational concerns.
 
 ## Architecture Summary
 
@@ -51,18 +51,18 @@ The deployment artifacts are produced from the following layered structure:
 packages/
 ├── core/                    # Cross-cutting features (help button, User Guide viewer)
 ├── services/                # Deployable service logic
-│   ├── core/                # @chikumiku/service-core
-│   ├── auth/                # @chikumiku/service-auth
-│   ├── content-store/       # @chikumiku/service-content-store
-│   ├── content-ingestion/   # @chikumiku/service-content-ingestion
-│   ├── pronunciation/       # @chikumiku/service-pronunciation
-│   ├── grammar/             # @chikumiku/service-grammar
-│   ├── comprehension/       # @chikumiku/service-comprehension
-│   ├── sync/                # @chikumiku/service-sync
-│   └── api/                 # @chikumiku/service-api
-├── platform-contracts/      # @chikumiku/platform-contracts (interfaces only)
-├── platform-web/            # @chikumiku/web-* (browser implementations)
-└── platform-mobile/         # @chikumiku/mobile-* (native implementations + rn-app)
+│   ├── core/                # @learnverse/service-core
+│   ├── auth/                # @learnverse/service-auth
+│   ├── content-store/       # @learnverse/service-content-store
+│   ├── content-ingestion/   # @learnverse/service-content-ingestion
+│   ├── pronunciation/       # @learnverse/service-pronunciation
+│   ├── grammar/             # @learnverse/service-grammar
+│   ├── comprehension/       # @learnverse/service-comprehension
+│   ├── sync/                # @learnverse/service-sync
+│   └── api/                 # @learnverse/service-api
+├── platform-contracts/      # @learnverse/platform-contracts (interfaces only)
+├── platform-web/            # @learnverse/web-* (browser implementations)
+└── platform-mobile/         # @learnverse/mobile-* (native implementations + rn-app)
 ```
 
 ## Infrastructure Components
@@ -257,21 +257,21 @@ The API Gateway routes requests to the appropriate Lambda functions. All routes 
 
 | Method | Path | Target Lambda | Notes |
 |--------|------|---------------|-------|
-| POST | `/api/v1/auth/login` | `chikumiku-service-auth` | Username + password login |
-| POST | `/api/v1/auth/register/parent` | `chikumiku-service-auth` | Parent account creation |
-| POST | `/api/v1/auth/register/student` | `chikumiku-service-auth` | Student registration (links to parent) |
-| POST | `/api/v1/auth/forgot-password` | `chikumiku-service-auth` | Password recovery via parent phone/email |
-| GET | `/api/v1/auth/validate` | `chikumiku-service-auth` | Token validation (Bearer token in header) |
+| POST | `/api/v1/auth/login` | `learnverse-service-auth` | Username + password login |
+| POST | `/api/v1/auth/register/parent` | `learnverse-service-auth` | Parent account creation |
+| POST | `/api/v1/auth/register/student` | `learnverse-service-auth` | Student registration (links to parent) |
+| POST | `/api/v1/auth/forgot-password` | `learnverse-service-auth` | Password recovery via parent phone/email |
+| GET | `/api/v1/auth/validate` | `learnverse-service-auth` | Token validation (Bearer token in header) |
 
 #### Content Hierarchy Routes (JWT required)
 
 | Method | Path | Target Lambda | Notes |
 |--------|------|---------------|-------|
-| GET | `/api/v1/subjects/:subjectId/textbooks` | `chikumiku-service-content-store` | List textbooks for a subject |
-| POST | `/api/v1/subjects/:subjectId/textbooks` | `chikumiku-service-content-store` | Create textbook (name: 1-200 chars) |
-| GET | `/api/v1/textbooks/:textbookId/chapters` | `chikumiku-service-content-store` | List chapters for a textbook |
-| POST | `/api/v1/textbooks/:textbookId/chapters` | `chikumiku-service-content-store` | Create chapter (name: 1-200 chars) |
-| POST | `/api/v1/chapters/:chapterId/pages` | `chikumiku-service-content-ingestion` | Upload page image (JPEG/PNG, max 10 MB) |
+| GET | `/api/v1/subjects/:subjectId/textbooks` | `learnverse-service-content-store` | List textbooks for a subject |
+| POST | `/api/v1/subjects/:subjectId/textbooks` | `learnverse-service-content-store` | Create textbook (name: 1-200 chars) |
+| GET | `/api/v1/textbooks/:textbookId/chapters` | `learnverse-service-content-store` | List chapters for a textbook |
+| POST | `/api/v1/textbooks/:textbookId/chapters` | `learnverse-service-content-store` | Create chapter (name: 1-200 chars) |
+| POST | `/api/v1/chapters/:chapterId/pages` | `learnverse-service-content-ingestion` | Upload page image (JPEG/PNG, max 10 MB) |
 
 #### Existing Routes (JWT required)
 
@@ -321,19 +321,19 @@ npm run db:migrate -- --env production
 ```bash
 # Deploy Lambda functions
 aws lambda update-function-code \
-  --function-name chikumiku-service-auth \
+  --function-name learnverse-service-auth \
   --zip-file fileb://deploy/auth-lambda.zip
 
 aws lambda update-function-code \
-  --function-name chikumiku-service-api \
+  --function-name learnverse-service-api \
   --zip-file fileb://deploy/api-lambda.zip
 
 aws lambda update-function-code \
-  --function-name chikumiku-service-content-store \
+  --function-name learnverse-service-content-store \
   --zip-file fileb://deploy/content-store-lambda.zip
 
 aws lambda update-function-code \
-  --function-name chikumiku-service-content-ingestion \
+  --function-name learnverse-service-content-ingestion \
   --zip-file fileb://deploy/content-ingestion-lambda.zip
 ```
 
@@ -351,7 +351,7 @@ aws apigateway create-deployment \
 ```bash
 # Each subject module is deployed independently
 aws lambda update-function-code \
-  --function-name chikumiku-module-kannada \
+  --function-name learnverse-module-kannada \
   --zip-file fileb://deploy/module-kannada.zip
 ```
 
@@ -368,11 +368,11 @@ The platform supports zero-downtime deployments:
 2. **Lambda Versioning**
    ```bash
    # Publish new version
-   aws lambda publish-version --function-name chikumiku-service-api
+   aws lambda publish-version --function-name learnverse-service-api
    
    # Update alias to point to new version (weighted routing)
    aws lambda update-alias \
-     --function-name chikumiku-service-api \
+     --function-name learnverse-service-api \
      --name production \
      --function-version <new-version> \
      --routing-config AdditionalVersionWeights={"<old-version>"=0.1}
@@ -398,14 +398,14 @@ zip -r deploy/module-new-subject.zip dist/ package.json
 
 # 3. Deploy as new Lambda
 aws lambda create-function \
-  --function-name chikumiku-module-new-subject \
+  --function-name learnverse-module-new-subject \
   --runtime nodejs22.x \
   --handler index.handler \
   --zip-file fileb://deploy/module-new-subject.zip
 
 # 4. Register in Subject Module Registry
 # (via API call or database entry)
-curl -X POST https://api.chikumiku.app/admin/modules \
+curl -X POST https://api.learnverse.app/admin/modules \
   -H "Authorization: Bearer <admin-token>" \
   -d '{"subjectId": "new-subject", "name": "New Subject", ...}'
 ```
@@ -454,7 +454,7 @@ functions:
     timeout: 10s
     reserved_concurrency: 50
     environment:
-      JWT_SECRET: ${ssm:/chikumiku/jwt-secret}
+      JWT_SECRET: ${ssm:/learnverse/jwt-secret}
       JWT_EXPIRY_DAYS: "30"
       AUTH_MAX_FAILED_ATTEMPTS: "3"
       AUTH_LOCKOUT_DURATION_MINUTES: "15"
@@ -492,7 +492,7 @@ queues:
   offline_sync:
     visibility_timeout: 30s
     max_receive_count: 3
-    dead_letter_queue: chikumiku-dlq
+    dead_letter_queue: learnverse-dlq
     
   batch_analytics:
     delay_seconds: 0
@@ -654,7 +654,7 @@ backups:
 ```bash
 # Revert Lambda to previous version
 aws lambda update-alias \
-  --function-name chikumiku-service-api \
+  --function-name learnverse-service-api \
   --name production \
   --function-version <previous-version>
 
@@ -670,8 +670,8 @@ aws apigateway update-stage \
 ```bash
 # Point-in-time recovery
 aws dynamodb restore-table-to-point-in-time \
-  --source-table-name chikumiku-learners \
-  --target-table-name chikumiku-learners-restored \
+  --source-table-name learnverse-learners \
+  --target-table-name learnverse-learners-restored \
   --restore-date-time <timestamp>
 ```
 

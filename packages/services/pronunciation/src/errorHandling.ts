@@ -9,7 +9,7 @@
  * Requirements: 2.6, 2.7, 2.9
  */
 
-import { PronunciationAssetConfig } from '@chikumiku/service-core';
+import { PronunciationAssetConfig } from '@learnverse/service-core';
 
 // --- Types ---
 

@@ -5,10 +5,10 @@
  * expected naming pattern based on its directory location within the monorepo.
  *
  * Naming rules:
- * - packages/services/*          → @chikumiku/service-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)
- * - packages/platform-contracts  → @chikumiku/platform-contracts (exact match)
- * - packages/platform-web/*      → @chikumiku/web-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)
- * - packages/platform-mobile/*   → @chikumiku/mobile-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)
+ * - packages/services/*          → @learnverse/service-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)
+ * - packages/platform-contracts  → @learnverse/platform-contracts (exact match)
+ * - packages/platform-web/*      → @learnverse/web-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)
+ * - packages/platform-mobile/*   → @learnverse/mobile-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)
  *
  * Usage: npx tsx scripts/validate-naming.ts
  */
@@ -85,29 +85,29 @@ export function discoverPackages(workspaceRoot: string): PackageInfo[] {
 export function getExpectedPattern(relativePath: string): { pattern: string; description: string } | null {
   if (relativePath === 'packages/platform-contracts') {
     return {
-      pattern: '@chikumiku/platform-contracts',
-      description: 'Must be exactly "@chikumiku/platform-contracts"',
+      pattern: '@learnverse/platform-contracts',
+      description: 'Must be exactly "@learnverse/platform-contracts"',
     };
   }
 
   if (relativePath.startsWith('packages/services/')) {
     return {
-      pattern: '@chikumiku/service-{name}',
-      description: '@chikumiku/service-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)',
+      pattern: '@learnverse/service-{name}',
+      description: '@learnverse/service-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)',
     };
   }
 
   if (relativePath.startsWith('packages/platform-web/')) {
     return {
-      pattern: '@chikumiku/web-{name}',
-      description: '@chikumiku/web-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)',
+      pattern: '@learnverse/web-{name}',
+      description: '@learnverse/web-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)',
     };
   }
 
   if (relativePath.startsWith('packages/platform-mobile/')) {
     return {
-      pattern: '@chikumiku/mobile-{name}',
-      description: '@chikumiku/mobile-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)',
+      pattern: '@learnverse/mobile-{name}',
+      description: '@learnverse/mobile-{name} where {name} matches [a-z][a-z0-9-]* (1-50 chars)',
     };
   }
 
@@ -130,21 +130,21 @@ export function validatePackageName(pkg: PackageInfo): NamingViolation | null {
   }
 
   // Platform-contracts: exact match
-  if (expected.pattern === '@chikumiku/platform-contracts') {
-    if (pkg.name !== '@chikumiku/platform-contracts') {
+  if (expected.pattern === '@learnverse/platform-contracts') {
+    if (pkg.name !== '@learnverse/platform-contracts') {
       return {
         packageDir: pkg.relativePath,
         actualName: pkg.name,
         expectedPattern: expected.description,
-        reason: `Package at "${pkg.relativePath}" must be named exactly "@chikumiku/platform-contracts", but found "${pkg.name}"`,
+        reason: `Package at "${pkg.relativePath}" must be named exactly "@learnverse/platform-contracts", but found "${pkg.name}"`,
       };
     }
     return null;
   }
 
-  // Service packages: @chikumiku/service-{name}
-  if (expected.pattern === '@chikumiku/service-{name}') {
-    const prefix = '@chikumiku/service-';
+  // Service packages: @learnverse/service-{name}
+  if (expected.pattern === '@learnverse/service-{name}') {
+    const prefix = '@learnverse/service-';
     if (!pkg.name.startsWith(prefix)) {
       return {
         packageDir: pkg.relativePath,
@@ -165,9 +165,9 @@ export function validatePackageName(pkg: PackageInfo): NamingViolation | null {
     return null;
   }
 
-  // Web packages: @chikumiku/web-{name}
-  if (expected.pattern === '@chikumiku/web-{name}') {
-    const prefix = '@chikumiku/web-';
+  // Web packages: @learnverse/web-{name}
+  if (expected.pattern === '@learnverse/web-{name}') {
+    const prefix = '@learnverse/web-';
     if (!pkg.name.startsWith(prefix)) {
       return {
         packageDir: pkg.relativePath,
@@ -188,9 +188,9 @@ export function validatePackageName(pkg: PackageInfo): NamingViolation | null {
     return null;
   }
 
-  // Mobile packages: @chikumiku/mobile-{name}
-  if (expected.pattern === '@chikumiku/mobile-{name}') {
-    const prefix = '@chikumiku/mobile-';
+  // Mobile packages: @learnverse/mobile-{name}
+  if (expected.pattern === '@learnverse/mobile-{name}') {
+    const prefix = '@learnverse/mobile-';
     if (!pkg.name.startsWith(prefix)) {
       return {
         packageDir: pkg.relativePath,

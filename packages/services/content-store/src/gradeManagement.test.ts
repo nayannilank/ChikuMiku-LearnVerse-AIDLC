@@ -4,7 +4,7 @@ import {
   type LearnerProfile,
   type GradeContent,
 } from './gradeManagement';
-import type { Grade } from '@chikumiku/service-core';
+import type { Grade } from '@learnverse/service-core';
 
 function createProfile(overrides: Partial<LearnerProfile> = {}): LearnerProfile {
   return {

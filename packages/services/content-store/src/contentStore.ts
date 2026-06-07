@@ -10,7 +10,7 @@ import type {
   ActivityScore,
   ActivityType,
   ProgressRecord,
-} from '@chikumiku/service-core';
+} from '@learnverse/service-core';
 
 // --- Types ---
 

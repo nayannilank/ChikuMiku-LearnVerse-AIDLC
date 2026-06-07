@@ -1,4 +1,4 @@
-import type {DeviceStorageInterface} from '@chikumiku/platform-contracts';
+import type {DeviceStorageInterface} from '@learnverse/platform-contracts';
 
 /**
  * Key used to store unsaved learner input in device storage.

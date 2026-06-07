@@ -18,7 +18,7 @@ import {
   RevisionSession,
   SubjectModuleRegistry,
   SubjectModuleNotFoundError,
-} from '@chikumiku/service-core';
+} from '@learnverse/service-core';
 
 // --- Constants ---
 

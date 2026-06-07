@@ -2,12 +2,12 @@
 
 ## Introduction
 
-This document specifies the UX improvements required for the ChikuMiku LearnVerse mobile and web applications. The app currently launches directly into the subject selection screen without authentication, lacks proper textbook and chapter management when creating new content, does not provide camera or image upload functionality in the learning screen, and needs branding integration using the existing logo asset across mobile, app icon, and web UI. These improvements address critical gaps in user onboarding, content creation, and branding experience.
+This document specifies the UX improvements required for the LearnVerse LearnVerse mobile and web applications. The app currently launches directly into the subject selection screen without authentication, lacks proper textbook and chapter management when creating new content, does not provide camera or image upload functionality in the learning screen, and needs branding integration using the existing logo asset across mobile, app icon, and web UI. These improvements address critical gaps in user onboarding, content creation, and branding experience.
 
 ## Glossary
 
-- **App**: The ChikuMiku LearnVerse React Native mobile application located at `packages/platform-mobile/rn-app/`
-- **Web_UI**: The ChikuMiku LearnVerse web application interface accessible via browser
+- **App**: The LearnVerse LearnVerse React Native mobile application located at `packages/platform-mobile/rn-app/`
+- **Web_UI**: The LearnVerse LearnVerse web application interface accessible via browser
 - **Auth_Service**: The existing authentication backend at `packages/services/auth/` providing registration, login, session management, and lockout logic
 - **Auth_Screen**: The login and registration screen presented before access to the main app content
 - **Navigator**: The React Navigation native stack navigator managing screen transitions in the App
@@ -18,7 +18,7 @@ This document specifies the UX improvements required for the ChikuMiku LearnVers
 - **Image_Picker_UI**: The user interface element allowing learners to select an image from the device gallery
 - **Page_Addition_UI**: The combined interface presenting both Camera_Capture_UI and Image_Picker_UI options for adding textbook pages to an active chapter
 - **Splash_Screen**: The initial branded screen displayed while the App loads
-- **Logo_Asset**: The `ChikuMiku-LearnVerse-Logo.png` file located at the project root
+- **Logo_Asset**: The `LearnVerse-LearnVerse-Logo.png` file located at the project root
 - **Session_Token**: A JWT token issued by the Auth_Service upon successful login, valid for a minimum of 30 days
 - **Lockout**: A 15-minute account lock triggered after 3 consecutive failed login attempts
 - **Parent**: A registered adult user who can have one or more students (kids) linked to their account; owns the phone number and email used for account recovery
@@ -123,7 +123,7 @@ This document specifies the UX improvements required for the ChikuMiku LearnVers
 
 ### Requirement 6: Splash Screen and Mobile Branding
 
-**User Story:** As a learner, I want to see the ChikuMiku LearnVerse logo when the app starts, so that I recognize the brand and have a polished launch experience.
+**User Story:** As a learner, I want to see the LearnVerse LearnVerse logo when the app starts, so that I recognize the brand and have a polished launch experience.
 
 #### Acceptance Criteria
 
@@ -135,11 +135,11 @@ This document specifies the UX improvements required for the ChikuMiku LearnVers
 
 ### Requirement 7: Web UI Branding
 
-**User Story:** As a user accessing the web interface, I want to see the ChikuMiku LearnVerse logo on the web UI, so that the brand is consistent across all platforms.
+**User Story:** As a user accessing the web interface, I want to see the LearnVerse LearnVerse logo on the web UI, so that the brand is consistent across all platforms.
 
 #### Acceptance Criteria
 
 1. THE Web_UI SHALL display the Logo_Asset in the header or navigation area, scaled proportionally to fit without cropping
 2. THE Web_UI SHALL use the Logo_Asset as the browser favicon
 3. WHEN the Web_UI loads, THE Logo_Asset SHALL be visible on the login page and all authenticated pages within the navigation area
-4. IF the Logo_Asset fails to load, THEN THE Web_UI SHALL display the text "ChikuMiku LearnVerse" as a fallback in place of the logo image
+4. IF the Logo_Asset fails to load, THEN THE Web_UI SHALL display the text "LearnVerse LearnVerse" as a fallback in place of the logo image

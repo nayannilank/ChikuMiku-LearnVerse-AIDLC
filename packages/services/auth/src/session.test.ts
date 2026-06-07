@@ -19,7 +19,7 @@ import {
   MIN_SESSION_DURATION_DAYS,
 } from './session';
 import { clearLockoutStore } from './lockout';
-import { Learner } from '@chikumiku/service-core';
+import { Learner } from '@learnverse/service-core';
 
 // --- Test Helpers ---
 

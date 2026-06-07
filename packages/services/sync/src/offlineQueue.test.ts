@@ -8,7 +8,7 @@ import {
   clearAllQueues,
   QueueFullError,
 } from './offlineQueue';
-import { MAX_QUEUED_ACTIONS } from '@chikumiku/service-core';
+import { MAX_QUEUED_ACTIONS } from '@learnverse/service-core';
 
 describe('offline action queue', () => {
   beforeEach(() => {

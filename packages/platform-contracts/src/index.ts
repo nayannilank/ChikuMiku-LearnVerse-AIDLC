@@ -2,7 +2,7 @@
  * Platform Contracts Package
  *
  * Defines the interface boundary between service logic and platform-specific code.
- * Extracted from @chikumiku/api platformInterface.ts with additional navigation
+ * Extracted from @learnverse/api platformInterface.ts with additional navigation
  * and device storage abstractions.
  *
  * This package exports ONLY TypeScript interfaces, type aliases, and the

@@ -11,7 +11,7 @@ import type {
   CameraCaptureOptions,
   CameraCaptureResult,
   CameraError,
-} from '@chikumiku/platform-contracts';
+} from '@learnverse/platform-contracts';
 
 /**
  * Web-specific implementation of CameraInterface.

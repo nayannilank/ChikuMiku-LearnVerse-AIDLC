@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiRouter, createDefaultRoutes, ApiRequest } from './endpoints';
-import { clearEnrollmentStore, clearSessionStore, enrollSubject, addChapterToSubject } from '@chikumiku/service-core';
-import type { Chapter } from '@chikumiku/service-core';
+import { clearEnrollmentStore, clearSessionStore, enrollSubject, addChapterToSubject } from '@learnverse/service-core';
+import type { Chapter } from '@learnverse/service-core';
 
 describe('Learning Session API Handlers (Integration)', () => {
   let router: ApiRouter;

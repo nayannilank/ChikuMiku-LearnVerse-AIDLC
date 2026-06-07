@@ -3,7 +3,7 @@
  *
  * Wires the learning session workflow (subject-first) to actual service logic.
  * Each handler extracts the learner ID from the JWT (sub claim) and delegates
- * to the learningSession service in @chikumiku/service-core.
+ * to the learningSession service in @learnverse/service-core.
  */
 
 import {
@@ -16,7 +16,7 @@ import {
   getCurrentSession,
   enrollSubject,
   listEnrolledSubjects,
-} from '@chikumiku/service-core';
+} from '@learnverse/service-core';
 
 import type { ApiRequest, ApiResponse } from './endpoints';
 

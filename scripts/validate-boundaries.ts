@@ -4,7 +4,7 @@
  *
  * Validates that packages in the monorepo respect the layered architecture rules:
  * - Service packages may only depend on other service packages or platform-contracts
- * - Platform-contracts may only depend on @chikumiku/service-core
+ * - Platform-contracts may only depend on @learnverse/service-core
  * - Web packages may depend on platform-contracts and service packages, but NOT mobile packages
  * - Mobile packages may depend on platform-contracts and service packages, but NOT web packages
  *
@@ -45,10 +45,10 @@ interface ValidationResult {
  * Returns undefined if the package doesn't match any known layer pattern.
  */
 export function classifyPackageLayer(name: string): Layer | undefined {
-  if (name === '@chikumiku/platform-contracts') return 'contracts';
-  if (name.startsWith('@chikumiku/service-')) return 'services';
-  if (name.startsWith('@chikumiku/web-')) return 'web';
-  if (name.startsWith('@chikumiku/mobile-')) return 'mobile';
+  if (name === '@learnverse/platform-contracts') return 'contracts';
+  if (name.startsWith('@learnverse/service-')) return 'services';
+  if (name.startsWith('@learnverse/web-')) return 'web';
+  if (name.startsWith('@learnverse/mobile-')) return 'mobile';
   return undefined;
 }
 
@@ -57,8 +57,8 @@ export function classifyPackageLayer(name: string): Layer | undefined {
 function isForbidden(layer: Layer, depName: string): string | null {
   const depLayer = classifyPackageLayer(depName);
 
-  // Only check internal @chikumiku packages
-  if (!depName.startsWith('@chikumiku/')) return null;
+  // Only check internal @learnverse packages
+  if (!depName.startsWith('@learnverse/')) return null;
 
   switch (layer) {
     case 'services':
@@ -72,8 +72,8 @@ function isForbidden(layer: Layer, depName: string): string | null {
       break;
 
     case 'contracts':
-      // Platform-contracts may only depend on @chikumiku/service-core
-      if (depName !== '@chikumiku/service-core') {
+      // Platform-contracts may only depend on @learnverse/service-core
+      if (depName !== '@learnverse/service-core') {
         if (depLayer === 'web') {
           return 'Platform-contracts cannot depend on web packages';
         }
@@ -81,13 +81,13 @@ function isForbidden(layer: Layer, depName: string): string | null {
           return 'Platform-contracts cannot depend on mobile packages';
         }
         if (depLayer === 'services') {
-          return 'Platform-contracts may only depend on @chikumiku/service-core';
+          return 'Platform-contracts may only depend on @learnverse/service-core';
         }
         if (depLayer === 'contracts') {
           return 'Platform-contracts cannot depend on itself';
         }
-        // Any other @chikumiku package (unrecognized layer) is also forbidden
-        return 'Platform-contracts may only depend on @chikumiku/service-core';
+        // Any other @learnverse package (unrecognized layer) is also forbidden
+        return 'Platform-contracts may only depend on @learnverse/service-core';
       }
       break;
 

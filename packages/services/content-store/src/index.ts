@@ -1,5 +1,5 @@
 /**
- * @chikumiku/service-content-store
+ * @learnverse/service-content-store
  *
  * Persistent storage of chapters, progress tracking, revision material organization,
  * and grade management.

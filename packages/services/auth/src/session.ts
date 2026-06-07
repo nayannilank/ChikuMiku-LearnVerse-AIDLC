@@ -7,7 +7,7 @@
  * Requirements: 8.2, 8.3, 8.4, 8.5, 8.9
  */
 
-import { Learner } from '@chikumiku/service-core';
+import { Learner } from '@learnverse/service-core';
 import { isAccountLocked, recordFailedAttempt, resetFailureCounter } from './lockout';
 
 // --- Session Types ---

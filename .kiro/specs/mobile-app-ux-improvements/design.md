@@ -2,13 +2,13 @@
 
 ## Overview
 
-This design addresses critical UX gaps in the ChikuMiku LearnVerse mobile and web applications: authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding. The implementation builds on the existing React Native 0.74 mobile app with React Navigation 6, the Express-style API router, the `@chikumiku/service-auth` package (JWT sessions, lockout logic, parental linking), and the `@chikumiku/platform-contracts` interfaces (CameraInterface, FileSystemInterface, DeviceStorageInterface).
+This design addresses critical UX gaps in the LearnVerse LearnVerse mobile and web applications: authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding. The implementation builds on the existing React Native 0.74 mobile app with React Navigation 6, the Express-style API router, the `@learnverse/service-auth` package (JWT sessions, lockout logic, parental linking), and the `@learnverse/platform-contracts` interfaces (CameraInterface, FileSystemInterface, DeviceStorageInterface).
 
 ### Key Design Decisions
 
 1. **Auth-first navigation** — The navigator conditionally renders an auth stack or the main stack based on token presence in `DeviceStorageInterface`, avoiding deep-link conflicts.
 2. **Textbook as an intermediate entity** — Subjects own textbooks; textbooks own chapters. This mirrors physical study material organization and enables future multi-textbook support per subject.
-3. **Platform contracts for camera/gallery** — Page capture uses `CameraInterface` and `FileSystemInterface` from `@chikumiku/platform-contracts`, keeping the learning screen platform-agnostic.
+3. **Platform contracts for camera/gallery** — Page capture uses `CameraInterface` and `FileSystemInterface` from `@learnverse/platform-contracts`, keeping the learning screen platform-agnostic.
 4. **Splash screen with timeout safety** — A 1–5 second branded splash handles token validation; if initialization fails within 5 seconds, the app falls through to the auth screen gracefully.
 
 ## Architecture
@@ -123,8 +123,8 @@ sequenceDiagram
 | `SplashScreen` | (shared with auth) | Centered logo on white background |
 | `HeaderLogo` | `rn-app/src/components/HeaderLogo.tsx` | Logo in navigation bar header |
 | `WebHeaderLogo` | `platform-web/app/src/components/HeaderLogo.tsx` | Logo in web navigation/header |
-| Android app icon | `rn-app/android/app/src/main/res/` | Generated from `ChikuMiku-LearnVerse-Logo.png` |
-| Web favicon | `platform-web/app/public/favicon.ico` | Generated from `ChikuMiku-LearnVerse-Logo.png` |
+| Android app icon | `rn-app/android/app/src/main/res/` | Generated from `LearnVerse-LearnVerse-Logo.png` |
+| Web favicon | `platform-web/app/public/favicon.ico` | Generated from `LearnVerse-LearnVerse-Logo.png` |
 
 ### 5. New API Endpoints
 
@@ -372,7 +372,7 @@ interface Page {
 
 | Error Condition | User-Facing Behavior | Recovery |
 |----------------|---------------------|----------|
-| Logo fails to load (web) | Display "ChikuMiku LearnVerse" text fallback | Automatic fallback |
+| Logo fails to load (web) | Display "LearnVerse LearnVerse" text fallback | Automatic fallback |
 | Initialization timeout (5s) | Transition to auth screen with loading error message | User retries or proceeds |
 
 ## Testing Strategy
