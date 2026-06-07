@@ -43,3 +43,75 @@ jobs:
 
       - name: Security audit
         run: npm audit --audit-level=high
+
+      - name: Validate CDK synthesis
+        run: cd infra/cdk && npx cdk synth --quiet
+
+  deploy-qa:
+    name: Deploy to QA
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npx turbo build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::165030184891:role/cdk-hnb659fds-deploy-role-165030184891-ap-south-1
+          aws-region: ap-south-1
+
+      - name: Deploy to QA
+        run: cd infra/cdk && npx cdk deploy LearVerse-qa --require-approval never
+
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-qa
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npx turbo build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::165030184891:role/cdk-hnb659fds-deploy-role-165030184891-ap-south-1
+          aws-region: ap-south-1
+
+      - name: Deploy to Production
+        run: cd infra/cdk && npx cdk deploy LearnVerse-prod --require-approval never
