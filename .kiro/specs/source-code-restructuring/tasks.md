@@ -2,7 +2,7 @@
 
 ## Overview
 
-Restructure the LearnVerse LearnVerse monorepo into a layered architecture with `packages/services/*` for domain logic, `packages/platform-contracts` for interface boundaries, `packages/platform-web/*` for web implementations, and `packages/platform-mobile/*` for mobile implementations. The migration preserves all existing functionality and tests while introducing enforceable dependency boundaries.
+Restructure the ChikuMiku LearnVerse monorepo into a layered architecture with `packages/services/*` for domain logic, `packages/platform-contracts` for interface boundaries, `packages/platform-web/*` for web implementations, and `packages/platform-mobile/*` for mobile implementations. The migration preserves all existing functionality and tests while introducing enforceable dependency boundaries.
 
 ## Tasks
 

@@ -1,4 +1,4 @@
-# LearnVerse LearnVerse — Android App
+# ChikuMiku LearnVerse — Android App
 
 React Native mobile app implementing the subject-first learning workflow.
 

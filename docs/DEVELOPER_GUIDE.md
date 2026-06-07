@@ -1,8 +1,8 @@
-# LearnVerse LearnVerse — Developer Guide
+# ChikuMiku LearnVerse — Developer Guide
 
 ## Introduction
 
-LearnVerse LearnVerse is a multi-subject learning platform for children built as a TypeScript monorepo with a layered architecture. This guide covers the project structure, development workflow, architecture, and conventions for contributors.
+ChikuMiku LearnVerse is a multi-subject learning platform for children built as a TypeScript monorepo with a layered architecture. This guide covers the project structure, development workflow, architecture, and conventions for contributors.
 
 ## Tech Stack
 
@@ -41,7 +41,7 @@ LearnVerse LearnVerse is a multi-subject learning platform for children built as
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd "LearnVerse LearnVerse"
+cd "ChikuMiku LearnVerse"
 
 # Install dependencies
 npm install
@@ -179,7 +179,7 @@ Set the API URL in both clients to `http://localhost:3000` (or your machine's lo
 ## Project Structure
 
 ```
-LearnVerse LearnVerse/
+ChikuMiku LearnVerse/
 ├── packages/
 │   ├── core/                        # Shared cross-cutting features (help button)
 │   │   └── src/helpButton/          # In-app help button & User Guide viewer

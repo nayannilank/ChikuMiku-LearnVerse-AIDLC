@@ -379,7 +379,7 @@ export interface OpenApiSecurityScheme {
 // --- Default API Routes ---
 
 /**
- * Create the default set of API routes for LearnVerse LearnVerse.
+ * Create the default set of API routes for ChikuMiku LearnVerse.
  * All routes use JSON payloads and standard HTTP methods.
  */
 export function createDefaultRoutes(): ApiRoute[] {

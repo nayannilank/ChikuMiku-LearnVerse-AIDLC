@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design addresses critical UX gaps in the LearnVerse LearnVerse mobile and web applications: authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding. The implementation builds on the existing React Native 0.74 mobile app with React Navigation 6, the Express-style API router, the `@learnverse/service-auth` package (JWT sessions, lockout logic, parental linking), and the `@learnverse/platform-contracts` interfaces (CameraInterface, FileSystemInterface, DeviceStorageInterface).
+This design addresses critical UX gaps in the ChikuMiku LearnVerse mobile and web applications: authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding. The implementation builds on the existing React Native 0.74 mobile app with React Navigation 6, the Express-style API router, the `@learnverse/service-auth` package (JWT sessions, lockout logic, parental linking), and the `@learnverse/platform-contracts` interfaces (CameraInterface, FileSystemInterface, DeviceStorageInterface).
 
 ### Key Design Decisions
 
@@ -372,7 +372,7 @@ interface Page {
 
 | Error Condition | User-Facing Behavior | Recovery |
 |----------------|---------------------|----------|
-| Logo fails to load (web) | Display "LearnVerse LearnVerse" text fallback | Automatic fallback |
+| Logo fails to load (web) | Display "ChikuMiku LearnVerse" text fallback | Automatic fallback |
 | Initialization timeout (5s) | Transition to auth screen with loading error message | User retries or proceeds |
 
 ## Testing Strategy

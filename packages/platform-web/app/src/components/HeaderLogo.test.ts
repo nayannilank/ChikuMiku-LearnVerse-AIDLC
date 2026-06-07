@@ -13,7 +13,7 @@ describe('HeaderLogo', () => {
     const img = el.querySelector('img');
     expect(img).not.toBeNull();
     expect(img!.src).toContain('/LearnVerse-LearnVerse-Logo.png');
-    expect(img!.alt).toBe('LearnVerse LearnVerse');
+    expect(img!.alt).toBe('ChikuMiku LearnVerse');
   });
 
   it('styles the image with object-fit contain and max-height', () => {
@@ -49,7 +49,7 @@ describe('HeaderLogo', () => {
     expect(el.querySelector('img')).toBeNull();
     const span = el.querySelector('span');
     expect(span).not.toBeNull();
-    expect(span!.textContent).toBe('LearnVerse LearnVerse');
+    expect(span!.textContent).toBe('ChikuMiku LearnVerse');
     expect(span!.className).toBe('header-logo-fallback');
   });
 

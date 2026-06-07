@@ -1,9 +1,9 @@
 /**
  * HeaderLogo — Framework-agnostic branding component for the web platform.
  *
- * Creates an HTMLElement displaying the LearnVerse LearnVerse logo in the
+ * Creates an HTMLElement displaying the ChikuMiku LearnVerse logo in the
  * header/navigation area. The logo is scaled proportionally (object-fit: contain)
- * without cropping. On image load failure, a text fallback "LearnVerse LearnVerse"
+ * without cropping. On image load failure, a text fallback "ChikuMiku LearnVerse"
  * is displayed in place of the image.
  *
  * Usage:
@@ -21,14 +21,14 @@ export interface HeaderLogoOptions {
   logoSrc?: string;
   /** Maximum height in pixels for the logo image. Defaults to 40. */
   maxHeight?: number;
-  /** Alt text for the logo image. Defaults to 'LearnVerse LearnVerse'. */
+  /** Alt text for the logo image. Defaults to 'ChikuMiku LearnVerse'. */
   altText?: string;
 }
 
 const DEFAULT_LOGO_SRC = '/LearnVerse-LearnVerse-Logo.png';
 const DEFAULT_MAX_HEIGHT = 40;
-const DEFAULT_ALT_TEXT = 'LearnVerse LearnVerse';
-const FALLBACK_TEXT = 'LearnVerse LearnVerse';
+const DEFAULT_ALT_TEXT = 'ChikuMiku LearnVerse';
+const FALLBACK_TEXT = 'ChikuMiku LearnVerse';
 
 /**
  * Creates a header logo DOM element.
@@ -36,7 +36,7 @@ const FALLBACK_TEXT = 'LearnVerse LearnVerse';
  * The returned container holds an `<img>` element pointing to the logo asset,
  * styled to scale proportionally without cropping (object-fit: contain).
  * If the image fails to load, the img is replaced with a `<span>` containing
- * the text fallback "LearnVerse LearnVerse".
+ * the text fallback "ChikuMiku LearnVerse".
  *
  * @param options - Optional configuration for logo src, max height, and alt text.
  * @returns An HTMLElement suitable for insertion into a navigation/header area.

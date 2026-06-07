@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan implements a persistent help button and in-app User Guide viewer for the LearnVerse LearnVerse platform. A build-time script converts `docs/USER_GUIDE.md` to static HTML with an embedded TOC. The viewer loads and displays this pre-built HTML, with offline caching support and full accessibility compliance.
+This plan implements a persistent help button and in-app User Guide viewer for the ChikuMiku LearnVerse platform. A build-time script converts `docs/USER_GUIDE.md` to static HTML with an embedded TOC. The viewer loads and displays this pre-built HTML, with offline caching support and full accessibility compliance.
 
 ## Tasks
 

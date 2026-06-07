@@ -1,5 +1,5 @@
 /**
- * Page management module for LearnVerse LearnVerse.
+ * Page management module for ChikuMiku LearnVerse.
  *
  * Provides functions to manage pages within chapters, including
  * validation of image format and size constraints.

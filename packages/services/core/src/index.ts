@@ -1,7 +1,7 @@
 /**
  * @learnverse/service-core
  *
- * Core data models, types, and shared utilities for the LearnVerse LearnVerse platform.
+ * Core data models, types, and shared utilities for the ChikuMiku LearnVerse platform.
  */
 
 export * from './types';

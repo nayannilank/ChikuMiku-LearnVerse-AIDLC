@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design restructures the LearnVerse LearnVerse monorepo to clearly segregate web-specific code, mobile-specific code, and platform-agnostic service logic. The current codebase has 9 packages (`api`, `auth`, `comprehension`, `content-ingestion`, `content-store`, `core`, `grammar`, `pronunciation`, `sync`) that are largely platform-agnostic but lack explicit boundaries for platform-specific implementations. The existing `PlatformProvider` interface in `@learnverse/api` already defines abstractions for camera, file system, notifications, and audio — but platform implementations (web, mobile) don't yet exist as separate packages.
+This design restructures the ChikuMiku LearnVerse monorepo to clearly segregate web-specific code, mobile-specific code, and platform-agnostic service logic. The current codebase has 9 packages (`api`, `auth`, `comprehension`, `content-ingestion`, `content-store`, `core`, `grammar`, `pronunciation`, `sync`) that are largely platform-agnostic but lack explicit boundaries for platform-specific implementations. The existing `PlatformProvider` interface in `@learnverse/api` already defines abstractions for camera, file system, notifications, and audio — but platform implementations (web, mobile) don't yet exist as separate packages.
 
 The restructuring introduces a layered architecture with three top-level package groups: `packages/services/*` for domain logic, `packages/platform-web/*` for web-specific implementations, and `packages/platform-mobile/*` for mobile-specific implementations. A shared `packages/platform-contracts` package defines the interface boundary between service logic and platform code.
 

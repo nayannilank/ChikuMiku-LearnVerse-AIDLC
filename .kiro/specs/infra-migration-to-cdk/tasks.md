@@ -2,7 +2,7 @@
 
 ## Overview
 
-Migrate LearnVerse LearnVerse infrastructure from Serverless Framework to AWS CDK v2 (TypeScript). The implementation follows a bottom-up approach: project scaffolding → nested stacks (auth, database, storage, API, Lambda, observability) → CI/CD pipeline → Turborepo integration. All 929 existing tests continue to pass, the local dev server remains functional, and the API contract is preserved.
+Migrate ChikuMiku LearnVerse infrastructure from Serverless Framework to AWS CDK v2 (TypeScript). The implementation follows a bottom-up approach: project scaffolding → nested stacks (auth, database, storage, API, Lambda, observability) → CI/CD pipeline → Turborepo integration. All 929 existing tests continue to pass, the local dev server remains functional, and the API contract is preserved.
 
 ## Tasks
 

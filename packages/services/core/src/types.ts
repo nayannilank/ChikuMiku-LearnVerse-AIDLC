@@ -1,5 +1,5 @@
 /**
- * Core data model types for LearnVerse LearnVerse.
+ * Core data model types for ChikuMiku LearnVerse.
  *
  * These types define the domain entities used across the platform.
  */

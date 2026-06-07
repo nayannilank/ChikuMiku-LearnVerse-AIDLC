@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan implements authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding across the LearnVerse LearnVerse mobile and web applications. Tasks are organized to build foundational validation and data models first, then backend API endpoints, followed by mobile screens/navigation, content management UI, page capture, branding, and finally end-to-end wiring.
+This plan implements authentication gating, textbook/chapter content hierarchy, camera-based page capture, and consistent branding across the ChikuMiku LearnVerse mobile and web applications. Tasks are organized to build foundational validation and data models first, then backend API endpoints, followed by mobile screens/navigation, content management UI, page capture, branding, and finally end-to-end wiring.
 
 ## Tasks
 
@@ -226,7 +226,7 @@ This plan implements authentication gating, textbook/chapter content hierarchy, 
     - Create `packages/platform-web/app/src/components/HeaderLogo.tsx` displaying logo in header/navigation area, scaled proportionally without cropping
     - Generate favicon from `LearnVerse-LearnVerse-Logo.png` to `packages/platform-web/app/public/favicon.ico`
     - Display logo on login page and all authenticated pages within the navigation area
-    - Implement text fallback "LearnVerse LearnVerse" on image load error
+    - Implement text fallback "ChikuMiku LearnVerse" on image load error
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
 - [x] 9. Wire navigation and integration

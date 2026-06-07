@@ -1,8 +1,8 @@
-# LearnVerse LearnVerse — Deployment Guide
+# ChikuMiku LearnVerse — Deployment Guide
 
 ## Overview
 
-LearnVerse LearnVerse is deployed as a cloud-hosted multi-tenant SaaS application with a layered monorepo architecture. This guide covers infrastructure setup, deployment procedures, scaling configuration, and operational concerns.
+ChikuMiku LearnVerse is deployed as a cloud-hosted multi-tenant SaaS application with a layered monorepo architecture. This guide covers infrastructure setup, deployment procedures, scaling configuration, and operational concerns.
 
 ## Architecture Summary
 

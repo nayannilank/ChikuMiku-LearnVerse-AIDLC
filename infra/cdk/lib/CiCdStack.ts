@@ -32,7 +32,7 @@ export class CiCdStack extends cdk.Stack {
     // IAM role trusted by the GitHub Actions OIDC provider for this repository
     this.deployRole = new iam.Role(this, 'GitHubActionsDeployRole', {
       roleName: 'learnverse-github-actions-deploy',
-      description: 'IAM role for GitHub Actions CI/CD via OIDC (LearnVerse LearnVerse)',
+      description: 'IAM role for GitHub Actions CI/CD via OIDC (ChikuMiku LearnVerse)',
       assumedBy: new iam.FederatedPrincipal(
         oidcProvider.openIdConnectProviderArn,
         {

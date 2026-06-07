@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document defines the requirements for restructuring the LearnVerse LearnVerse monorepo into a layered architecture that clearly separates service logic, platform contracts, web-specific implementations, and mobile-specific implementations. The restructuring preserves all existing functionality and tests while introducing enforceable dependency boundaries between layers.
+This document defines the requirements for restructuring the ChikuMiku LearnVerse monorepo into a layered architecture that clearly separates service logic, platform contracts, web-specific implementations, and mobile-specific implementations. The restructuring preserves all existing functionality and tests while introducing enforceable dependency boundaries between layers.
 
 ## Glossary
 

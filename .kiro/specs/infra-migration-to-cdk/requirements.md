@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Migrate the LearnVerse LearnVerse project's infrastructure from Serverless Framework to AWS CDK, modeled after the BlipZo Shopping project's architecture. This is a major infrastructure overhaul covering seven areas: CDK adoption, Cognito authentication, Lambda decomposition, GitHub OIDC, environment gates, Turborepo build pipeline, and observability infrastructure. The migration preserves the existing API contract, all 929 tests, and local development workflow while delivering improved security, modularity, and operational visibility.
+Migrate the ChikuMiku LearnVerse project's infrastructure from Serverless Framework to AWS CDK, modeled after the BlipZo Shopping project's architecture. This is a major infrastructure overhaul covering seven areas: CDK adoption, Cognito authentication, Lambda decomposition, GitHub OIDC, environment gates, Turborepo build pipeline, and observability infrastructure. The migration preserves the existing API contract, all 929 tests, and local development workflow while delivering improved security, modularity, and operational visibility.
 
 ## Glossary
 

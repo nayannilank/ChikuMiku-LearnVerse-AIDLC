@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design migrates LearnVerse LearnVerse's infrastructure from Serverless Framework to AWS CDK v2 (TypeScript), following the proven architecture patterns from the BlipZo Shopping project. The migration delivers seven interconnected capabilities:
+This design migrates ChikuMiku LearnVerse's infrastructure from Serverless Framework to AWS CDK v2 (TypeScript), following the proven architecture patterns from the BlipZo Shopping project. The migration delivers seven interconnected capabilities:
 
 1. **CDK Stack Composition** — Typed, modular nested stacks replacing `serverless.yml`
 2. **Cognito Authentication** — Managed auth replacing custom JWT authorizer Lambda
