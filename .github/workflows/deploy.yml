@@ -20,8 +20,8 @@ env:
   AWS_REGION: ap-south-1
 
 jobs:
-  deploy:
-    name: Deploy to ${{ inputs.environment }}
+  deploy-backend:
+    name: Deploy Backend to ${{ inputs.environment }}
     runs-on: ubuntu-latest
 
     steps:
@@ -52,30 +52,3 @@ jobs:
       - name: Deploy CDK stack
         working-directory: infra/cdk
         run: npx cdk deploy LearnVerseStack-${{ inputs.environment }} --require-approval never
-
-      - name: Get CDK stack outputs
-        id: cdk-outputs
-        run: |
-          WEB_BUCKET=$(aws cloudformation describe-stacks \
-            --stack-name LearnVerseStack-${{ inputs.environment }} \
-            --query "Stacks[0].Outputs[?OutputKey=='WebAppBucketName'].OutputValue" \
-            --output text)
-          CF_DIST_ID=$(aws cloudformation describe-stacks \
-            --stack-name LearnVerseStack-${{ inputs.environment }} \
-            --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" \
-            --output text)
-          echo "web-app-bucket=$WEB_BUCKET" >> "$GITHUB_OUTPUT"
-          echo "cloudfront-distribution-id=$CF_DIST_ID" >> "$GITHUB_OUTPUT"
-
-      - name: Build web app
-        working-directory: packages/platform-web/app
-        run: npx vite build
-
-      - name: Sync web assets to S3
-        run: aws s3 sync packages/platform-web/app/dist/ s3://${{ steps.cdk-outputs.outputs.web-app-bucket }} --delete
-
-      - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ steps.cdk-outputs.outputs.cloudfront-distribution-id }} \
-            --paths "/*"

@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build && cd packages/platform-web/app && npx vite build",
+  "outputDirectory": "packages/platform-web/app/dist",
+  "installCommand": "npm ci",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
