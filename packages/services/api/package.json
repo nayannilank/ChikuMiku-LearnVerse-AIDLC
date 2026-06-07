@@ -15,18 +15,12 @@
     "@chikumiku/service-comprehension": "0.1.0",
     "@chikumiku/service-sync": "0.1.0"
   },
-  "devDependencies": {
-    "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.0"
-  },
+  "devDependencies": {},
   "scripts": {
     "build": "tsc --build",
     "test": "vitest run",
     "clean": "rm -rf dist",
     "dev": "tsx src/server.ts",
-    "deploy": "serverless deploy --stage prod",
-    "deploy:dev": "serverless deploy --stage dev",
-    "offline": "serverless offline",
     "test:unit": "vitest run"
   }
 }
