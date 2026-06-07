@@ -5,8 +5,8 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test:unit": "vitest run",
-    "test:property": "vitest run --testPathPattern=property",
+    "test:unit": "vitest run --exclude='**/*.property.test.ts'",
+    "test:property": "vitest run __tests__/*.property.test.ts",
     "cdk": "cdk",
     "synth": "cdk synth",
     "deploy": "cdk deploy"
