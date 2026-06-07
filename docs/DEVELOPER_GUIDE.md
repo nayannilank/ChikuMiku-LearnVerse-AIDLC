@@ -9,7 +9,7 @@ ChikuMiku LearnVerse is a multi-subject learning platform for children built as 
 | Category | Technology | Version / Notes |
 |----------|-----------|-----------------|
 | **Language & Runtime** | TypeScript | 5.6 (strict mode) |
-| | Node.js | 18+ |
+| | Node.js | 22+ |
 | **Monorepo** | npm workspaces | Layered architecture with dependency boundaries |
 | **Build** | `tsc --build` | Project references for incremental compilation |
 | | Vite | Web dev server with HMR |
@@ -32,7 +32,7 @@ ChikuMiku LearnVerse is a multi-subject learning platform for children built as 
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - npm 9+
 - Git
 

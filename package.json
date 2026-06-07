@@ -12,13 +12,18 @@
     "packages/platform-mobile/camera",
     "packages/platform-mobile/filesystem",
     "packages/platform-mobile/notifications",
-    "packages/platform-mobile/ui"
+    "packages/platform-mobile/ui",
+    "infra/cdk"
   ],
   "scripts": {
-    "build": "npm run build:user-guide && tsc --build",
-    "test": "vitest run",
+    "build": "npx turbo build",
+    "typecheck": "npx turbo typecheck",
+    "lint": "npx turbo lint",
+    "test:unit": "npx turbo test:unit",
+    "test:property": "npx turbo test:property",
+    "test:integration": "npx turbo test:integration",
+    "test": "npx turbo test:unit test:property",
     "test:watch": "vitest",
-    "lint": "eslint 'packages/services/*/src/**/*.ts' 'packages/platform-contracts/src/**/*.ts' 'packages/platform-web/*/src/**/*.ts' 'packages/platform-mobile/*/src/**/*.ts'",
     "build:user-guide": "npx tsx scripts/build-user-guide.ts",
     "validate:naming": "npx tsx scripts/validate-naming.ts",
     "validate:boundaries": "npx tsx scripts/validate-boundaries.ts",
@@ -32,9 +37,11 @@
     "fast-check": "3.22.0",
     "happy-dom": "^20.9.0",
     "marked": "14.1.4",
+    "turbo": "^2.9.16",
     "typescript": "5.6.3",
     "vitest": "^4.1.8"
   },
+  "packageManager": "npm@10.9.8",
   "engines": {
     "node": ">=18.0.0"
   }

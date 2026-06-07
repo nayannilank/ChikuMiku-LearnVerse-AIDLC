@@ -1,43 +1,186 @@
-name: CI
+name: CI/CD
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  NODE_VERSION: 22
 
 jobs:
-  build-and-test:
+  # ─────────────────────────────────────────────────────────────
+  # Stage 1: Validate
+  # Runs on all pushes and PRs to main
+  # ─────────────────────────────────────────────────────────────
+  validate:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Validate naming conventions
-        run: npm run validate:naming
-
-      - name: Validate dependency boundaries
-        run: npm run validate:boundaries
-
-      - name: Build (includes User Guide generation)
-        run: npm run build
-
-      - name: Run tests
-        run: npm run test
+      - name: Type check
+        run: npm run typecheck
 
       - name: Lint
         run: npm run lint
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Property tests
+        run: npm run test:property
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: Security audit
+        run: npm audit --audit-level=high
+
+      - name: CDK synth validation
+        run: npx cdk synth --quiet
+        working-directory: infra/cdk
+
+  # ─────────────────────────────────────────────────────────────
+  # Stage 2: Deploy to QA
+  # Runs only on pushes to main (not PRs), after validate passes
+  # ─────────────────────────────────────────────────────────────
+  deploy-qa:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    outputs:
+      web-app-bucket: ${{ steps.cdk-outputs.outputs.web-app-bucket }}
+      cloudfront-distribution-id: ${{ steps.cdk-outputs.outputs.cloudfront-distribution-id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy CDK stack to QA
+        run: npx cdk deploy ChikuMikuStack-qa --require-approval never
+        working-directory: infra/cdk
+
+      - name: Get CDK stack outputs
+        id: cdk-outputs
+        run: |
+          WEB_BUCKET=$(aws cloudformation describe-stacks \
+            --stack-name ChikuMikuStack-qa \
+            --query "Stacks[0].Outputs[?OutputKey=='WebAppBucketName'].OutputValue" \
+            --output text)
+          CF_DIST_ID=$(aws cloudformation describe-stacks \
+            --stack-name ChikuMikuStack-qa \
+            --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" \
+            --output text)
+          echo "web-app-bucket=$WEB_BUCKET" >> "$GITHUB_OUTPUT"
+          echo "cloudfront-distribution-id=$CF_DIST_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Build web app
+        working-directory: packages/platform-web/app
+        run: npx vite build
+
+      - name: Sync web assets to S3
+        run: aws s3 sync packages/platform-web/app/dist/ s3://${{ steps.cdk-outputs.outputs.web-app-bucket }} --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.cdk-outputs.outputs.cloudfront-distribution-id }} \
+            --paths "/*"
+
+  # ─────────────────────────────────────────────────────────────
+  # Stage 3: Deploy to Production
+  # Runs after deploy-qa succeeds, requires manual approval
+  # ─────────────────────────────────────────────────────────────
+  deploy-prod:
+    needs: deploy-qa
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy CDK stack to Production
+        run: npx cdk deploy ChikuMikuStack-prod --require-approval never
+        working-directory: infra/cdk
+
+      - name: Get CDK stack outputs
+        id: cdk-outputs
+        run: |
+          WEB_BUCKET=$(aws cloudformation describe-stacks \
+            --stack-name ChikuMikuStack-prod \
+            --query "Stacks[0].Outputs[?OutputKey=='WebAppBucketName'].OutputValue" \
+            --output text)
+          CF_DIST_ID=$(aws cloudformation describe-stacks \
+            --stack-name ChikuMikuStack-prod \
+            --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" \
+            --output text)
+          echo "web-app-bucket=$WEB_BUCKET" >> "$GITHUB_OUTPUT"
+          echo "cloudfront-distribution-id=$CF_DIST_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Build web app
+        working-directory: packages/platform-web/app
+        run: npx vite build
+
+      - name: Sync web assets to S3
+        run: aws s3 sync packages/platform-web/app/dist/ s3://${{ steps.cdk-outputs.outputs.web-app-bucket }} --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.cdk-outputs.outputs.cloudfront-distribution-id }} \
+            --paths "/*"

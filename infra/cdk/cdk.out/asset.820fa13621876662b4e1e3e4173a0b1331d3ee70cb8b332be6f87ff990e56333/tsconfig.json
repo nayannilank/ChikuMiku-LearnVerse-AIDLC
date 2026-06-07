@@ -1,0 +1,23 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../auth" },
+    { "path": "../content-store" },
+    { "path": "../content-ingestion" },
+    { "path": "../pronunciation" },
+    { "path": "../grammar" },
+    { "path": "../comprehension" },
+    { "path": "../sync" },
+    { "path": "../../platform-contracts" }
+  ]
+}

@@ -1,0 +1,1088 @@
+{
+ "Resources": {
+  "AuthLambdaLogGroup4AE3A9A6": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/lambda/chikumiku-qa-auth",
+    "RetentionInDays": 90,
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/AuthLambda/LogGroup/Resource"
+   }
+  },
+  "AuthLambdaFunctionServiceRole0FE1D002": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/AuthLambda/Function/ServiceRole/Resource"
+   }
+  },
+  "AuthLambdaFunctionServiceRoleDefaultPolicy5F29FCB3": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Arn"
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Arn"
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "cognito-idp:AdminInitiateAuth",
+        "cognito-idp:AdminCreateUser",
+        "cognito-idp:AdminSetUserPassword",
+        "cognito-idp:AdminUpdateUserAttributes",
+        "cognito-idp:AdminGetUser"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPool4463AAA1Arn"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AuthLambdaFunctionServiceRoleDefaultPolicy5F29FCB3",
+    "Roles": [
+     {
+      "Ref": "AuthLambdaFunctionServiceRole0FE1D002"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/AuthLambda/Function/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AuthLambdaFunction73B20087": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1"
+     },
+     "S3Key": "0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "STAGE_NAME": "qa",
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+      "LEARNERS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Ref"
+      },
+      "ACCOUNTS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Ref"
+      },
+      "CONTENT_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Ref"
+      },
+      "CONTENT_BUCKET": {
+       "Ref": "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Ref"
+      },
+      "USER_POOL_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPool4463AAA1Ref"
+      },
+      "USER_POOL_CLIENT_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPoolUserPoolClient59C64A7ERef"
+      }
+     }
+    },
+    "FunctionName": "chikumiku-qa-auth",
+    "Handler": "dist/handlers/auth/index.handler",
+    "LoggingConfig": {
+     "LogGroup": {
+      "Ref": "AuthLambdaLogGroup4AE3A9A6"
+     }
+    },
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "AuthLambdaFunctionServiceRole0FE1D002",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "AuthLambdaFunctionServiceRoleDefaultPolicy5F29FCB3",
+    "AuthLambdaFunctionServiceRole0FE1D002"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/AuthLambda/Function/Resource",
+    "aws:asset:path": "asset.0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ContentLambdaLogGroup0976A215": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/lambda/chikumiku-qa-content",
+    "RetentionInDays": 90,
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/ContentLambda/LogGroup/Resource"
+   }
+  },
+  "ContentLambdaFunctionServiceRole3FC1544F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/ContentLambda/Function/ServiceRole/Resource"
+   }
+  },
+  "ContentLambdaFunctionServiceRoleDefaultPolicy86FE54CE": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Arn"
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ContentLambdaFunctionServiceRoleDefaultPolicy86FE54CE",
+    "Roles": [
+     {
+      "Ref": "ContentLambdaFunctionServiceRole3FC1544F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/ContentLambda/Function/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ContentLambdaFunctionA34A1CB8": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1"
+     },
+     "S3Key": "0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "STAGE_NAME": "qa",
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+      "LEARNERS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Ref"
+      },
+      "ACCOUNTS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Ref"
+      },
+      "CONTENT_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Ref"
+      },
+      "CONTENT_BUCKET": {
+       "Ref": "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Ref"
+      },
+      "USER_POOL_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPool4463AAA1Ref"
+      },
+      "USER_POOL_CLIENT_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPoolUserPoolClient59C64A7ERef"
+      }
+     }
+    },
+    "FunctionName": "chikumiku-qa-content",
+    "Handler": "dist/handlers/content/index.handler",
+    "LoggingConfig": {
+     "LogGroup": {
+      "Ref": "ContentLambdaLogGroup0976A215"
+     }
+    },
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "ContentLambdaFunctionServiceRole3FC1544F",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "ContentLambdaFunctionServiceRoleDefaultPolicy86FE54CE",
+    "ContentLambdaFunctionServiceRole3FC1544F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/ContentLambda/Function/Resource",
+    "aws:asset:path": "asset.0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "LearningLambdaLogGroup1D11F0CE": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/lambda/chikumiku-qa-learning",
+    "RetentionInDays": 90,
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/LearningLambda/LogGroup/Resource"
+   }
+  },
+  "LearningLambdaFunctionServiceRole3BB672F9": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/LearningLambda/Function/ServiceRole/Resource"
+   }
+  },
+  "LearningLambdaFunctionServiceRoleDefaultPolicy9A76FCB8": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Arn"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LearningLambdaFunctionServiceRoleDefaultPolicy9A76FCB8",
+    "Roles": [
+     {
+      "Ref": "LearningLambdaFunctionServiceRole3BB672F9"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/LearningLambda/Function/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LearningLambdaFunction9B5C1E4D": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1"
+     },
+     "S3Key": "0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "STAGE_NAME": "qa",
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+      "LEARNERS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Ref"
+      },
+      "ACCOUNTS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Ref"
+      },
+      "CONTENT_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Ref"
+      },
+      "CONTENT_BUCKET": {
+       "Ref": "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Ref"
+      },
+      "USER_POOL_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPool4463AAA1Ref"
+      },
+      "USER_POOL_CLIENT_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPoolUserPoolClient59C64A7ERef"
+      }
+     }
+    },
+    "FunctionName": "chikumiku-qa-learning",
+    "Handler": "dist/handlers/learning/index.handler",
+    "LoggingConfig": {
+     "LogGroup": {
+      "Ref": "LearningLambdaLogGroup1D11F0CE"
+     }
+    },
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LearningLambdaFunctionServiceRole3BB672F9",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "LearningLambdaFunctionServiceRoleDefaultPolicy9A76FCB8",
+    "LearningLambdaFunctionServiceRole3BB672F9"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/LearningLambda/Function/Resource",
+    "aws:asset:path": "asset.0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SyncLambdaLogGroup0A4E2649": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/lambda/chikumiku-qa-sync",
+    "RetentionInDays": 90,
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/SyncLambda/LogGroup/Resource"
+   }
+  },
+  "SyncLambdaFunctionServiceRoleB587AAE7": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/SyncLambda/Function/ServiceRole/Resource"
+   }
+  },
+  "SyncLambdaFunctionServiceRoleDefaultPolicyAACA8118": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Arn"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Arn"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SyncLambdaFunctionServiceRoleDefaultPolicyAACA8118",
+    "Roles": [
+     {
+      "Ref": "SyncLambdaFunctionServiceRoleB587AAE7"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/SyncLambda/Function/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "SyncLambdaFunction605EE1EE": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1"
+     },
+     "S3Key": "0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "STAGE_NAME": "qa",
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+      "LEARNERS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Ref"
+      },
+      "ACCOUNTS_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Ref"
+      },
+      "CONTENT_TABLE": {
+       "Ref": "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Ref"
+      },
+      "CONTENT_BUCKET": {
+       "Ref": "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Ref"
+      },
+      "USER_POOL_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPool4463AAA1Ref"
+      },
+      "USER_POOL_CLIENT_ID": {
+       "Ref": "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPoolUserPoolClient59C64A7ERef"
+      }
+     }
+    },
+    "FunctionName": "chikumiku-qa-sync",
+    "Handler": "dist/handlers/sync/index.handler",
+    "LoggingConfig": {
+     "LogGroup": {
+      "Ref": "SyncLambdaLogGroup0A4E2649"
+     }
+    },
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "SyncLambdaFunctionServiceRoleB587AAE7",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "SyncLambdaFunctionServiceRoleDefaultPolicyAACA8118",
+    "SyncLambdaFunctionServiceRoleB587AAE7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/SyncLambda/Function/Resource",
+    "aws:asset:path": "asset.0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWJUQuCMBRGf4vv8xaToNcM6iUi9AfIdVsynVt4tyTG/nuo+HTOdz4O/HSGY4Yz5UIOudEtxKcir2TtUQwMZ2qicR1BfLjuPrnwYde33T0xg2MrEeItWOG1s8u7e2IaR4iVM2rJK1/OaPFb5maJUdEgkfIElwWMCiiDGJQvkVRia6w9dtp2iVknFfR0+HIOnEOR9aR1PgXr9aig2vgHev1q3NYAAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/LambdaStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "AuthLambdaFunction73B20087",
+     "Arn"
+    ]
+   }
+  },
+  "ChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649AArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "ContentLambdaFunctionA34A1CB8",
+     "Arn"
+    ]
+   }
+  },
+  "ChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "LearningLambdaFunction9B5C1E4D",
+     "Arn"
+    ]
+   }
+  },
+  "ChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "SyncLambdaFunction605EE1EE",
+     "Arn"
+    ]
+   }
+  },
+  "ChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Ref": {
+   "Value": {
+    "Ref": "AuthLambdaFunction73B20087"
+   }
+  },
+  "ChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649ARef": {
+   "Value": {
+    "Ref": "ContentLambdaFunctionA34A1CB8"
+   }
+  },
+  "ChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Ref": {
+   "Value": {
+    "Ref": "LearningLambdaFunction9B5C1E4D"
+   }
+  },
+  "ChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Ref": {
+   "Value": {
+    "Ref": "SyncLambdaFunction605EE1EE"
+   }
+  }
+ },
+ "Parameters": {
+  "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Arn": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Arn": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPool4463AAA1Arn": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackLearnersTable88C47879Ref": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackAccountsTable1084B033Ref": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Ref": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Ref": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPool4463AAA1Ref": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaAuthStackNestedStackAuthStackNestedStackResource0E3087EAOutputsChikuMikuStackqaAuthStackUserPoolUserPoolClient59C64A7ERef": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaDatabaseStackNestedStackDatabaseStackNestedStackResource0FB8B094OutputsChikuMikuStackqaDatabaseStackContentTable8833DBC6Arn": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaStorageStackNestedStackStorageStackNestedStackResource68D4E45COutputsChikuMikuStackqaStorageStackContentBucketA8974BF3Arn": {
+   "Type": "String"
+  }
+ }
+}

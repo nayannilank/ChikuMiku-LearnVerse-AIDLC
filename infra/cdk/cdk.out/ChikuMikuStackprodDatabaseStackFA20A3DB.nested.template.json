@@ -1,0 +1,223 @@
+{
+ "Resources": {
+  "LearnersTable1A10271D": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "pk",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "sk",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "pk",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "sk",
+      "KeyType": "RANGE"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "chikumiku-prod-learners",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-prod"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "prod"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/DatabaseStack/LearnersTable/Resource"
+   }
+  },
+  "AccountsTable81C15AE5": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "pk",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "sk",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "username",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "email",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "username-index",
+      "KeySchema": [
+       {
+        "AttributeName": "username",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "email-index",
+      "KeySchema": [
+       {
+        "AttributeName": "email",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "pk",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "sk",
+      "KeyType": "RANGE"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "chikumiku-prod-accounts",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-prod"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "prod"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/DatabaseStack/AccountsTable/Resource"
+   }
+  },
+  "ContentTableA82027C3": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "pk",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "sk",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "pk",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "sk",
+      "KeyType": "RANGE"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "chikumiku-prod-content",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-prod"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "prod"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/DatabaseStack/ContentTable/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/yXGvQqDMBAA4GdxT85yIri7O9ju5ZI7If4k4MWKiO8u1On7ELBu4FXQrtbzZOfg4OxEs/A7k58M7frlI9KS2MH5ITeLaYf4z2V60bStXi4TEwuMWv4QARGqYtQQ7LrFHBaB/vEGnOyZUm4AAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/DatabaseStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ChikuMikuStackprodDatabaseStackAccountsTableDAACC2C5Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "AccountsTable81C15AE5",
+     "Arn"
+    ]
+   }
+  },
+  "ChikuMikuStackprodDatabaseStackLearnersTable3744F7BEArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "LearnersTable1A10271D",
+     "Arn"
+    ]
+   }
+  },
+  "ChikuMikuStackprodDatabaseStackLearnersTable3744F7BERef": {
+   "Value": {
+    "Ref": "LearnersTable1A10271D"
+   }
+  },
+  "ChikuMikuStackprodDatabaseStackAccountsTableDAACC2C5Ref": {
+   "Value": {
+    "Ref": "AccountsTable81C15AE5"
+   }
+  },
+  "ChikuMikuStackprodDatabaseStackContentTable09449D84Ref": {
+   "Value": {
+    "Ref": "ContentTableA82027C3"
+   }
+  },
+  "ChikuMikuStackprodDatabaseStackContentTable09449D84Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "ContentTableA82027C3",
+     "Arn"
+    ]
+   }
+  }
+ }
+}

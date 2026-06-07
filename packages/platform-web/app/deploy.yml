@@ -1,0 +1,171 @@
+# Web App Deployment Configuration
+# Deploys the Vite-built web app to S3 + CloudFront
+#
+# Usage:
+#   1. Build the web app:  cd packages/platform-web/app && npx vite build
+#   2. Deploy:             aws s3 sync dist/ s3://$BUCKET_NAME --delete
+#   3. Invalidate cache:   aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
+#
+# Infrastructure is defined below as a CloudFormation template.
+# Deploy with: aws cloudformation deploy --template-file deploy.yml --stack-name chikumiku-web-<stage>
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ChikuMiku LearnVerse Web App - S3 + CloudFront hosting
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Deployment stage
+
+  ApiEndpoint:
+    Type: String
+    Description: Backend API Gateway URL (e.g., https://abc123.execute-api.ap-south-1.amazonaws.com/prod)
+
+  DomainName:
+    Type: String
+    Default: ''
+    Description: Custom domain name (optional, leave empty for CloudFront default)
+
+  CertificateArn:
+    Type: String
+    Default: ''
+    Description: ACM certificate ARN for custom domain (required if DomainName is set)
+
+Conditions:
+  HasCustomDomain: !Not [!Equals [!Ref DomainName, '']]
+
+Resources:
+  # --- S3 Bucket for static web assets ---
+  WebAppBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'chikumiku-${Stage}-webapp-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [GET]
+            AllowedOrigins: ['*']
+            MaxAge: 86400
+
+  # --- CloudFront Origin Access Identity ---
+  CloudFrontOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'OAI for chikumiku-${Stage}-webapp'
+
+  # --- Bucket Policy allowing CloudFront access ---
+  WebAppBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebAppBucket
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOAI.S3CanonicalUserId
+            Action: s3:GetObject
+            Resource: !Sub '${WebAppBucket.Arn}/*'
+
+  # --- CloudFront Distribution ---
+  WebAppDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Comment: !Sub 'ChikuMiku LearnVerse Web App (${Stage})'
+        HttpVersion: http2and3
+        PriceClass: PriceClass_200
+
+        Origins:
+          # Static web assets from S3
+          - Id: S3Origin
+            DomainName: !GetAtt WebAppBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOAI}'
+
+          # API backend proxy
+          - Id: ApiOrigin
+            DomainName: !Select [2, !Split ['/', !Ref ApiEndpoint]]
+            OriginPath: !Sub '/${Stage}'
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: [TLSv1.2]
+
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized
+          ResponseHeadersPolicyId: 5cc3b908-e619-4b99-88e5-2cf7f45965bd  # CORS-With-Preflight
+
+        CacheBehaviors:
+          # Proxy /api/* requests to API Gateway
+          - PathPattern: /api/*
+            TargetOriginId: ApiOrigin
+            ViewerProtocolPolicy: https-only
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac  # AllViewerExceptHostHeader
+            ResponseHeadersPolicyId: 5cc3b908-e619-4b99-88e5-2cf7f45965bd
+
+        # SPA routing: return index.html for 403/404 (client-side routing)
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+
+        # Custom domain (if provided)
+        Aliases:
+          !If
+            - HasCustomDomain
+            - [!Ref DomainName]
+            - !Ref AWS::NoValue
+
+        ViewerCertificate:
+          !If
+            - HasCustomDomain
+            - AcmCertificateArn: !Ref CertificateArn
+              MinimumProtocolVersion: TLSv1.2_2021
+              SslSupportMethod: sni-only
+            - CloudFrontDefaultCertificate: true
+
+Outputs:
+  WebAppBucketName:
+    Description: S3 bucket name for web app assets
+    Value: !Ref WebAppBucket
+
+  CloudFrontDistributionId:
+    Description: CloudFront distribution ID (for cache invalidation)
+    Value: !Ref WebAppDistribution
+
+  CloudFrontDomainName:
+    Description: CloudFront distribution domain name
+    Value: !GetAtt WebAppDistribution.DomainName
+
+  WebAppUrl:
+    Description: Web app URL
+    Value: !If
+      - HasCustomDomain
+      - !Sub 'https://${DomainName}'
+      - !Sub 'https://${WebAppDistribution.DomainName}'

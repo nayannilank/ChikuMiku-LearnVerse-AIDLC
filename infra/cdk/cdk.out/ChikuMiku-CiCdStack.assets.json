@@ -1,0 +1,36 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "c0d9f24649426c60a1bc01108070535a40353ae6cd8ceccb812969319b936e5d": {
+      "displayName": "ChikuMiku-CiCdStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider Code",
+      "source": {
+        "path": "asset.c0d9f24649426c60a1bc01108070535a40353ae6cd8ceccb812969319b936e5d",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-ap-south-1-a130567e": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "c0d9f24649426c60a1bc01108070535a40353ae6cd8ceccb812969319b936e5d.zip",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "b1eb8c326ab2725d994ad96e011ac66ef4721473af551c5a8b09fa9da73c8825": {
+      "displayName": "ChikuMiku-CiCdStack Template",
+      "source": {
+        "path": "ChikuMiku-CiCdStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-565f8b14": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "b1eb8c326ab2725d994ad96e011ac66ef4721473af551c5a8b09fa9da73c8825.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

@@ -1,0 +1,146 @@
+{
+  "/ChikuMiku-CiCdStack": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:23:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider": [
+    {
+      "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+      "data": true
+    }
+  ],
+  "/ChikuMiku-CiCdStack/DeployRoleArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DeployRoleArn"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new CiCdStack (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/lib/CiCdStack.ts:193:5)",
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:23:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Role": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new OpenIdConnectProvider2 in aws-cdk-lib...",
+        "new CiCdStack (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/lib/CiCdStack.ts:26:26)",
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:23:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Handler": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new OpenIdConnectProvider2 in aws-cdk-lib...",
+        "new CiCdStack (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/lib/CiCdStack.ts:26:26)",
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:23:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/GitHubActionsDeployRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GitHubActionsDeployRoleA6F4AD3D"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Role2 in aws-cdk-lib...",
+        "new CiCdStack (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/lib/CiCdStack.ts:33:23)",
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:23:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...App.synth in aws-cdk-lib...",
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:28:5)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/GitHubOidcProvider/Resource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GitHubOidcProvider7EBF861F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new OpenIdConnectProvider2 in aws-cdk-lib...",
+        "new CiCdStack (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/lib/CiCdStack.ts:26:26)",
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:23:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ChikuMiku-CiCdStack/GitHubActionsDeployRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GitHubActionsDeployRoleDefaultPolicy3AC475A7"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new CiCdStack (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/lib/CiCdStack.ts:52:21)",
+        "<anonymous> (/Users/nilankn/Desktop/Nayan/Projects/ChikuMiku-LearnVerse-AIDLC/infra/cdk/bin/chikumiku.ts:23:1)",
+        "...node internals..."
+      ]
+    }
+  ]
+}

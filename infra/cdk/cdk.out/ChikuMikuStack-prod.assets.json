@@ -1,0 +1,126 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6": {
+      "displayName": "LambdaStack/AuthLambda/Function/Code",
+      "source": {
+        "path": "asset.0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-ap-south-1-9b59f6bd": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "0e01f4c5a5fbcc0901cb0b08f40d80a0abd4913274017242503b9df486e3c6d6.zip",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "e121fc4bd2e33f1f6c4e8df53b7ad533b74c84eae114976b0e1a5d175a8a8135": {
+      "displayName": "AuthStack Nested Stack Template",
+      "source": {
+        "path": "ChikuMikuStackprodAuthStackCF92AC43.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-61798acb": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "e121fc4bd2e33f1f6c4e8df53b7ad533b74c84eae114976b0e1a5d175a8a8135.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "cd5a5a5c96ebc1005c61943091463aa3c95343fc0a149e8a05b8b4c0acc2e4ac": {
+      "displayName": "DatabaseStack Nested Stack Template",
+      "source": {
+        "path": "ChikuMikuStackprodDatabaseStackFA20A3DB.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-0db1ef89": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "cd5a5a5c96ebc1005c61943091463aa3c95343fc0a149e8a05b8b4c0acc2e4ac.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "278a9f6a5929640b88193e34ddfe0f6a2f7b6b7049dccfcab8da907dede2506b": {
+      "displayName": "StorageStack Nested Stack Template",
+      "source": {
+        "path": "ChikuMikuStackprodStorageStackE7429EB0.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-215eda81": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "278a9f6a5929640b88193e34ddfe0f6a2f7b6b7049dccfcab8da907dede2506b.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "882f0649270aa57434d500357e5c735488c7066acfb7337af0013da32d70fe0c": {
+      "displayName": "ApiStack Nested Stack Template",
+      "source": {
+        "path": "ChikuMikuStackprodApiStackEDAB5608.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-949dd440": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "882f0649270aa57434d500357e5c735488c7066acfb7337af0013da32d70fe0c.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "c8fcc852f921146be24b468756cdcbc1a7206f5a1a28b6b47d26345dda2a1b3a": {
+      "displayName": "LambdaStack Nested Stack Template",
+      "source": {
+        "path": "ChikuMikuStackprodLambdaStack43FD145F.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-c740cc26": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "c8fcc852f921146be24b468756cdcbc1a7206f5a1a28b6b47d26345dda2a1b3a.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "02b2637d8e863848c729cbc0f6851ce81fab149a6b6ac8402556a5fccf6fa659": {
+      "displayName": "ObservabilityStack Nested Stack Template",
+      "source": {
+        "path": "ChikuMikuStackprodObservabilityStackE265BC56.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-da74fb80": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "02b2637d8e863848c729cbc0f6851ce81fab149a6b6ac8402556a5fccf6fa659.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    },
+    "0b4273a28eb4385d63f38983ca9cb116af13f42fc739d2cf896853a39a689c29": {
+      "displayName": "ChikuMikuStack-prod Template",
+      "source": {
+        "path": "ChikuMikuStack-prod.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-south-1-6bc33f4a": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-south-1",
+          "objectKey": "0b4273a28eb4385d63f38983ca9cb116af13f42fc739d2cf896853a39a689c29.json",
+          "region": "ap-south-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-south-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

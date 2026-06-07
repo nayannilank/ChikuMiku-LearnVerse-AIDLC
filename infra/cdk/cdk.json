@@ -1,0 +1,25 @@
+{
+  "app": "npx ts-node bin/chikumiku.ts",
+  "watch": {
+    "include": ["**"],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "**/*.d.ts",
+      "**/*.js",
+      "tsconfig.json",
+      "package*.json",
+      "node_modules",
+      "dist",
+      "__tests__"
+    ]
+  },
+  "context": {
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/core:target-partitions": ["aws"],
+    "region": "ap-south-1",
+    "projectName": "chikumiku",
+    "githubRepo": "NayanKhedkar/ChikuMiku-LearnVerse"
+  }
+}

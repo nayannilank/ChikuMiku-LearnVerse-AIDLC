@@ -1,0 +1,308 @@
+{
+ "Resources": {
+  "ContentBucket52D4B12C": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketName": {
+     "Fn::Join": [
+      "",
+      [
+       "chikumiku-prod-content-",
+       {
+        "Ref": "AWS::AccountId"
+       }
+      ]
+     ]
+    },
+    "CorsConfiguration": {
+     "CorsRules": [
+      {
+       "AllowedMethods": [
+        "GET",
+        "PUT"
+       ],
+       "AllowedOrigins": [
+        "*"
+       ],
+       "MaxAge": 3600
+      }
+     ]
+    },
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "Status": "Enabled",
+       "Transitions": [
+        {
+         "StorageClass": "STANDARD_IA",
+         "TransitionInDays": 30
+        },
+        {
+         "StorageClass": "GLACIER_IR",
+         "TransitionInDays": 90
+        }
+       ]
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-prod"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "prod"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/StorageStack/ContentBucket/Resource"
+   }
+  },
+  "WebAppBucket8F6FA179": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-prod"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "prod"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/StorageStack/WebAppBucket/Resource"
+   }
+  },
+  "WebAppBucketPolicy542A2969": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "WebAppBucket8F6FA179"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "CanonicalUser": {
+         "Fn::GetAtt": [
+          "WebAppOAI5ED67000",
+          "S3CanonicalUserId"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "WebAppBucket8F6FA179",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "WebAppBucket8F6FA179",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Principal": {
+        "CanonicalUser": {
+         "Fn::GetAtt": [
+          "WebAppOAI5ED67000",
+          "S3CanonicalUserId"
+         ]
+        }
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "WebAppBucket8F6FA179",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/StorageStack/WebAppBucket/Policy/Resource"
+   }
+  },
+  "WebAppOAI5ED67000": {
+   "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+   "Properties": {
+    "CloudFrontOriginAccessIdentityConfig": {
+     "Comment": "OAI for chikumiku-prod-web-app"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/StorageStack/WebAppOAI/Resource"
+   }
+  },
+  "WebAppDistribution4473AB7E": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "CacheBehaviors": [
+      {
+       "AllowedMethods": [
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "PUT",
+        "PATCH",
+        "POST",
+        "DELETE"
+       ],
+       "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+       "Compress": true,
+       "OriginRequestPolicyId": "b689b0a8-53d0-40ab-baf2-68738e2966ac",
+       "PathPattern": "/api/*",
+       "TargetOriginId": "ChikuMikuStackprodStorageStackWebAppDistributionOrigin23E9F778D",
+       "ViewerProtocolPolicy": "redirect-to-https"
+      }
+     ],
+     "CustomErrorResponses": [
+      {
+       "ErrorCode": 403,
+       "ResponseCode": 200,
+       "ResponsePagePath": "/index.html"
+      },
+      {
+       "ErrorCode": 404,
+       "ResponseCode": 200,
+       "ResponsePagePath": "/index.html"
+      }
+     ],
+     "DefaultCacheBehavior": {
+      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "Compress": true,
+      "TargetOriginId": "ChikuMikuStackprodStorageStackWebAppDistributionOrigin1EC1ACB10",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "DefaultRootObject": "index.html",
+     "Enabled": true,
+     "HttpVersion": "http2and3",
+     "IPV6Enabled": true,
+     "Origins": [
+      {
+       "DomainName": {
+        "Fn::GetAtt": [
+         "WebAppBucket8F6FA179",
+         "RegionalDomainName"
+        ]
+       },
+       "Id": "ChikuMikuStackprodStorageStackWebAppDistributionOrigin1EC1ACB10",
+       "S3OriginConfig": {
+        "OriginAccessIdentity": {
+         "Fn::Join": [
+          "",
+          [
+           "origin-access-identity/cloudfront/",
+           {
+            "Ref": "WebAppOAI5ED67000"
+           }
+          ]
+         ]
+        }
+       }
+      },
+      {
+       "CustomOriginConfig": {
+        "OriginProtocolPolicy": "https-only",
+        "OriginSSLProtocols": [
+         "TLSv1.2"
+        ]
+       },
+       "DomainName": "placeholder-api-gateway.execute-api.ap-south-1.amazonaws.com",
+       "Id": "ChikuMikuStackprodStorageStackWebAppDistributionOrigin23E9F778D"
+      }
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-prod"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "prod"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/StorageStack/WebAppDistribution/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22LwQrCMBBEv6X3dJUUwatWhF5U9AOkTVLZtiaQ3Vgk5N+lVtCDp5k3vJEgV2tYZvVIudJ9PmAD8WCIjb5wrXpRj3SNVEDcBtUbFmVrP22OkxtQPb/zzEmowQXdemcZ4tHjDe1GKUNUaWMZ+f0oJ2c/OX+NHRJ7bAKjs5P+yyklYZ020NHiISVICUXWEWLug2W8GzjP+QJNhsJj4QAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-prod/StorageStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ChikuMikuStackprodStorageStackContentBucket44612E58Ref": {
+   "Value": {
+    "Ref": "ContentBucket52D4B12C"
+   }
+  },
+  "ChikuMikuStackprodStorageStackContentBucket44612E58Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "ContentBucket52D4B12C",
+     "Arn"
+    ]
+   }
+  }
+ }
+}

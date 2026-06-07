@@ -1,0 +1,504 @@
+{
+ "Resources": {
+  "AlarmTopicD01E77F9": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "TopicName": "chikumiku-qa-alarms"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/AlarmTopic/Resource"
+   }
+  },
+  "authErrorRateAlarm5F2C656B": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Lambda auth error rate exceeds 1%",
+    "AlarmName": "chikumiku-qa-auth-error-rate",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "EvaluationPeriods": 1,
+    "Metrics": [
+     {
+      "Expression": "IF(invocations > 0, (errors / invocations) * 100, 0)",
+      "Id": "expr_1",
+      "Label": "auth Error Rate (%)",
+      "ReturnData": true
+     },
+     {
+      "Id": "errors",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Ref"
+          }
+         }
+        ],
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     },
+     {
+      "Id": "invocations",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Ref"
+          }
+         }
+        ],
+        "MetricName": "Invocations",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Threshold": 1,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/authErrorRateAlarm/Resource"
+   }
+  },
+  "contentErrorRateAlarm21491385": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Lambda content error rate exceeds 1%",
+    "AlarmName": "chikumiku-qa-content-error-rate",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "EvaluationPeriods": 1,
+    "Metrics": [
+     {
+      "Expression": "IF(invocations > 0, (errors / invocations) * 100, 0)",
+      "Id": "expr_1",
+      "Label": "content Error Rate (%)",
+      "ReturnData": true
+     },
+     {
+      "Id": "errors",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649ARef"
+          }
+         }
+        ],
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     },
+     {
+      "Id": "invocations",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649ARef"
+          }
+         }
+        ],
+        "MetricName": "Invocations",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Threshold": 1,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/contentErrorRateAlarm/Resource"
+   }
+  },
+  "learningErrorRateAlarm9A745FD4": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Lambda learning error rate exceeds 1%",
+    "AlarmName": "chikumiku-qa-learning-error-rate",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "EvaluationPeriods": 1,
+    "Metrics": [
+     {
+      "Expression": "IF(invocations > 0, (errors / invocations) * 100, 0)",
+      "Id": "expr_1",
+      "Label": "learning Error Rate (%)",
+      "ReturnData": true
+     },
+     {
+      "Id": "errors",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Ref"
+          }
+         }
+        ],
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     },
+     {
+      "Id": "invocations",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Ref"
+          }
+         }
+        ],
+        "MetricName": "Invocations",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Threshold": 1,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/learningErrorRateAlarm/Resource"
+   }
+  },
+  "syncErrorRateAlarm6ECE95EF": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Lambda sync error rate exceeds 1%",
+    "AlarmName": "chikumiku-qa-sync-error-rate",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "EvaluationPeriods": 1,
+    "Metrics": [
+     {
+      "Expression": "IF(invocations > 0, (errors / invocations) * 100, 0)",
+      "Id": "expr_1",
+      "Label": "sync Error Rate (%)",
+      "ReturnData": true
+     },
+     {
+      "Id": "errors",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Ref"
+          }
+         }
+        ],
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     },
+     {
+      "Id": "invocations",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "FunctionName",
+          "Value": {
+           "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Ref"
+          }
+         }
+        ],
+        "MetricName": "Invocations",
+        "Namespace": "AWS/Lambda"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Threshold": 1,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/syncErrorRateAlarm/Resource"
+   }
+  },
+  "ApiLatencyAlarm453002C0": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "API Gateway p99 latency exceeds 2000ms",
+    "AlarmName": "chikumiku-qa-api-latency-p99",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "ApiName",
+      "Value": "chikumiku-qa-api"
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "ExtendedStatistic": "p99",
+    "MetricName": "Latency",
+    "Namespace": "AWS/ApiGateway",
+    "Period": 300,
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ],
+    "Threshold": 2000,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/ApiLatencyAlarm/Resource"
+   }
+  },
+  "Dashboard9E4231ED": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"widgets\":[{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"auth Error Rate\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Ref"
+       },
+       "\",{\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Ref"
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":6,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"content Error Rate\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649ARef"
+       },
+       "\",{\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649ARef"
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":12,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"learning Error Rate\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Ref"
+       },
+       "\",{\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Ref"
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":18,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"sync Error Rate\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Ref"
+       },
+       "\",{\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Ref"
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"auth Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Ref"
+       },
+       "\",{\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":6,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"content Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649ARef"
+       },
+       "\",{\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":12,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"learning Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Ref"
+       },
+       "\",{\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":18,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"sync Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Ref"
+       },
+       "\",{\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"API Gateway Latency (p99)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Latency\",\"ApiName\",\"chikumiku-qa-api\",{\"stat\":\"p99\"}]],\"yAxis\":{}}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "chikumiku-qa-dashboard",
+    "Tags": [
+     {
+      "Key": "chikumiku:stack",
+      "Value": "ChikuMikuStack-qa"
+     },
+     {
+      "Key": "chikumiku:stage",
+      "Value": "qa"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/Dashboard/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/z2JwQ7CIBAFv6V3WA3GxKvRs4fq3WwXTGkpGBbkQPh3U5t4mpn3FKjjCfYdFpakZ+nsAPVmOBl9T0izwMLPyp6hPsLbkri8/E+aIBeyLphohHp2GJf12+SKPA4Bo16nf7QmesMhRzJN+KANTLz7KAVKwaGb2FoZs092MdBv/ALWkPK7ngAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "ChikuMikuStack-qa/ObservabilityStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackAuthLambdaFunctionFF91C5B3Ref": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackContentLambdaFunctionE6EA649ARef": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackLearningLambdaFunction1B448760Ref": {
+   "Type": "String"
+  },
+  "referencetoChikuMikuStackqaLambdaStackNestedStackLambdaStackNestedStackResource07E73235OutputsChikuMikuStackqaLambdaStackSyncLambdaFunction45635C02Ref": {
+   "Type": "String"
+  }
+ }
+}

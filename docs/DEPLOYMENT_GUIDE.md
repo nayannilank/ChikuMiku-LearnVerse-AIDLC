@@ -39,7 +39,7 @@ ChikuMiku LearnVerse is deployed as a cloud-hosted multi-tenant SaaS application
 ## Prerequisites
 
 - AWS Account (or equivalent cloud provider)
-- Node.js 18+ (for build)
+- Node.js 22+ (for build)
 - AWS CLI v2 (for deployment)
 - Terraform or AWS CDK (for infrastructure-as-code)
 
@@ -399,7 +399,7 @@ zip -r deploy/module-new-subject.zip dist/ package.json
 # 3. Deploy as new Lambda
 aws lambda create-function \
   --function-name chikumiku-module-new-subject \
-  --runtime nodejs18.x \
+  --runtime nodejs22.x \
   --handler index.handler \
   --zip-file fileb://deploy/module-new-subject.zip
 
