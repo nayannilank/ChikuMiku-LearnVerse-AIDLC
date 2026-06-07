@@ -10,3 +10,4 @@ vitest.config.js.map
 vitest.config.d.ts
 vitest.config.d.ts.map
 .turbo
+cdk.out/
