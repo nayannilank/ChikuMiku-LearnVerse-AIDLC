@@ -23,6 +23,7 @@ export class StorageStack extends cdk.NestedStack {
         {
           allowedMethods: [s3.HttpMethods.GET, s3.HttpMethods.PUT],
           allowedOrigins: ['*'],
+          allowedHeaders: ['*'],
           maxAge: 3600,
         },
       ],
