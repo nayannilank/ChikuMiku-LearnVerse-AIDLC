@@ -1,0 +1,295 @@
+/* ==========================================================================
+   Home Page Styles — LearnVerse Web Application
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   CSS Custom Properties
+   -------------------------------------------------------------------------- */
+:root {
+  /* Colors */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-error: #dc2626;
+  --color-background: #f9fafb;
+  --color-card-bg: #ffffff;
+  --color-input-border: #d1d5db;
+  --color-input-focus: #4f46e5;
+  --color-register-border: #4f46e5;
+  --color-register-text: #4f46e5;
+  --color-register-hover-bg: #4f46e5;
+  --color-register-hover-text: #ffffff;
+  --color-link: #4f46e5;
+  --color-link-hover: #4338ca;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Shadows */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-input-focus: 0 0 0 3px rgba(79, 70, 229, 0.15);
+
+  /* Border Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Base / Reset
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   Header — Req 1.2, 3.3, 7.3
+   -------------------------------------------------------------------------- */
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-xl);
+  width: 100%;
+}
+
+.home-header .header-logo img {
+  max-height: 40px;
+}
+
+/* --------------------------------------------------------------------------
+   Register Button — Req 3.3
+   -------------------------------------------------------------------------- */
+.register-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-register-text);
+  background-color: transparent;
+  border: 2px solid var(--color-register-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.register-btn:hover,
+.register-btn:focus {
+  background-color: var(--color-register-hover-bg);
+  color: var(--color-register-hover-text);
+  outline: none;
+}
+
+.register-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Background Watermark — Req 2.1, 2.2, 2.3
+   -------------------------------------------------------------------------- */
+.background-watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 0.05;
+  pointer-events: none;
+  min-width: 50vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.background-watermark img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* --------------------------------------------------------------------------
+   Login Card — Req 4.1, 4.5, 7.2
+   -------------------------------------------------------------------------- */
+.login-card-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  padding: var(--spacing-xl);
+}
+
+.login-card {
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-2xl);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card h2 {
+  margin: 0 0 var(--spacing-xl) 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+}
+
+/* --------------------------------------------------------------------------
+   Form Inputs and Labels — Req 4.2, 4.3, 8.1
+   -------------------------------------------------------------------------- */
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.form-group input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--color-input-focus);
+  box-shadow: var(--shadow-input-focus);
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Submit Button — Req 4.4, 5.3
+   -------------------------------------------------------------------------- */
+.login-btn {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.login-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.login-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Error Messages — Req 5.2
+   -------------------------------------------------------------------------- */
+#message-area {
+  margin-top: var(--spacing-md);
+}
+
+.message {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.message.error {
+  color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.message.success {
+  color: #16a34a;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.validation-error {
+  color: var(--color-error);
+  font-size: 0.75rem;
+  margin-top: var(--spacing-xs);
+}
+
+/* --------------------------------------------------------------------------
+   Forgot Password Link — Req 6.1, 6.3
+   -------------------------------------------------------------------------- */
+.forgot-password-link {
+  display: block;
+  margin-top: var(--spacing-lg);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.forgot-password-link:hover,
+.forgot-password-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.forgot-password-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — Req 7.1, 7.2
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .login-card-wrapper {
+    padding: var(--spacing-md);
+  }
+
+  .login-card {
+    max-width: 100%;
+  }
+
+  .home-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}

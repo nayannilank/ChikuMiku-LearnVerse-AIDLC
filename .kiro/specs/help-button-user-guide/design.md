@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature adds a persistent help button to the LearnVerse LearnVerse platform (both web and Android) that opens an in-app viewer displaying the User Guide. The guide is pre-built as a static HTML file at build time from `docs/USER_GUIDE.md`, eliminating the need for any runtime markdown parsing. The viewer loads and renders the static HTML directly, with a pre-generated table of contents using anchor links.
+This feature adds a persistent help button to the ChikuMiku LearnVerse platform (both web and Android) that opens an in-app viewer displaying the User Guide. The guide is pre-built as a static HTML file at build time from `docs/USER_GUIDE.md`, eliminating the need for any runtime markdown parsing. The viewer loads and renders the static HTML directly, with a pre-generated table of contents using anchor links.
 
 The design leverages the existing `PlatformProvider` abstraction in `packages/api/src/platformInterface.ts` and the `ClientCache` pattern from `packages/sync/src/clientCache.ts` to deliver a cross-platform solution with offline support.
 

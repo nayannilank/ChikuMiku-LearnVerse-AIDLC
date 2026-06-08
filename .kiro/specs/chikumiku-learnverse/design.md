@@ -1,8 +1,8 @@
-# Design Document: LearnVerse LearnVerse
+# Design Document: ChikuMiku LearnVerse
 
 ## Overview
 
-LearnVerse LearnVerse is a multi-subject learning platform for children, delivered as a SaaS application on Android and web. The system enables learners to ingest textbook content via photos, practice pronunciation and grammar for language subjects, answer chapter-based questions, and revise for tests. The architecture is designed around pluggable Subject Modules that define subject-specific behavior (extraction rules, question generation, rendering) while core platform services (auth, storage, progress tracking) remain subject-agnostic.
+ChikuMiku LearnVerse is a multi-subject learning platform for children, delivered as a SaaS application on Android and web. The system enables learners to ingest textbook content via photos, practice pronunciation and grammar for language subjects, answer chapter-based questions, and revise for tests. The architecture is designed around pluggable Subject Modules that define subject-specific behavior (extraction rules, question generation, rendering) while core platform services (auth, storage, progress tracking) remain subject-agnostic.
 
 The platform uses a client-server architecture with:
 - A reactive frontend (Android + Web) using shared business logic

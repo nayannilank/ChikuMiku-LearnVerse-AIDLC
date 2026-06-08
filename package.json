@@ -2,7 +2,7 @@
   "name": "learnverse",
   "version": "0.1.0",
   "private": true,
-  "description": "LearnVerse LearnVerse - Multi-subject learning platform for children",
+  "description": "ChikuMiku LearnVerse - Multi-subject learning platform for children",
   "workspaces": [
     "packages/services/*",
     "packages/platform-contracts",

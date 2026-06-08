@@ -1,8 +1,8 @@
-# Implementation Plan: LearnVerse LearnVerse
+# Implementation Plan: ChikuMiku LearnVerse
 
 ## Overview
 
-This implementation plan builds the LearnVerse LearnVerse platform incrementally, starting with core infrastructure (data models, authentication, storage), then layering subject-specific services (content ingestion, pronunciation, grammar, comprehension), and finally wiring together cross-cutting concerns (sync, offline queue, caching). TypeScript is used throughout with a monorepo structure. Property-based tests use fast-check.
+This implementation plan builds the ChikuMiku LearnVerse platform incrementally, starting with core infrastructure (data models, authentication, storage), then layering subject-specific services (content ingestion, pronunciation, grammar, comprehension), and finally wiring together cross-cutting concerns (sync, offline queue, caching). TypeScript is used throughout with a monorepo structure. Property-based tests use fast-check.
 
 ## Tasks
 

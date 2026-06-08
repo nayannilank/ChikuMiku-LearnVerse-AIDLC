@@ -2,11 +2,11 @@
 
 ## Introduction
 
-LearnVerse LearnVerse is a subject-agnostic learning platform designed for children that enables them to learn any subject — including languages (Kannada, Hindi, English), Maths, Computers, Science, and more — through textbook chapter content. The platform supports photo-based content ingestion from textbook pages, interactive pronunciation practice for language subjects, grammar exercises, chapter-based question answering, and revision tools for test preparation. Learners can enroll in multiple subjects simultaneously and track progress independently per subject. The system is available on Android mobile and web platforms with persistent user sessions for continuous learning.
+ChikuMiku LearnVerse is a subject-agnostic learning platform designed for children that enables them to learn any subject — including languages (Kannada, Hindi, English), Maths, Computers, Science, and more — through textbook chapter content. The platform supports photo-based content ingestion from textbook pages, interactive pronunciation practice for language subjects, grammar exercises, chapter-based question answering, and revision tools for test preparation. Learners can enroll in multiple subjects simultaneously and track progress independently per subject. The system is available on Android mobile and web platforms with persistent user sessions for continuous learning.
 
 ## Glossary
 
-- **Learning_App**: The LearnVerse LearnVerse application system encompassing both Android and web clients
+- **Learning_App**: The ChikuMiku LearnVerse application system encompassing both Android and web clients
 - **Content_Ingestion_Service**: The subsystem responsible for capturing, processing, and extracting text from textbook page images in any language or notation
 - **Pronunciation_Engine**: The subsystem that provides audio playback and speech recognition for alphabets and words of any language subject
 - **Grammar_Engine**: The subsystem that assists learners in constructing grammatically correct sentences for any language subject
