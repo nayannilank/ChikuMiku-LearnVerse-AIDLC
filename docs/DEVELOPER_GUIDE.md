@@ -471,6 +471,7 @@ API layer and platform abstraction.
 | POST | `/api/v1/auth/register/parent` | Register parent account (name, username, phone, email) |
 | POST | `/api/v1/auth/register/student` | Register student account linked to parent username |
 | POST | `/api/v1/auth/forgot-password` | Initiate password recovery via parent's phone/email |
+| POST | `/api/v1/auth/reset-password` | Reset password using token + new password |
 | GET | `/api/v1/auth/validate` | Validate current token (requires Bearer token) |
 
 #### Content Hierarchy Endpoints (JWT required)
@@ -502,6 +503,38 @@ Browser-based implementations of platform contracts.
 
 - **`web-app`**: Exports `createWebPlatformProvider` — the web entry point
 - **`web-camera`**, **`web-filesystem`**, **`web-audio`**, **`web-notifications`**, **`web-ui`**: Individual capability implementations using browser APIs
+
+#### Web App Routing Architecture
+
+The web app (`packages/platform-web/app`) uses a lightweight hash-based router for client-side navigation. The router is defined in `src/router/HashRouter.ts` and wired up in `src/main.ts`.
+
+**Route definitions:**
+
+| Hash | View | Description |
+|------|------|-------------|
+| `#` (empty) | `HomeView` | Role selector → Login form (with failure actions) |
+| `#register` | `RegistrationView` | Role choice → Parent form or Parent login gate → Student form |
+| `#forgot-password` | `ForgotPasswordView` | Request password reset link |
+| `#reset-password?token=<value>` | `ResetPasswordView` | Set new password using reset token |
+| Unknown hash | `HomeView` (fallback) | Any unrecognized hash renders the home page |
+
+**Key components:**
+
+- `HashRouter` — Listens to `hashchange` events, matches regex patterns against the hash, renders the matched view into a single mount point
+- `RoleSelector` — Radio buttons (Parent/Student) on the home page, using fieldset/legend for accessibility
+- `LoginForm` — Username + password form with loading state; shows `LoginFailureActions` (Register + Reset Password links) on first failure
+- `RegistrationView` — Internal state machine: RoleChoiceScreen → ParentRegistrationForm or ParentLoginGate → StudentRegistrationForm
+- `ValidationEngine` — Declarative validation module (`src/validation/ValidationEngine.ts`) with composable validators (length, charset, email, phone, match, required)
+
+**Navigation flow (login failure → registration/reset):**
+
+```
+HomeView (role selected) → LoginForm → failure → LoginFailureActions
+  ├── "Register" link → window.location.hash = '#register'
+  └── "Reset Password" link → window.location.hash = '#forgot-password'
+```
+
+All views include a "Back to Login" link (`href="#"`) for returning to the home page.
 
 ### `packages/platform-mobile/*`
 
@@ -581,6 +614,18 @@ npm run test:watch
 - Property-based tests use fast-check with minimum 100 iterations
 - Test files follow the naming pattern: `<module>.test.ts`
 - Property test files: `<module>.property.test.ts`
+- Integration tests live in `src/integration/` within the relevant package (e.g., `packages/platform-web/app/src/integration/Navigation.test.ts`)
+
+### Integration Tests
+
+Integration tests verify end-to-end flows across multiple components. They use real implementations (not mocks) for the components under test, mocking only external services.
+
+**Web navigation integration test** (`packages/platform-web/app/src/integration/Navigation.test.ts`):
+- Tests hash-based routing with real view factories
+- Verifies navigation from login failure actions to registration and forgot-password views
+- Verifies "Back to Login" links from all views navigate back to the home page
+- Verifies unknown hashes render the fallback HomeView
+- Mocks only AuthService (external API calls) and trivial UI components (Header, BackgroundWatermark)
 
 ### Writing Tests
 
@@ -682,15 +727,18 @@ These validators run in CI on every pull request and must pass before merge.
 
 This project uses spec-driven development. Specs live in `.kiro/specs/`:
 
-- `.kiro/specs/learnverse/` — Core platform spec
-- `.kiro/specs/source-code-restructuring/` — Package restructuring spec
-- `.kiro/specs/help-button-user-guide/` — Help button & User Guide viewer spec
-- `.kiro/specs/mobile-app-ux-improvements/` — Authentication, textbook hierarchy, camera/gallery page capture, branding
-
 Each spec contains:
 - `requirements.md` — Formal requirements with acceptance criteria
 - `design.md` — Architecture, interfaces, data models, correctness properties
 - `tasks.md` — Implementation plan with requirement traceability
+
+Current specs:
+- `.kiro/specs/chikumiku-learnverse/` — Core platform spec
+- `.kiro/specs/source-code-restructuring/` — Package restructuring spec
+- `.kiro/specs/help-button-user-guide/` — Help button & User Guide viewer spec
+- `.kiro/specs/mobile-app-ux-improvements/` — Authentication, textbook hierarchy, camera/gallery page capture, branding
+- `.kiro/specs/registration-and-password-reset/` — Web role-based login, conditional registration (parent-direct, student-via-parent), and password reset flows
+- `.kiro/specs/infra-migration-to-cdk/` — Infrastructure migration to AWS CDK
 
 ## Useful Commands
 

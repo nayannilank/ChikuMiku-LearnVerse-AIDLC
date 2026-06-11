@@ -261,6 +261,7 @@ The API Gateway routes requests to the appropriate Lambda functions. All routes 
 | POST | `/api/v1/auth/register/parent` | `learnverse-service-auth` | Parent account creation |
 | POST | `/api/v1/auth/register/student` | `learnverse-service-auth` | Student registration (links to parent) |
 | POST | `/api/v1/auth/forgot-password` | `learnverse-service-auth` | Password recovery via parent phone/email |
+| POST | `/api/v1/auth/reset-password` | `learnverse-service-auth` | Reset password using token + new password |
 | GET | `/api/v1/auth/validate` | `learnverse-service-auth` | Token validation (Bearer token in header) |
 
 #### Content Hierarchy Routes (JWT required)
@@ -292,6 +293,7 @@ authorizer:
 #   - POST /api/v1/auth/register/parent
 #   - POST /api/v1/auth/register/student
 #   - POST /api/v1/auth/forgot-password
+#   - POST /api/v1/auth/reset-password
 #   - GET  /api/v1/auth/validate (uses Bearer token but validates internally)
 ```
 

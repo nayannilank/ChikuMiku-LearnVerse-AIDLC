@@ -293,3 +293,784 @@ body {
     padding: var(--spacing-sm) var(--spacing-md);
   }
 }
+
+
+/* ==========================================================================
+   Registration, Forgot Password & Reset Password Styles
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Role Selector — Req 1.1
+   -------------------------------------------------------------------------- */
+.role-selector {
+  border: none;
+  padding: 0;
+  margin: 0 auto var(--spacing-xl);
+  max-width: 400px;
+  text-align: center;
+}
+
+.role-selector legend {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+  display: block;
+  width: 100%;
+}
+
+.role-selector__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+}
+
+.role-selector__option input[type='radio'] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.role-selector__option label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Login Form — Req 1.2–1.8
+   -------------------------------------------------------------------------- */
+.home-view__login-area {
+  display: flex;
+  justify-content: center;
+}
+
+.login-form-container {
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-2xl);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form__submit {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: var(--spacing-sm);
+}
+
+.login-form__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.login-form__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.login-form__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-form__error {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.login-form__error-message {
+  display: block;
+}
+
+.login-form__failure-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.login-form__action-link {
+  font-size: 0.875rem;
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.login-form__action-link:hover,
+.login-form__action-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.login-form__action-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Registration View — Req 2.1–2.3, 12.1
+   -------------------------------------------------------------------------- */
+.registration-view {
+  max-width: 500px;
+  margin: var(--spacing-xl) auto;
+  padding: var(--spacing-xl);
+}
+
+.registration-view__back-link {
+  display: inline-block;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.875rem;
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.registration-view__back-link:hover,
+.registration-view__back-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.registration-view__back-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.registration-view__content {
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-2xl);
+}
+
+/* --------------------------------------------------------------------------
+   Role Choice Screen — Req 2.1
+   -------------------------------------------------------------------------- */
+.role-choice-screen {
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.role-choice-screen legend {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-lg);
+  display: block;
+  width: 100%;
+}
+
+.role-choice-screen__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+}
+
+.role-choice-screen__option input[type='radio'] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.role-choice-screen__option label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Parent Registration Form — Req 3.1–3.6
+   -------------------------------------------------------------------------- */
+.parent-registration-form-container {
+  width: 100%;
+}
+
+.parent-registration-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.parent-registration-form__submit {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: var(--spacing-sm);
+}
+
+.parent-registration-form__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.parent-registration-form__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.parent-registration-form__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.parent-registration-form__error {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.parent-registration-form__error-message {
+  display: block;
+}
+
+.parent-registration-form__success {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.parent-registration-form__success p {
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.parent-registration-form__login-link {
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.parent-registration-form__login-link:hover,
+.parent-registration-form__login-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Parent Login Gate — Req 6.1–6.5
+   -------------------------------------------------------------------------- */
+.parent-login-gate-container {
+  width: 100%;
+}
+
+.parent-login-gate {
+  display: flex;
+  flex-direction: column;
+}
+
+.parent-login-gate__submit {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: var(--spacing-sm);
+}
+
+.parent-login-gate__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.parent-login-gate__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.parent-login-gate__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.parent-login-gate__error {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.parent-login-gate__error-message {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Student Registration Form — Req 7.1–7.7
+   -------------------------------------------------------------------------- */
+.student-registration-form-container {
+  width: 100%;
+}
+
+.student-registration-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-registration-form__submit {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: var(--spacing-sm);
+}
+
+.student-registration-form__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.student-registration-form__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.student-registration-form__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.student-registration-form__error {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.student-registration-form__error-message {
+  display: block;
+}
+
+.student-registration-form__success {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.student-registration-form__success-message {
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.student-registration-form__login-link {
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.student-registration-form__login-link:hover,
+.student-registration-form__login-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Forgot Password View — Req 10.1–10.8, 12.2
+   -------------------------------------------------------------------------- */
+.forgot-password-view {
+  max-width: 500px;
+  margin: var(--spacing-xl) auto;
+  padding: var(--spacing-xl);
+}
+
+.forgot-password-view__back-link {
+  display: inline-block;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.875rem;
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-view__back-link:hover,
+.forgot-password-view__back-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.forgot-password-view__back-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.forgot-password-view__form {
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.forgot-password-view__submit {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: var(--spacing-sm);
+}
+
+.forgot-password-view__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.forgot-password-view__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.forgot-password-view__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.forgot-password-view__error {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.forgot-password-view__error-message {
+  display: block;
+}
+
+.forgot-password-view__success {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.forgot-password-view__success p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Reset Password View — Req 11.1–11.8, 12.3
+   -------------------------------------------------------------------------- */
+.reset-password-view {
+  max-width: 500px;
+  margin: var(--spacing-xl) auto;
+  padding: var(--spacing-xl);
+}
+
+.reset-password-view__back-link {
+  display: inline-block;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.875rem;
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.reset-password-view__back-link:hover,
+.reset-password-view__back-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.reset-password-view__back-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.reset-password-form {
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.reset-password-form__submit {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: var(--spacing-sm);
+}
+
+.reset-password-form__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.reset-password-form__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.reset-password-form__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reset-password-form__error {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.reset-password-form__error-message {
+  display: block;
+}
+
+.reset-password-form__success {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.reset-password-form__success p {
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.reset-password-form__login-link {
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.reset-password-form__login-link:hover,
+.reset-password-form__login-link:focus {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.reset-password-form__login-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Inline Validation Errors — Shared
+   -------------------------------------------------------------------------- */
+.form-group__error {
+  color: var(--color-error);
+  font-size: 0.75rem;
+  margin-top: var(--spacing-xs);
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Helper Text — Shared
+   -------------------------------------------------------------------------- */
+.form-group__helper-text {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-top: var(--spacing-xs);
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Select / Dropdown — Shared
+   -------------------------------------------------------------------------- */
+.form-group select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  padding-right: var(--spacing-2xl);
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-input-focus);
+  box-shadow: var(--shadow-input-focus);
+}
+
+/* --------------------------------------------------------------------------
+   Read-Only Input — Shared
+   -------------------------------------------------------------------------- */
+.form-group input[readonly] {
+  background-color: var(--color-background);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  border-color: var(--color-input-border);
+}
+
+.form-group input[readonly]:focus {
+  border-color: var(--color-input-border);
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Loading Indicator — Shared
+   -------------------------------------------------------------------------- */
+button:disabled {
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Welcome Card — Login Success
+   -------------------------------------------------------------------------- */
+.welcome-card {
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-2xl);
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.welcome-card h2 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.welcome-card p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   Main Content — Layout
+   -------------------------------------------------------------------------- */
+.main-content {
+  max-width: 600px;
+  margin: var(--spacing-2xl) auto;
+  padding: 0 var(--spacing-xl);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — Registration, Forgot Password, Reset Password
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .registration-view,
+  .forgot-password-view,
+  .reset-password-view {
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) auto;
+  }
+
+  .registration-view__content,
+  .forgot-password-view__form,
+  .reset-password-form {
+    padding: var(--spacing-lg);
+  }
+
+  .login-form-container {
+    padding: var(--spacing-lg);
+    max-width: 100%;
+  }
+
+  .main-content {
+    padding: 0 var(--spacing-md);
+  }
+
+  .role-selector__option,
+  .role-choice-screen__option {
+    display: flex;
+    margin: var(--spacing-sm) 0;
+  }
+}

@@ -16,11 +16,46 @@ When you open ChikuMiku LearnVerse, you'll see the branded splash screen — the
 
 ### Creating an Account
 
-ChikuMiku LearnVerse uses a two-step registration process: a **parent** creates their account first, then registers their **student** (child) linked to that parent account.
+ChikuMiku LearnVerse uses a two-step registration process: a **parent** creates their account first, then registers their **student** (child) linked to that parent account. The flow varies slightly between the web and mobile apps.
 
-#### Step 1: Register as Parent
+#### On the Web
 
-1. Open ChikuMiku LearnVerse on your Android device or web browser
+The web app uses hash-based navigation between views. You access registration from the home page:
+
+1. On the home page, select your role (Parent or Student) and attempt to log in
+2. After a failed login attempt, **Register** and **Reset Password** links appear below the error message
+3. Click **Register** to navigate to the registration view
+
+**Registering as a Parent:**
+
+1. On the registration view, select **Parent**
+2. Fill in the following fields:
+   - **Username** (8–15 characters; letters, numbers, hyphens, and underscores only)
+   - **Name** (5–20 characters; letters and spaces only)
+   - **Phone Number** (exactly 10 digits)
+   - **Email** (up to 30 characters, valid email format)
+   - **Password** (8–20 characters; letters, numbers, and special symbols)
+3. Click **Register Parent**
+4. On success, you'll see a confirmation message and be redirected to the login page after 3 seconds (a "Go to Login" link is provided as a fallback)
+
+**Registering a Student (requires parent authentication):**
+
+1. On the registration view, select **Student**
+2. You'll be asked to log in as a parent first — enter your parent credentials and click **Login as Parent**
+3. After successful parent authentication, the student registration form appears with your parent username pre-filled (read-only)
+4. Fill in the remaining fields:
+   - **Student Username** (8–15 characters; letters, numbers, hyphens, and underscores only)
+   - **Name** (5–20 characters; letters and spaces only)
+   - **Grade** (select from LKG through Twelfth)
+   - **School Name** (5–20 characters; letters, spaces, commas, and hyphens only)
+5. Click **Register Student**
+6. On success, you'll see a confirmation and be redirected to login after 3 seconds
+
+A **Back to Login** link is always visible at the top of the registration view.
+
+#### On Mobile (Android)
+
+1. Open ChikuMiku LearnVerse on your Android device
 2. Tap **Sign Up**, then select **Register as Parent**
 3. Fill in the following:
    - **Name** (up to 100 characters)
@@ -32,7 +67,7 @@ ChikuMiku LearnVerse uses a two-step registration process: a **parent** creates 
 
 If a username, email, or phone number is already taken, the app highlights exactly which field has the conflict without clearing your other entries.
 
-#### Step 2: Register as Student
+**Registering a Student on Mobile:**
 
 1. From the registration screen, select **Register as Student**
 2. Fill in the following:
@@ -55,6 +90,15 @@ If the parent username doesn't exist, the app will let you know — double-check
 
 ### Logging In
 
+#### On the Web
+
+1. On the home page, select your role — **Parent** or **Student** — using the role selector
+2. The login form appears with **Username** and **Password** fields
+3. Enter your credentials and click **Log In**
+4. If login fails, an error message appears along with **Register** and **Reset Password** links
+
+#### On Mobile (Android)
+
 1. Enter your **username** (5–15 characters) and **password** (masked by default)
 2. Tap **Log In**
 3. Your session stays active for at least 30 days — no need to log in every time
@@ -63,7 +107,26 @@ If the parent username doesn't exist, the app will let you know — double-check
 
 ### Forgot Password
 
-If you forget your password, tap the **Forgot Password** link on the login screen. Password recovery is handled via the phone number or email registered to the parent account linked to the student.
+If you forget your password, the reset process always routes through the parent's registered email — this applies to both parent and student accounts.
+
+#### On the Web
+
+1. On the home page, select your role and attempt to log in
+2. After a failed login, click the **Reset Password** link that appears
+3. On the forgot password page, enter the **Parent Username or Email** in the input field
+4. Helper text explains that the reset link will be sent to the parent's registered email regardless of whether the account is a parent or student account
+5. Click **Send Reset Link**
+6. You'll see a confirmation that the reset link has been sent to the parent's email
+7. Check your email and follow the reset link — it navigates to the reset password page
+8. Enter your **New Password** and **Confirm Password** (8–20 characters; letters, numbers, and special symbols)
+9. Click **Reset Password**
+10. On success, you'll be redirected to the login page after 3 seconds
+
+A **Back to Login** link is available on both the forgot password and reset password pages.
+
+#### On Mobile (Android)
+
+Tap the **Forgot Password** link on the login screen. Password recovery is handled via the phone number or email registered to the parent account linked to the student.
 
 ### Session Expiry
 
