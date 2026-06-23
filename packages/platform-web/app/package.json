@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "tsc --build",
     "preview": "vite preview",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test:unit": "vitest run --exclude='**/*.property.test.ts'",
+    "test:property": "vitest run src/**/*.property.test.ts"
   },
   "dependencies": {
     "@learnverse/platform-contracts": "*"

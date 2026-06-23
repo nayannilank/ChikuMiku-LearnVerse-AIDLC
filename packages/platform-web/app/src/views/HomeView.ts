@@ -78,6 +78,9 @@ export function createHomeView(): HTMLElement {
               <p>You are logged in as <strong>${result.data?.username ?? username}</strong>.</p>
             `;
             main.appendChild(welcomeCard);
+
+            // Navigate to dashboard route (Req 2.7)
+            window.location.hash = '#dashboard';
           } else {
             // Login failed — throw so LoginForm shows error + failure actions (Req 1.5, 1.6)
             throw new Error(result.error || 'Login failed. Please try again.');

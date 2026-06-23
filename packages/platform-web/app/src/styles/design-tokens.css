@@ -1,0 +1,37 @@
+:root {
+  /* Colors */
+  --cm-color-primary: #E94F9B;
+  --cm-color-secondary: #9B59B6;
+  --cm-color-background: #F8F5FF;
+  --cm-color-dark: #2C2341;
+  --cm-color-border: #E0D8EC;
+  --cm-color-error: #E74C3C;
+  --cm-color-success: #27AE60;
+  --cm-color-white: #FFFFFF;
+  --cm-color-text-muted: #6B7280;
+
+  /* Typography */
+  --cm-font-title: 26px;
+  --cm-font-heading: 16px;
+  --cm-font-heading-lg: 18px;
+  --cm-font-body: 13px;
+  --cm-font-body-sm: 12px;
+  --cm-font-button: 13px;
+  --cm-font-button-sm: 11px;
+  --cm-font-label: 11px;
+  --cm-font-label-sm: 10px;
+
+  /* Spacing & Radii */
+  --cm-radius-card: 16px;
+  --cm-radius-button: 22px;
+  --cm-radius-input: 8px;
+  --cm-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --cm-navbar-height: 36px;
+
+  /* Watermark */
+  --cm-watermark-width: 75%;
+  --cm-watermark-opacity: 0.05;
+
+  /* Content */
+  --cm-content-min-width: 960px;
+}

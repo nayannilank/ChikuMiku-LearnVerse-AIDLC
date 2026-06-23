@@ -162,7 +162,7 @@ describe('LoginForm', () => {
     const usernameInput = el.querySelector('#login-username') as HTMLInputElement;
     const passwordInput = el.querySelector('#login-password') as HTMLInputElement;
     usernameInput.value = 'testuser';
-    passwordInput.value = 'testpass';
+    passwordInput.value = 'Test1234!';
 
     // Submit
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -191,7 +191,7 @@ describe('LoginForm', () => {
     const usernameInput = el.querySelector('#login-username') as HTMLInputElement;
     const passwordInput = el.querySelector('#login-password') as HTMLInputElement;
     usernameInput.value = 'baduser';
-    passwordInput.value = 'badpass';
+    passwordInput.value = 'BadPass1!';
 
     // Submit the form
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -241,8 +241,8 @@ describe('LoginForm', () => {
 
     // Trigger failure to show actions
     const form = el.querySelector('form') as HTMLFormElement;
-    (el.querySelector('#login-username') as HTMLInputElement).value = 'u';
-    (el.querySelector('#login-password') as HTMLInputElement).value = 'p';
+    (el.querySelector('#login-username') as HTMLInputElement).value = 'failuser';
+    (el.querySelector('#login-password') as HTMLInputElement).value = 'Fail1234!';
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
     await vi.waitFor(() => {
@@ -268,8 +268,8 @@ describe('LoginForm', () => {
 
     // Trigger failure to show actions
     const form = el.querySelector('form') as HTMLFormElement;
-    (el.querySelector('#login-username') as HTMLInputElement).value = 'u';
-    (el.querySelector('#login-password') as HTMLInputElement).value = 'p';
+    (el.querySelector('#login-username') as HTMLInputElement).value = 'failuser';
+    (el.querySelector('#login-password') as HTMLInputElement).value = 'Fail1234!';
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
     await vi.waitFor(() => {
@@ -341,14 +341,14 @@ describe('HomeView', () => {
     const usernameInput = view.querySelector('#login-username') as HTMLInputElement;
     const passwordInput = view.querySelector('#login-password') as HTMLInputElement;
     usernameInput.value = 'testuser';
-    passwordInput.value = 'testpass123';
+    passwordInput.value = 'Testpass1!';
 
     // Submit
     const form = view.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
     await vi.waitFor(() => {
-      expect(mockedLoginWithRole).toHaveBeenCalledWith('testuser', 'testpass123', 'parent');
+      expect(mockedLoginWithRole).toHaveBeenCalledWith('testuser', 'Testpass1!', 'parent');
     });
   });
 
@@ -367,7 +367,7 @@ describe('HomeView', () => {
 
     // Fill and submit
     (view.querySelector('#login-username') as HTMLInputElement).value = 'student1';
-    (view.querySelector('#login-password') as HTMLInputElement).value = 'pass123';
+    (view.querySelector('#login-password') as HTMLInputElement).value = 'Pass1234!';
 
     const form = view.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -397,8 +397,8 @@ describe('HomeView', () => {
     parentRadio.dispatchEvent(new Event('change', { bubbles: true }));
 
     // Fill and submit
-    (view.querySelector('#login-username') as HTMLInputElement).value = 'bad';
-    (view.querySelector('#login-password') as HTMLInputElement).value = 'bad';
+    (view.querySelector('#login-username') as HTMLInputElement).value = 'baduser1';
+    (view.querySelector('#login-password') as HTMLInputElement).value = 'BadPass1!';
 
     const form = view.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -427,8 +427,8 @@ describe('HomeView', () => {
     const parentRadio = view.querySelector('#role-parent') as HTMLInputElement;
     parentRadio.checked = true;
     parentRadio.dispatchEvent(new Event('change', { bubbles: true }));
-    (view.querySelector('#login-username') as HTMLInputElement).value = 'u';
-    (view.querySelector('#login-password') as HTMLInputElement).value = 'p';
+    (view.querySelector('#login-username') as HTMLInputElement).value = 'failuser';
+    (view.querySelector('#login-password') as HTMLInputElement).value = 'Fail1234!';
 
     const form = view.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -457,8 +457,8 @@ describe('HomeView', () => {
     const parentRadio = view.querySelector('#role-parent') as HTMLInputElement;
     parentRadio.checked = true;
     parentRadio.dispatchEvent(new Event('change', { bubbles: true }));
-    (view.querySelector('#login-username') as HTMLInputElement).value = 'u';
-    (view.querySelector('#login-password') as HTMLInputElement).value = 'p';
+    (view.querySelector('#login-username') as HTMLInputElement).value = 'failuser';
+    (view.querySelector('#login-password') as HTMLInputElement).value = 'Fail1234!';
 
     const form = view.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -490,7 +490,7 @@ describe('HomeView', () => {
 
     // Fill and submit
     (view.querySelector('#login-username') as HTMLInputElement).value = 'happyuser';
-    (view.querySelector('#login-password') as HTMLInputElement).value = 'secret';
+    (view.querySelector('#login-password') as HTMLInputElement).value = 'Secret1234!';
 
     const form = view.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));

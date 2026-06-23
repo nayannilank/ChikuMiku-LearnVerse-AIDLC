@@ -23,12 +23,16 @@ const textbookStore = new Map<string, Textbook>();
 /** Map of chapter ID → Chapter (from textbook hierarchy) */
 const chapterStore = new Map<string, Chapter>();
 
+/** Map of chapter ID → subjectId (tracks subject association for standalone chapters) */
+const chapterSubjectMap = new Map<string, string>();
+
 /**
  * Clears all content stores. Used in tests.
  */
 export function clearContentStore(): void {
   textbookStore.clear();
   chapterStore.clear();
+  chapterSubjectMap.clear();
 }
 
 // --- Helper: Extract learner ID from JWT ---
@@ -428,5 +432,176 @@ export async function handleAddPage(req: ApiRequest): Promise<ApiResponse> {
     status: 201,
     headers: { 'Content-Type': 'application/json' },
     body: { data: page, message: 'Page added successfully.' },
+  };
+}
+
+/**
+ * POST /api/v1/chapters
+ *
+ * Creates a standalone chapter (not scoped to a textbook route).
+ * Body: { "name": "...", "textbookId": "...", "subjectId": "..." }
+ *
+ * Requirements: 8.1, 8.2, 8.3
+ */
+export async function handleCreateStandaloneChapter(req: ApiRequest): Promise<ApiResponse> {
+  const body = req.body as { name?: string; textbookId?: string; subjectId?: string } | undefined;
+  const nameValue = body?.name ?? '';
+  const textbookId = body?.textbookId ?? '';
+  const subjectId = body?.subjectId ?? '';
+
+  // Validate required fields
+  const errors: Array<{ field: string; message: string }> = [];
+
+  const trimmedName = nameValue.trim();
+  if (!trimmedName || trimmedName.length < 1 || trimmedName.length > 200) {
+    errors.push({
+      field: 'name',
+      message: 'Name is required and must be between 1 and 200 characters.',
+    });
+  }
+
+  if (!textbookId) {
+    errors.push({
+      field: 'textbookId',
+      message: 'Textbook ID is required.',
+    });
+  }
+
+  if (!subjectId) {
+    errors.push({
+      field: 'subjectId',
+      message: 'Subject ID is required.',
+    });
+  }
+
+  if (errors.length > 0) {
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'VALIDATION_ERROR',
+        message: 'Validation failed.',
+        errors,
+        retryable: false,
+      },
+    };
+  }
+
+  const now = new Date();
+  const chapter: Chapter = {
+    id: randomUUID(),
+    textbookId,
+    name: trimmedName,
+    pages: [],
+    chapterNumber: 1,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  chapterStore.set(chapter.id, chapter);
+  chapterSubjectMap.set(chapter.id, subjectId);
+
+  return {
+    status: 201,
+    headers: { 'Content-Type': 'application/json' },
+    body: { id: chapter.id, message: 'Chapter created' },
+  };
+}
+
+/**
+ * GET /api/v1/chapters/:chapterId
+ *
+ * Retrieves a chapter by its ID.
+ *
+ * Requirements: 9.1, 9.2, 9.3
+ */
+export async function handleGetChapterById(req: ApiRequest): Promise<ApiResponse> {
+  // Extract chapterId from path: /api/v1/chapters/:chapterId
+  const pathParts = req.path.split('/');
+  const chapterId = pathParts[4]; // /api/v1/chapters/<chapterId>
+
+  if (!chapterId) {
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: { code: 'MISSING_PARAM', message: 'Chapter ID is required.', retryable: false },
+    };
+  }
+
+  const chapter = chapterStore.get(chapterId);
+  if (!chapter) {
+    return {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+      body: { code: 'NOT_FOUND', message: 'Chapter not found', retryable: false },
+    };
+  }
+
+  return {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: {
+      name: chapter.name,
+      pageCount: chapter.pages.length,
+      createdAt: chapter.createdAt,
+      textbookId: chapter.textbookId,
+    },
+  };
+}
+
+/**
+ * GET /api/v1/subjects/:subjectId/chapters
+ *
+ * Lists chapters for a subject with pagination.
+ *
+ * Requirements: 10.1, 10.2, 10.3
+ */
+export async function handleListSubjectChapters(req: ApiRequest): Promise<ApiResponse> {
+  // Extract subjectId from path: /api/v1/subjects/:subjectId/chapters
+  const pathParts = req.path.split('/');
+  const subjectId = pathParts[4]; // /api/v1/subjects/<subjectId>/chapters
+
+  if (!subjectId) {
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: { code: 'MISSING_PARAM', message: 'Subject ID is required.', retryable: false },
+    };
+  }
+
+  // Parse pagination params
+  const pageParam = req.queryParams?.page;
+  const pageSizeParam = req.queryParams?.pageSize;
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 1;
+  const pageSize = pageSizeParam ? Math.max(1, parseInt(pageSizeParam, 10) || 20) : 20;
+
+  // Filter chapters by subjectId
+  const subjectChapters: Chapter[] = [];
+  for (const [chapterId, chapter] of chapterStore.entries()) {
+    const mappedSubjectId = chapterSubjectMap.get(chapterId);
+    if (mappedSubjectId === subjectId) {
+      subjectChapters.push(chapter);
+    }
+  }
+
+  const totalItems = subjectChapters.length;
+  const totalPages = totalItems === 0 ? 0 : Math.ceil(totalItems / pageSize);
+
+  // Slice for pagination
+  const startIndex = (page - 1) * pageSize;
+  const paginatedData = subjectChapters.slice(startIndex, startIndex + pageSize);
+
+  return {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: {
+      data: paginatedData,
+      pagination: {
+        page,
+        pageSize,
+        totalItems,
+        totalPages,
+      },
+    },
   };
 }

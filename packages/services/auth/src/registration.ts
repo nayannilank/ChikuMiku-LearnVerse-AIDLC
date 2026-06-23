@@ -418,6 +418,48 @@ export function findParentByUsername(username: string): ParentAccount | undefine
 }
 
 /**
+ * Retrieves a student account by username. Used for forgot-password and login lookups.
+ */
+export function findStudentByUsername(username: string): StudentAccount | undefined {
+  for (const account of studentAccountStore.values()) {
+    if (account.username === username) {
+      return account;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Updates the password hash for a parent account identified by username.
+ * Returns true if the account was found and updated, false otherwise.
+ */
+export function updateParentPasswordHash(username: string, newPasswordHash: string): boolean {
+  for (const account of parentAccountStore.values()) {
+    if (account.username === username) {
+      account.passwordHash = newPasswordHash;
+      account.updatedAt = new Date();
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Updates the password hash for a student account identified by username.
+ * Returns true if the account was found and updated, false otherwise.
+ */
+export function updateStudentPasswordHash(username: string, newPasswordHash: string): boolean {
+  for (const account of studentAccountStore.values()) {
+    if (account.username === username) {
+      account.passwordHash = newPasswordHash;
+      account.updatedAt = new Date();
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Retrieves a parent account by email.
  */
 function findParentByEmail(email: string): ParentAccount | undefined {

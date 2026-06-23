@@ -167,7 +167,7 @@ describe('Navigation Integration', () => {
       const usernameInput = mountPoint.querySelector('#login-username') as HTMLInputElement;
       const passwordInput = mountPoint.querySelector('#login-password') as HTMLInputElement;
       usernameInput.value = 'testuser';
-      passwordInput.value = 'testpass';
+      passwordInput.value = 'Testpass1!';
 
       // Dispatch submit event on the form element
       loginForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -208,7 +208,7 @@ describe('Navigation Integration', () => {
       const usernameInput = mountPoint.querySelector('#login-username') as HTMLInputElement;
       const passwordInput = mountPoint.querySelector('#login-password') as HTMLInputElement;
       usernameInput.value = 'testuser';
-      passwordInput.value = 'testpass';
+      passwordInput.value = 'Testpass1!';
 
       loginForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 

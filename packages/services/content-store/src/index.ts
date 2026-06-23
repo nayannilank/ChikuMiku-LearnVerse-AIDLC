@@ -9,3 +9,4 @@ export * from './contentStore';
 export * from './gradeManagement';
 export * from './tieredStorage';
 export * from './clientCache';
+export * from './revisionEngine';

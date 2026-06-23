@@ -59,6 +59,10 @@ export function emailValidator(): ValidatorFn {
     if (local.length === 0 || domain.length === 0) {
       return `Invalid email format`;
     }
+    // Domain must contain at least one dot (e.g., example.com)
+    if (!domain.includes('.')) {
+      return `Invalid email format`;
+    }
     return null;
   };
 }

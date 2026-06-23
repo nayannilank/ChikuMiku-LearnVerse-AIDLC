@@ -122,6 +122,16 @@ export function createParentRegistrationForm(
   // Store references to inputs and error elements for each field
   const inputs: Record<string, HTMLInputElement> = {};
   const errorElements: Record<string, HTMLElement> = {};
+  const tooltipElements: Record<string, HTMLElement> = {};
+
+  // Tooltip text for each field's validation criteria
+  const TOOLTIP_TEXT: Record<string, string> = {
+    username: 'Username should be between 8–15 characters, and contain letters, numbers, hyphens, and underscores only.',
+    name: 'Name should be between 5–20 characters, and contain letters and spaces only.',
+    phone: 'Phone number should be exactly 10 digits (0-9), with no spaces, dashes, or country code.',
+    email: 'Email should be 30 characters or less, with a valid format like name@example.com.',
+    password: 'Password should be between 8–20 characters, and contain letters, numbers, and special characters (!@#$%^&*).',
+  };
 
   // Create form groups for each field (Req 13.2: label with matching for/id)
   for (const field of FIELDS) {
@@ -145,16 +155,42 @@ export function createParentRegistrationForm(
     errorEl.setAttribute('role', 'alert');
     errorEl.style.display = 'none';
 
+    // Tooltip element showing validation criteria on failure
+    const tooltipEl = document.createElement('div');
+    tooltipEl.className = 'validation-tooltip';
+    tooltipEl.setAttribute('role', 'tooltip');
+    tooltipEl.style.display = 'none';
+    tooltipEl.textContent = TOOLTIP_TEXT[field.name] ?? '';
+
     // Associate input with its error element via aria-describedby
     input.setAttribute('aria-describedby', errorEl.id);
 
     group.appendChild(label);
     group.appendChild(input);
     group.appendChild(errorEl);
+    group.appendChild(tooltipEl);
     form.appendChild(group);
 
     inputs[field.name] = input;
     errorElements[field.name] = errorEl;
+    tooltipElements[field.name] = tooltipEl;
+
+    // Attach blur validation for phone and email fields (Req 2.1, 2.2)
+    if (field.name === 'phone' || field.name === 'email') {
+      input.addEventListener('blur', () => {
+        const value = input.value;
+        const error = validateSingleField(field.name, value);
+        if (error) {
+          errorEl.innerHTML = `<span>${escapeHtml(error)}</span>`;
+          errorEl.style.display = 'block';
+          tooltipEl.style.display = 'block';
+        } else {
+          errorEl.innerHTML = '';
+          errorEl.style.display = 'none';
+          tooltipEl.style.display = 'none';
+        }
+      });
+    }
   }
 
   // Submit button (Req 3.6, 5.3: loading state)
@@ -181,6 +217,17 @@ export function createParentRegistrationForm(
 
   // --- Helpers ---
 
+  /**
+   * Validates a single field by name against its VALIDATION_RULES entry.
+   * Returns the first error message string if invalid, or null if valid.
+   */
+  function validateSingleField(fieldName: string, value: string): string | null {
+    const rule = VALIDATION_RULES.find((r) => r.fieldName === fieldName);
+    if (!rule) return null;
+    const result = validate([rule], { [fieldName]: value });
+    return result.errors[fieldName] ?? null;
+  }
+
   function setLoading(loading: boolean): void {
     submitButton.disabled = loading;
     submitButton.textContent = loading ? BUTTON_TEXT_LOADING : BUTTON_TEXT_DEFAULT;
@@ -189,13 +236,16 @@ export function createParentRegistrationForm(
   function showInlineErrors(errors: Record<string, string>): void {
     for (const field of FIELDS) {
       const errorEl = errorElements[field.name];
+      const tooltipEl = tooltipElements[field.name];
       const message = errors[field.name];
       if (message) {
         errorEl.innerHTML = `<span>${escapeHtml(message)}</span>`;
         errorEl.style.display = 'block';
+        if (tooltipEl) tooltipEl.style.display = 'block';
       } else {
         errorEl.innerHTML = '';
         errorEl.style.display = 'none';
+        if (tooltipEl) tooltipEl.style.display = 'none';
       }
     }
   }
@@ -203,8 +253,10 @@ export function createParentRegistrationForm(
   function clearInlineErrors(): void {
     for (const field of FIELDS) {
       const errorEl = errorElements[field.name];
+      const tooltipEl = tooltipElements[field.name];
       errorEl.innerHTML = '';
       errorEl.style.display = 'none';
+      if (tooltipEl) tooltipEl.style.display = 'none';
     }
   }
 

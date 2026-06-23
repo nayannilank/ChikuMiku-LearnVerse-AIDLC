@@ -81,94 +81,76 @@ describe('createWebPlatformProvider', () => {
     });
   });
 
-  describe('capability methods throw or reject when invoked (stub behavior)', () => {
-    it('camera.requestPermission rejects with "Not implemented"', async () => {
+  describe('capability methods degrade gracefully when browser APIs are unavailable', () => {
+    it('camera.requestPermission resolves to false when mediaDevices is unavailable', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.camera.requestPermission()).rejects.toThrow('Not implemented');
+      const result = await provider.camera.requestPermission();
+      expect(result).toBe(false);
     });
 
-    it('camera.capture rejects with "Not implemented"', async () => {
+    it('camera.capture throws a CameraError when mediaDevices is unavailable', async () => {
       const provider = createWebPlatformProvider();
       await expect(
         provider.camera.capture({ format: 'jpeg', quality: 80 })
-      ).rejects.toThrow('Not implemented');
+      ).rejects.toEqual(expect.objectContaining({ code: 'CAMERA_UNAVAILABLE' }));
     });
 
-    it('fileSystem.pickFiles rejects with "Not implemented"', async () => {
+    it('fileSystem.readFile resolves with empty data when file is not found', async () => {
       const provider = createWebPlatformProvider();
-      await expect(
-        provider.fileSystem.pickFiles({ acceptedTypes: ['image/png'], multiple: false })
-      ).rejects.toThrow('Not implemented');
+      const result = await provider.fileSystem.readFile('/test.txt');
+      expect(result.data.byteLength).toBe(0);
     });
 
-    it('fileSystem.readFile rejects with "Not implemented"', async () => {
+    it('fileSystem.deleteFile resolves to false when file does not exist', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.fileSystem.readFile('/test.txt')).rejects.toThrow('Not implemented');
+      const result = await provider.fileSystem.deleteFile('/test.txt');
+      expect(result).toBe(false);
     });
 
-    it('fileSystem.writeFile rejects with "Not implemented"', async () => {
+    it('fileSystem.getAvailableSpace resolves to 0 when Storage API is unavailable', async () => {
       const provider = createWebPlatformProvider();
-      await expect(
-        provider.fileSystem.writeFile('/test.txt', new ArrayBuffer(0), 'text/plain')
-      ).rejects.toThrow('Not implemented');
+      const result = await provider.fileSystem.getAvailableSpace();
+      expect(result).toBe(0);
     });
 
-    it('fileSystem.deleteFile rejects with "Not implemented"', async () => {
+    it('notifications.requestPermission resolves to false when Notification API is unavailable', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.fileSystem.deleteFile('/test.txt')).rejects.toThrow('Not implemented');
+      const result = await provider.notifications.requestPermission();
+      expect(result).toBe(false);
     });
 
-    it('fileSystem.getAvailableSpace rejects with "Not implemented"', async () => {
+    it('notifications.registerForPush resolves to empty string when push is unavailable', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.fileSystem.getAvailableSpace()).rejects.toThrow('Not implemented');
+      const result = await provider.notifications.registerForPush();
+      expect(result).toBe('');
     });
 
-    it('notifications.requestPermission rejects with "Not implemented"', async () => {
+    it('notifications.showLocalNotification resolves to false when permission not granted', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.notifications.requestPermission()).rejects.toThrow('Not implemented');
+      const result = await provider.notifications.showLocalNotification({
+        id: '1',
+        title: 'Test',
+        body: 'Test body',
+      });
+      expect(result).toBe(false);
     });
 
-    it('notifications.registerForPush rejects with "Not implemented"', async () => {
+    it('audio.requestMicrophonePermission resolves to false when mediaDevices is unavailable', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.notifications.registerForPush()).rejects.toThrow('Not implemented');
+      const result = await provider.audio.requestMicrophonePermission();
+      expect(result).toBe(false);
     });
 
-    it('notifications.showLocalNotification rejects with "Not implemented"', async () => {
+    it('audio.stopRecording resolves with empty result when no recording active', async () => {
       const provider = createWebPlatformProvider();
-      await expect(
-        provider.notifications.showLocalNotification({
-          id: '1',
-          title: 'Test',
-          body: 'Test body',
-        })
-      ).rejects.toThrow('Not implemented');
+      const result = await provider.audio.stopRecording();
+      expect(result.data.byteLength).toBe(0);
+      expect(result.durationSeconds).toBe(0);
     });
 
-    it('audio.requestMicrophonePermission rejects with "Not implemented"', async () => {
+    it('audio.stopPlayback resolves without error when nothing is playing', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.audio.requestMicrophonePermission()).rejects.toThrow('Not implemented');
-    });
-
-    it('audio.startRecording rejects with "Not implemented"', async () => {
-      const provider = createWebPlatformProvider();
-      await expect(
-        provider.audio.startRecording({ maxDurationSeconds: 30, format: 'wav' })
-      ).rejects.toThrow('Not implemented');
-    });
-
-    it('audio.stopRecording rejects with "Not implemented"', async () => {
-      const provider = createWebPlatformProvider();
-      await expect(provider.audio.stopRecording()).rejects.toThrow('Not implemented');
-    });
-
-    it('audio.playAudio rejects with "Not implemented"', async () => {
-      const provider = createWebPlatformProvider();
-      await expect(provider.audio.playAudio(new ArrayBuffer(0))).rejects.toThrow('Not implemented');
-    });
-
-    it('audio.stopPlayback rejects with "Not implemented"', async () => {
-      const provider = createWebPlatformProvider();
-      await expect(provider.audio.stopPlayback()).rejects.toThrow('Not implemented');
+      await expect(provider.audio.stopPlayback()).resolves.toBeUndefined();
     });
 
     it('navigation.navigate throws "Not implemented"', () => {
@@ -181,29 +163,31 @@ describe('createWebPlatformProvider', () => {
       expect(() => provider.navigation.goBack()).toThrow('Not implemented');
     });
 
-    it('storage.getItem rejects with "Not implemented"', async () => {
+    it('storage.setItem resolves successfully', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.storage.getItem('key')).rejects.toThrow('Not implemented');
+      await expect(provider.storage.setItem('key', 'value')).resolves.toBeUndefined();
     });
 
-    it('storage.setItem rejects with "Not implemented"', async () => {
+    it('storage.getItem resolves to null for non-existent key', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.storage.setItem('key', 'value')).rejects.toThrow('Not implemented');
+      const result = await provider.storage.getItem('nonexistent');
+      expect(result).toBeNull();
     });
 
-    it('storage.removeItem rejects with "Not implemented"', async () => {
+    it('storage.removeItem resolves successfully', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.storage.removeItem('key')).rejects.toThrow('Not implemented');
+      await expect(provider.storage.removeItem('key')).resolves.toBeUndefined();
     });
 
-    it('storage.clear rejects with "Not implemented"', async () => {
+    it('storage.clear resolves successfully', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.storage.clear()).rejects.toThrow('Not implemented');
+      await expect(provider.storage.clear()).resolves.toBeUndefined();
     });
 
-    it('storage.getAllKeys rejects with "Not implemented"', async () => {
+    it('storage.getAllKeys resolves to an array', async () => {
       const provider = createWebPlatformProvider();
-      await expect(provider.storage.getAllKeys()).rejects.toThrow('Not implemented');
+      const result = await provider.storage.getAllKeys();
+      expect(Array.isArray(result)).toBe(true);
     });
   });
 });

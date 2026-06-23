@@ -1,24 +1,67 @@
 /**
  * Authentication API Handlers.
  *
- * Handles login, registration (parent + student), forgot-password, and token validation.
+ * Handles login, registration (parent + student), forgot-password, reset-password,
+ * token refresh, and token validation.
  * Integrates with @learnverse/service-auth for JWT issuance, lockout logic, and session management.
  *
- * Requirements: 1.1, 2.2, 2.3, 2.5, 3.4, 3.10, 3.11
+ * Requirements: 1.1, 2.2, 2.3, 2.5, 3.1-3.5, 4.1-4.5, 5.1-5.4
  */
 
 import {
-  login,
-  validateSession,
   isAccountLocked,
+  recordFailedAttempt,
+  resetFailureCounter,
   validateUsername,
   validatePassword,
   validateEmail,
   validatePhone,
-  validateRegistrationInput,
+  registerParent,
+  registerStudent,
+  addLearnerToStore,
+  createTokenPair,
+  getJwtConfig,
+  verifyToken,
+  findParentByUsername,
+  findStudentByUsername,
+  updateParentPasswordHash,
+  updateStudentPasswordHash,
+  hashPassword,
+  verifyPassword,
+  generateResetToken,
+  validateResetToken,
+  consumeResetToken,
+  notificationService,
 } from '@learnverse/service-auth';
 
+import type { Learner, ContactType, Grade } from '@learnverse/service-core';
+import { randomUUID } from 'crypto';
 import type { ApiRequest, ApiResponse } from './endpoints';
+
+// --- Revoked Refresh Token Registry ---
+// Maintains a set of revoked refresh tokens to prevent reuse (Requirement 5.3)
+const revokedRefreshTokens = new Set<string>();
+
+/**
+ * Revokes a refresh token so it cannot be reused.
+ */
+export function revokeRefreshToken(token: string): void {
+  revokedRefreshTokens.add(token);
+}
+
+/**
+ * Checks if a refresh token has been revoked.
+ */
+export function isRefreshTokenRevoked(token: string): boolean {
+  return revokedRefreshTokens.has(token);
+}
+
+/**
+ * Clears the revoked token set. Used for test isolation.
+ */
+export function clearRevokedTokens(): void {
+  revokedRefreshTokens.clear();
+}
 
 // --- POST /api/v1/auth/login ---
 
@@ -63,10 +106,29 @@ export async function handleLogin(req: ApiRequest): Promise<ApiResponse> {
     };
   }
 
-  const result = login({ contactValue: username, password });
+  // Look up account by username only (parent or student store)
+  const parentAccount = findParentByUsername(username);
+  const studentAccount = !parentAccount ? findStudentByUsername(username) : undefined;
+  const account = parentAccount || studentAccount;
 
-  if (!result.success) {
-    // After login failure, check if account became locked
+  if (!account) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'INVALID_USERNAME',
+        message: 'Invalid User Name',
+        retryable: false,
+      },
+    };
+  }
+
+  // Verify password against the account's stored hash
+  if (!verifyPassword(password, account.passwordHash)) {
+    // Record failed attempt (may trigger lockout)
+    recordFailedAttempt(username, 'email');
+
+    // Check if account became locked after this attempt
     if (isAccountLocked(username)) {
       return {
         status: 429,
@@ -86,22 +148,28 @@ export async function handleLogin(req: ApiRequest): Promise<ApiResponse> {
       headers: { 'Content-Type': 'application/json' },
       body: {
         code: 'INVALID_CREDENTIALS',
-        message: result.error,
+        message: 'Invalid credentials. Please check your username and password.',
         retryable: false,
       },
     };
   }
 
-  const { session } = result;
+  // Successful login — reset failure counter and issue JWT tokens
+  resetFailureCounter(username);
+
+  const jwtConfig = getJwtConfig();
+  const roles = parentAccount ? ['parent'] : ['student'];
+  const tokenPair = createTokenPair(account.id, roles, jwtConfig);
 
   return {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
     body: {
-      accessToken: session.token,
-      refreshToken: session.refreshToken,
-      expiresAt: session.expiresAt.getTime(),
+      token: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
+      expiresAt: tokenPair.expiresAt,
       tokenType: 'Bearer',
+      username: account.username,
     },
   };
 }
@@ -200,14 +268,57 @@ export async function handleRegisterParent(req: ApiRequest): Promise<ApiResponse
     };
   }
 
-  // Registration logic will be fully implemented in task 2.2.
-  // For now, return success to wire the endpoint structure.
+  // Call registerParent() from service-auth
+  const result = registerParent({
+    name: body.name!,
+    username: body.username!,
+    password: body.password!,
+    phoneNumber: body.phone!,
+    email: body.email!,
+  });
+
+  if (!result.success) {
+    // Determine if this is a duplicate/conflict error or a validation error
+    const conflictMessages = [
+      'Username is already taken',
+      'Email is already registered',
+      'Phone number is already registered',
+    ];
+    const isConflict = result.errors.some((e) =>
+      conflictMessages.includes(e.message)
+    );
+
+    if (isConflict) {
+      return {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          code: 'CONFLICT',
+          message: 'An account with this information already exists.',
+          errors: result.errors,
+          retryable: false,
+        },
+      };
+    }
+
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'VALIDATION_ERROR',
+        message: 'One or more fields failed validation.',
+        errors: result.errors,
+        retryable: false,
+      },
+    };
+  }
+
   return {
     status: 201,
     headers: { 'Content-Type': 'application/json' },
     body: {
       message: 'Parent account created successfully. Please register your student.',
-      username: body.username,
+      username: result.account.username,
     },
   };
 }
@@ -303,17 +414,90 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
     };
   }
 
-  // Full registration + parent-linking logic will be implemented in task 2.2.
-  // For now, return success with a placeholder token (auto-login on student registration).
+  // Call registerStudent() from service-auth
+  const result = registerStudent({
+    name: body.name!,
+    username: body.username!,
+    password: body.password!,
+    grade: body.grade!,
+    parentUsername: body.parentUsername!,
+  });
+
+  if (!result.success) {
+    // Determine if this is a duplicate/conflict error or a validation error
+    const isConflict = result.errors.some(
+      (e) => e.message === 'Username is already taken'
+    );
+    const isParentNotFound = result.errors.some(
+      (e) => e.field === 'parentUsername' && e.message === 'Parent username does not exist'
+    );
+
+    if (isConflict) {
+      return {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          code: 'CONFLICT',
+          message: 'An account with this username already exists.',
+          errors: result.errors,
+          retryable: false,
+        },
+      };
+    }
+
+    if (isParentNotFound) {
+      return {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          code: 'VALIDATION_ERROR',
+          message: 'Parent username does not exist.',
+          errors: result.errors,
+          retryable: false,
+        },
+      };
+    }
+
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'VALIDATION_ERROR',
+        message: 'One or more fields failed validation.',
+        errors: result.errors,
+        retryable: false,
+      },
+    };
+  }
+
+  // Add a Learner record to the learner store with contactValue = student username
+  const learner: Learner = {
+    id: randomUUID(),
+    displayName: result.account.name,
+    contactType: 'email' as ContactType,
+    contactValue: result.account.username,
+    passwordHash: result.account.passwordHash,
+    grade: result.account.grade as Grade,
+    enrolledSubjects: [],
+    parentAccountId: result.account.parentAccountId,
+    createdAt: result.account.createdAt,
+    updatedAt: result.account.updatedAt,
+  };
+  addLearnerToStore(learner);
+
+  // Generate JWT token pair for auto-login
+  const jwtConfig = getJwtConfig();
+  const tokenPair = createTokenPair(learner.id, ['student'], jwtConfig);
+
   return {
     status: 201,
     headers: { 'Content-Type': 'application/json' },
     body: {
       message: 'Student account created successfully.',
-      username: body.username,
-      accessToken: '',
-      refreshToken: '',
-      expiresAt: 0,
+      username: result.account.username,
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
+      expiresAt: tokenPair.expiresAt,
       tokenType: 'Bearer',
     },
   };
@@ -323,11 +507,15 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
 
 /**
  * Initiates the password recovery process.
- * Sends a reset link/code to the registered parent's phone or email.
+ * Looks up the username in both parent and student stores.
+ * If found, generates a reset token and sends notification to the parent's contact.
+ * For students: resolves the linked parent account and sends to parent's contact.
+ *
+ * Always returns 200 to avoid user enumeration, regardless of whether the account exists.
  *
  * Body: { username: string }
  *
- * Always returns 200 to avoid user enumeration, regardless of whether the account exists.
+ * Requirements: 3.1, 3.2, 3.3, 3.4, 3.5
  */
 export async function handleForgotPassword(req: ApiRequest): Promise<ApiResponse> {
   const body = req.body as { username?: string } | undefined;
@@ -345,8 +533,65 @@ export async function handleForgotPassword(req: ApiRequest): Promise<ApiResponse
     };
   }
 
-  // Always return 200 to prevent username enumeration attacks.
-  // Actual password reset delivery will be implemented when notification service is available.
+  const { username } = body;
+
+  // Look up user in parent and student stores
+  const parentAccount = findParentByUsername(username);
+  const studentAccount = !parentAccount ? findStudentByUsername(username) : undefined;
+
+  if (parentAccount) {
+    // Generate reset token for parent
+    const token = generateResetToken(username, 'parent');
+    const resetLink = `https://learnverse.app/reset-password?token=${token}`;
+
+    // Send notification to parent's contact
+    try {
+      if (parentAccount.email) {
+        await notificationService.sendEmail(
+          parentAccount.email,
+          'Password Reset Request',
+          `Your password reset link: ${resetLink}. This link expires in 1 hour.`
+        );
+      } else if (parentAccount.phoneNumber) {
+        await notificationService.sendSms(
+          parentAccount.phoneNumber,
+          `Your password reset link: ${resetLink}. Expires in 1 hour.`
+        );
+      }
+    } catch (error) {
+      // Log notification failure without surfacing to client (Requirement 3.5)
+      console.error('[ForgotPassword] Notification delivery failed:', error);
+    }
+  } else if (studentAccount) {
+    // Generate reset token for student
+    const token = generateResetToken(username, 'student');
+    const resetLink = `https://learnverse.app/reset-password?token=${token}`;
+
+    // Resolve linked parent account and send notification to parent's contact (Requirement 3.3)
+    const linkedParent = findParentByUsername(studentAccount.parentUsername);
+
+    if (linkedParent) {
+      try {
+        if (linkedParent.email) {
+          await notificationService.sendEmail(
+            linkedParent.email,
+            'Student Password Reset Request',
+            `A password reset was requested for student account "${username}". Reset link: ${resetLink}. This link expires in 1 hour.`
+          );
+        } else if (linkedParent.phoneNumber) {
+          await notificationService.sendSms(
+            linkedParent.phoneNumber,
+            `Password reset for student "${username}": ${resetLink}. Expires in 1 hour.`
+          );
+        }
+      } catch (error) {
+        // Log notification failure without surfacing to client (Requirement 3.5)
+        console.error('[ForgotPassword] Notification delivery failed for student:', error);
+      }
+    }
+  }
+
+  // Always return 200 regardless of account existence (Requirement 3.4)
   return {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
@@ -395,9 +640,11 @@ export async function handleValidateSession(req: ApiRequest): Promise<ApiRespons
     };
   }
 
-  const session = validateSession(token);
+  // Use JWT verification instead of legacy session store
+  const jwtConfig = getJwtConfig();
+  const decoded = verifyToken(token, jwtConfig);
 
-  if (!session) {
+  if (!decoded) {
     return {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
@@ -414,8 +661,193 @@ export async function handleValidateSession(req: ApiRequest): Promise<ApiRespons
     headers: { 'Content-Type': 'application/json' },
     body: {
       valid: true,
-      learnerId: session.learnerId,
-      expiresAt: session.expiresAt.getTime(),
+      learnerId: decoded.sub,
+      expiresAt: decoded.exp,
+    },
+  };
+}
+
+// --- POST /api/v1/auth/reset-password ---
+
+/**
+ * Resets a user's password using a valid reset token.
+ * Validates the new password against registration rules.
+ * Updates the account's password hash and consumes the token.
+ *
+ * Body: { token: string, newPassword: string }
+ *
+ * Returns 200 on success.
+ * Returns 400 for invalid/expired token or invalid password.
+ *
+ * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+ */
+export async function handleResetPassword(req: ApiRequest): Promise<ApiResponse> {
+  const body = req.body as { token?: string; newPassword?: string } | undefined;
+
+  if (!body?.token || !body?.newPassword) {
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'VALIDATION_ERROR',
+        message: 'Token and new password are required.',
+        retryable: false,
+      },
+    };
+  }
+
+  const { token, newPassword } = body;
+
+  // Validate the new password against registration rules (Requirement 4.5)
+  const passwordResult = validatePassword(newPassword);
+  if (!passwordResult.valid) {
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'VALIDATION_ERROR',
+        message: passwordResult.error!,
+        field: 'newPassword',
+        retryable: false,
+      },
+    };
+  }
+
+  // Validate the reset token (Requirement 4.2, 4.3)
+  const tokenEntry = validateResetToken(token);
+  if (!tokenEntry) {
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'INVALID_RESET_TOKEN',
+        message: 'The reset token is invalid or has expired.',
+        retryable: false,
+      },
+    };
+  }
+
+  // Update the account's password hash (Requirement 4.1)
+  const newPasswordHash = hashPassword(newPassword);
+  let updated = false;
+
+  if (tokenEntry.accountType === 'parent') {
+    updated = updateParentPasswordHash(tokenEntry.username, newPasswordHash);
+  } else {
+    updated = updateStudentPasswordHash(tokenEntry.username, newPasswordHash);
+  }
+
+  if (!updated) {
+    return {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'INVALID_RESET_TOKEN',
+        message: 'Unable to reset password. Account not found.',
+        retryable: false,
+      },
+    };
+  }
+
+  // Consume the token to prevent reuse (Requirement 4.4)
+  consumeResetToken(token);
+
+  return {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: {
+      message: 'Password has been reset successfully. You can now log in with your new password.',
+    },
+  };
+}
+
+// --- POST /api/v1/auth/refresh ---
+
+/**
+ * Refreshes an expired access token using a valid refresh token.
+ * Verifies the refresh token is valid, not expired, and not revoked.
+ * Revokes the old refresh token and issues a new token pair.
+ *
+ * Body: { refreshToken: string }
+ *
+ * Returns 200 with new token pair on success.
+ * Returns 401 for invalid/expired/revoked refresh tokens.
+ *
+ * Requirements: 5.1, 5.2, 5.3, 5.4
+ */
+export async function handleRefresh(req: ApiRequest): Promise<ApiResponse> {
+  const body = req.body as { refreshToken?: string } | undefined;
+
+  if (!body?.refreshToken) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'INVALID_TOKEN',
+        message: 'Refresh token is required.',
+        retryable: false,
+      },
+    };
+  }
+
+  const { refreshToken } = body;
+
+  // Check if the refresh token has been revoked (Requirement 5.3)
+  if (isRefreshTokenRevoked(refreshToken)) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'INVALID_TOKEN',
+        message: 'Refresh token has been revoked. Please log in again.',
+        retryable: false,
+      },
+    };
+  }
+
+  // Verify the refresh token via JWT verification (Requirement 5.2)
+  const jwtConfig = getJwtConfig();
+  const decoded = verifyToken(refreshToken, jwtConfig);
+
+  if (!decoded) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid or expired refresh token. Please log in again.',
+        retryable: false,
+      },
+    };
+  }
+
+  // Verify it's actually a refresh token type
+  if (decoded.type !== 'refresh') {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid token type. Expected a refresh token.',
+        retryable: false,
+      },
+    };
+  }
+
+  // Revoke the old refresh token to prevent reuse (Requirement 5.3)
+  revokeRefreshToken(refreshToken);
+
+  // Issue a new token pair with minimum 30-day access token expiry (Requirement 5.1, 5.4)
+  const newTokenPair = createTokenPair(decoded.sub, decoded.roles, jwtConfig);
+
+  return {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: {
+      accessToken: newTokenPair.accessToken,
+      refreshToken: newTokenPair.refreshToken,
+      expiresAt: newTokenPair.expiresAt,
+      tokenType: 'Bearer',
     },
   };
 }

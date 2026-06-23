@@ -5,6 +5,8 @@ import {
   clearSessionStore,
   addLearnerToStore,
   hashPassword,
+  registerParent,
+  clearParentStudentStore,
 } from '@learnverse/service-auth';
 import { clearLockoutStore } from '@learnverse/service-auth';
 import type { Learner } from '@learnverse/service-core';
@@ -47,6 +49,7 @@ describe('Auth API Handlers (Integration)', () => {
     clearLearnerStore();
     clearSessionStore();
     clearLockoutStore();
+    clearParentStudentStore();
     router = new ApiRouter();
     for (const route of createDefaultRoutes()) {
       router.register(route);
@@ -73,41 +76,54 @@ describe('Auth API Handlers (Integration)', () => {
     it('should return 401 for invalid credentials', async () => {
       const res = await router.dispatch(
         makeRequest('POST', '/api/v1/auth/login', {
-          username: 'nonexistent@email.com',
+          username: 'nonexistent',
           password: 'wrongpass',
         })
       );
       expect(res.status).toBe(401);
-      expect((res.body as any).code).toBe('INVALID_CREDENTIALS');
+      expect((res.body as any).code).toBe('INVALID_USERNAME');
     });
 
     it('should return 200 with tokens on successful login', async () => {
-      const learner = createTestLearner();
-      addLearnerToStore(learner);
+      // Register a parent account via the registration flow
+      registerParent({
+        name: 'Test Parent',
+        username: 'testparent',
+        password: 'ValidPass1!',
+        email: 'test@example.com',
+        phoneNumber: '9876543210',
+      });
 
       const res = await router.dispatch(
         makeRequest('POST', '/api/v1/auth/login', {
-          username: 'test@example.com',
+          username: 'testparent',
           password: 'ValidPass1!',
         })
       );
       expect(res.status).toBe(200);
-      expect((res.body as any).accessToken).toBeDefined();
-      expect((res.body as any).accessToken.length).toBeGreaterThan(0);
+      expect((res.body as any).token).toBeDefined();
+      expect((res.body as any).token.length).toBeGreaterThan(0);
       expect((res.body as any).refreshToken).toBeDefined();
       expect((res.body as any).tokenType).toBe('Bearer');
       expect((res.body as any).expiresAt).toBeGreaterThan(Date.now());
+      expect((res.body as any).username).toBe('testparent');
     });
 
     it('should return 429 when account is locked after 3 failed attempts', async () => {
-      const learner = createTestLearner();
-      addLearnerToStore(learner);
+      // Register a parent account
+      registerParent({
+        name: 'Test Parent',
+        username: 'testparent',
+        password: 'ValidPass1!',
+        email: 'test@example.com',
+        phoneNumber: '9876543210',
+      });
 
       // 3 failed attempts to trigger lockout
       for (let i = 0; i < 3; i++) {
         await router.dispatch(
           makeRequest('POST', '/api/v1/auth/login', {
-            username: 'test@example.com',
+            username: 'testparent',
             password: 'WrongPass1!',
           })
         );
@@ -115,7 +131,7 @@ describe('Auth API Handlers (Integration)', () => {
 
       const res = await router.dispatch(
         makeRequest('POST', '/api/v1/auth/login', {
-          username: 'test@example.com',
+          username: 'testparent',
           password: 'ValidPass1!',
         })
       );
@@ -198,6 +214,15 @@ describe('Auth API Handlers (Integration)', () => {
     });
 
     it('should return 201 for valid student registration', async () => {
+      // Register the parent that the student will be linked to
+      registerParent({
+        name: 'Parent One',
+        username: 'parent_01',
+        password: 'ParentPass1!',
+        email: 'parent01@example.com',
+        phoneNumber: '9876543211',
+      });
+
       const res = await router.dispatch(
         makeRequest('POST', '/api/v1/auth/register/student', {
           name: 'Student Name',
@@ -253,17 +278,23 @@ describe('Auth API Handlers (Integration)', () => {
     });
 
     it('should return 200 with session info for valid token', async () => {
-      const learner = createTestLearner();
-      addLearnerToStore(learner);
+      // Register a parent account
+      registerParent({
+        name: 'Test Parent',
+        username: 'testparent',
+        password: 'ValidPass1!',
+        email: 'test@example.com',
+        phoneNumber: '9876543210',
+      });
 
       // Login to get a valid token
       const loginRes = await router.dispatch(
         makeRequest('POST', '/api/v1/auth/login', {
-          username: 'test@example.com',
+          username: 'testparent',
           password: 'ValidPass1!',
         })
       );
-      const token = (loginRes.body as any).accessToken;
+      const token = (loginRes.body as any).token;
 
       const res = await router.dispatch(
         makeRequest('GET', '/api/v1/auth/validate', undefined, {
@@ -272,7 +303,7 @@ describe('Auth API Handlers (Integration)', () => {
       );
       expect(res.status).toBe(200);
       expect((res.body as any).valid).toBe(true);
-      expect((res.body as any).learnerId).toBe('learner-test-1');
+      expect((res.body as any).learnerId).toBeDefined();
       expect((res.body as any).expiresAt).toBeGreaterThan(Date.now());
     });
   });

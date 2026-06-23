@@ -125,16 +125,18 @@ describe('Feature: registration-and-password-reset, Property 3: Email validator 
    * **Validates: Requirements 4.6**
    *
    * For any string s, emailValidator()(s) returns null iff s.length <= 30
-   * AND s has exactly one @ with non-empty local and domain parts.
+   * AND s has exactly one @ with non-empty local and domain parts,
+   * and the domain contains at least one dot.
    */
 
-  /** Generates a valid email: local@domain where total length <= 30 */
+  /** Generates a valid email: local@domain.tld where total length <= 30 */
   const validEmailArb = fc
     .tuple(
       fc.stringMatching(/^[a-z]{1,10}$/),
-      fc.stringMatching(/^[a-z]{1,10}$/)
+      fc.stringMatching(/^[a-z]{1,7}$/),
+      fc.stringMatching(/^[a-z]{2,4}$/)
     )
-    .map(([local, domain]) => `${local}@${domain}`)
+    .map(([local, domain, tld]) => `${local}@${domain}.${tld}`)
     .filter((e) => e.length <= 30);
 
   it('accepts valid emails (length <= 30, exactly one @, non-empty local and domain)', () => {

@@ -28,6 +28,9 @@ import {
   handleListChapters,
   handleCreateChapter,
   handleAddPage,
+  handleCreateStandaloneChapter,
+  handleGetChapterById,
+  handleListSubjectChapters,
 } from './contentHandlers';
 
 import {
@@ -36,7 +39,21 @@ import {
   handleRegisterStudent,
   handleForgotPassword,
   handleValidateSession,
+  handleResetPassword,
+  handleRefresh,
 } from './authHandlers';
+
+import { handleGetProgress, handleUpdateProgress } from './progressHandlers';
+
+import {
+  handleStartRevision,
+  handleSubmitAnswer,
+  handleGetRevisionSummary,
+} from './revisionHandlers';
+
+import { handleSyncPush, handleSyncPull } from './syncHandlers';
+
+import { verifyToken, getJwtConfig } from '@learnverse/service-auth';
 
 // --- HTTP Types ---
 
@@ -219,8 +236,9 @@ export class ApiRouter {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
           body: {
-            code: 'UNAUTHORIZED',
+            code: authResult.code ?? 'UNAUTHORIZED',
             message: authResult.reason ?? 'Authentication required',
+            suggestedAction: authResult.suggestedAction,
             retryable: false,
           } as ApiErrorBody,
         };
@@ -275,8 +293,11 @@ export class ApiRouter {
 
   /**
    * Validate authentication token from request headers.
+   * Uses JWT signature verification to validate token integrity and expiry.
+   *
+   * Requirements: 6.1, 6.2, 6.3, 7.1, 7.2, 7.3
    */
-  private validateAuth(request: ApiRequest): { valid: boolean; reason?: string } {
+  private validateAuth(request: ApiRequest): { valid: boolean; reason?: string; code?: string; suggestedAction?: string } {
     const authHeader = request.headers['authorization'] ?? request.headers['Authorization'];
 
     if (!authHeader) {
@@ -292,8 +313,37 @@ export class ApiRouter {
       return { valid: false, reason: 'Empty token' };
     }
 
-    // In a real implementation, this would verify the JWT signature and expiration.
-    // For now, we validate the token is present and well-formed.
+    // Verify JWT signature and expiry using the service-auth module
+    const jwtConfig = getJwtConfig();
+    const decoded = verifyToken(token, jwtConfig);
+
+    if (!decoded) {
+      // Attempt to determine if the token is expired vs invalid signature
+      // by parsing the token structure manually
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        try {
+          let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+          const pad = base64.length % 4;
+          if (pad === 2) base64 += '==';
+          else if (pad === 3) base64 += '=';
+          const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf8'));
+          if (payload.exp && typeof payload.exp === 'number' && payload.exp < Date.now()) {
+            return {
+              valid: false,
+              reason: 'Token expired',
+              code: 'TOKEN_EXPIRED',
+              suggestedAction: 'Please refresh your token or log in again',
+            };
+          }
+        } catch {
+          // If we can't parse it, treat as invalid token
+        }
+      }
+
+      return { valid: false, reason: 'Invalid token', code: 'INVALID_TOKEN' };
+    }
+
     return { valid: true };
   }
 }
@@ -418,6 +468,14 @@ export function createDefaultRoutes(): ApiRoute[] {
       tags: ['auth'],
     },
     {
+      method: 'POST',
+      path: '/api/v1/auth/reset-password',
+      handler: handleResetPassword,
+      requiresAuth: false,
+      description: 'Reset password using a valid reset token',
+      tags: ['auth'],
+    },
+    {
       method: 'GET',
       path: '/api/v1/auth/validate',
       handler: handleValidateSession,
@@ -428,11 +486,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'POST',
       path: '/api/v1/auth/refresh',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { accessToken: '', refreshToken: '', expiresAt: 0, tokenType: 'Bearer' },
-      }),
+      handler: handleRefresh,
       requiresAuth: false,
       description: 'Refresh an expired access token',
       tags: ['auth'],
@@ -484,11 +538,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'POST',
       path: '/api/v1/chapters',
-      handler: async (req) => ({
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-        body: { id: '', message: 'Chapter created' },
-      }),
+      handler: handleCreateStandaloneChapter,
       requiresAuth: true,
       description: 'Create a new chapter from uploaded content',
       tags: ['content'],
@@ -496,11 +546,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'GET',
       path: '/api/v1/chapters/:chapterId',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: {},
-      }),
+      handler: handleGetChapterById,
       requiresAuth: true,
       description: 'Retrieve a chapter by ID',
       tags: ['content'],
@@ -508,11 +554,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'GET',
       path: '/api/v1/subjects/:subjectId/chapters',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { data: [], pagination: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 } },
-      }),
+      handler: handleListSubjectChapters,
       requiresAuth: true,
       description: 'List chapters for a subject',
       tags: ['content'],
@@ -521,11 +563,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'GET',
       path: '/api/v1/progress',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: {},
-      }),
+      handler: handleGetProgress,
       requiresAuth: true,
       description: 'Get learner progress summary',
       tags: ['progress'],
@@ -533,11 +571,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'POST',
       path: '/api/v1/progress',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { message: 'Progress updated' },
-      }),
+      handler: handleUpdateProgress,
       requiresAuth: true,
       description: 'Update progress for a chapter activity',
       tags: ['progress'],
@@ -546,11 +580,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'POST',
       path: '/api/v1/revision/sessions',
-      handler: async (req) => ({
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-        body: { sessionId: '' },
-      }),
+      handler: handleStartRevision,
       requiresAuth: true,
       description: 'Start a new revision session',
       tags: ['revision'],
@@ -558,11 +588,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'POST',
       path: '/api/v1/revision/sessions/:sessionId/answers',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { message: 'Answer submitted' },
-      }),
+      handler: handleSubmitAnswer,
       requiresAuth: true,
       description: 'Submit an answer in a revision session',
       tags: ['revision'],
@@ -570,11 +596,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'GET',
       path: '/api/v1/revision/sessions/:sessionId/summary',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: {},
-      }),
+      handler: handleGetRevisionSummary,
       requiresAuth: true,
       description: 'Get revision session performance summary',
       tags: ['revision'],
@@ -583,11 +605,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'POST',
       path: '/api/v1/sync/push',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { synced: [], conflicts: [], failed: [] },
-      }),
+      handler: handleSyncPush,
       requiresAuth: true,
       description: 'Push local changes to server',
       tags: ['sync'],
@@ -595,11 +613,7 @@ export function createDefaultRoutes(): ApiRoute[] {
     {
       method: 'GET',
       path: '/api/v1/sync/pull',
-      handler: async (req) => ({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: { changes: [] },
-      }),
+      handler: handleSyncPull,
       requiresAuth: true,
       description: 'Pull remote changes since last sync',
       tags: ['sync'],

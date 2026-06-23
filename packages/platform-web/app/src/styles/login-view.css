@@ -1,0 +1,108 @@
+/* ==========================================================================
+   Login View Styles — Two-Panel Layout
+   Requirements: 2.1, 2.2, 2.6, 2.7, 4.1, 4.2, 4.3, 4.4
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Login View — Full-height flex row layout
+   Req 2.1: Two-panel horizontal layout
+   Req 2.2: Background color #F8F5FF
+   -------------------------------------------------------------------------- */
+.login-view {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  background-color: var(--cm-color-background);
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Branding Panel — Left panel (~50% width, centered content)
+   Req 2.1: Branding_Panel on the left
+   -------------------------------------------------------------------------- */
+.branding-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Login Panel — Right panel (~50% width, centered content)
+   Req 2.1: Login_Panel on the right
+   -------------------------------------------------------------------------- */
+.login-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Login Card — Card with border-radius and shadow
+   Req 2.6: 16px border-radius and box-shadow 0 4px 20px rgba(0,0,0,.08)
+   -------------------------------------------------------------------------- */
+.login-card {
+  background-color: var(--cm-color-white);
+  border-radius: var(--cm-radius-card);
+  box-shadow: var(--cm-shadow-card);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* --------------------------------------------------------------------------
+   Watermark — Logo watermark positioning
+   Req 4.1: 75% of the content area width
+   Req 4.2: Centered horizontally and vertically
+   Req 4.3: 5% opacity
+   Req 4.4: Behind all interactive elements, no pointer events
+   -------------------------------------------------------------------------- */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--cm-watermark-width);
+  opacity: var(--cm-watermark-opacity);
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.watermark img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — Stack vertically below 768px
+   Req 2.7: Stack panels vertically with Branding_Panel above Login_Panel
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .login-view {
+    flex-direction: column;
+  }
+
+  .branding-panel {
+    flex: none;
+    padding: 1.5rem 1rem;
+  }
+
+  .login-panel {
+    flex: none;
+    padding: 1.5rem 1rem;
+  }
+
+  .login-card {
+    max-width: 100%;
+  }
+}

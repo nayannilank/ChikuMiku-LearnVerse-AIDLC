@@ -4,6 +4,7 @@
  * Authentication service: registration, login, session management, parental account linking.
  */
 
+export * from './jwt';
 export * from './validation';
 export {
   type RegistrationInput,
@@ -33,8 +34,13 @@ export {
   registerStudent,
   clearParentStudentStore,
   findParentByUsername,
+  findStudentByUsername,
+  updateParentPasswordHash,
+  updateStudentPasswordHash,
 } from './registration';
 export * from './session';
 export * from './lockout';
 export * from './localBackup';
 export * from './parental';
+export * from './notifications';
+export * from './resetToken';

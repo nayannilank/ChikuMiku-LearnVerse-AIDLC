@@ -149,9 +149,8 @@ describe('emailValidator', () => {
 
   it('accepts email at exactly 30 characters', () => {
     const validator = emailValidator();
-    // 'a' x 14 + '@' + 'b' x 14 + '.' = exactly 30 chars → 'aaaaa...a@bbbbb...b.c' won't be 30
-    // Let's construct: local(14) + @ + domain(15) = 30
-    const email = 'a'.repeat(14) + '@' + 'b'.repeat(15);
+    // local(14) + @ + domain with dot(15) = 30 chars
+    const email = 'a'.repeat(14) + '@' + 'b'.repeat(11) + '.com';
     expect(email.length).toBe(30);
     expect(validator(email)).toBeNull();
   });

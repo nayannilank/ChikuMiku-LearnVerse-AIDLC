@@ -23,6 +23,16 @@ export interface HeaderOptions {
 }
 
 /**
+ * Configuration options for the authenticated header component.
+ */
+export interface AuthenticatedHeaderOptions {
+  /** Callback invoked when the logout button is clicked. */
+  onLogoutClick: () => void;
+  /** Callback invoked when the home button is clicked. */
+  onHomeClick: () => void;
+}
+
+/**
  * Creates a header DOM element with logo and register button.
  *
  * The returned element is a flex container using the `home-header` CSS class.
@@ -50,6 +60,52 @@ export function createHeader(options: HeaderOptions): HTMLElement {
   registerBtn.textContent = 'Register';
   registerBtn.addEventListener('click', options.onRegisterClick);
   header.appendChild(registerBtn);
+
+  return header;
+}
+
+/**
+ * Creates an authenticated header DOM element with logo, home button, and logout button.
+ *
+ * The returned element is a flex container using the `authenticated-header` CSS class.
+ * It renders `createHeaderLogo` on the left with the ChikuMiku LearnVerse logo
+ * and Home + Logout buttons on the right within a `.header-actions` container.
+ *
+ * Validates: Requirements 2.1, 2.2, 2.3, 2.4
+ *
+ * @param options - Configuration with `onLogoutClick` and `onHomeClick` callbacks.
+ * @returns An HTMLElement suitable for insertion at the top of authenticated pages.
+ */
+export function createAuthenticatedHeader(options: AuthenticatedHeaderOptions): HTMLElement {
+  const header = document.createElement('header');
+  header.className = 'authenticated-header';
+
+  // Logo on the left (Req 2.1, 2.4)
+  const logo = createHeaderLogo({
+    logoSrc: '/ChikuMiku-LearnVerse-Logo.png',
+    maxHeight: 40,
+  });
+  header.appendChild(logo);
+
+  // Action buttons on the right (Req 2.2, 2.3, 2.4)
+  const actions = document.createElement('div');
+  actions.className = 'header-actions';
+
+  const homeBtn = document.createElement('button');
+  homeBtn.type = 'button';
+  homeBtn.className = 'home-btn';
+  homeBtn.textContent = 'Home';
+  homeBtn.addEventListener('click', options.onHomeClick);
+  actions.appendChild(homeBtn);
+
+  const logoutBtn = document.createElement('button');
+  logoutBtn.type = 'button';
+  logoutBtn.className = 'logout-btn';
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.addEventListener('click', options.onLogoutClick);
+  actions.appendChild(logoutBtn);
+
+  header.appendChild(actions);
 
   return header;
 }

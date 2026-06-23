@@ -75,6 +75,17 @@ async function toApiRequest(req: IncomingMessage): Promise<ApiRequest> {
 // Create HTTP server
 const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
   try {
+    // Handle CORS preflight before dispatching to router
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-learner-id',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+      });
+      res.end();
+      return;
+    }
+
     const apiRequest = await toApiRequest(req);
 
     console.log(`${apiRequest.method} ${apiRequest.path}`);
@@ -88,17 +99,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
       'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       ...apiResponse.headers,
     });
-
-    // Handle CORS preflight
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204, {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-learner-id',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-      });
-      res.end();
-      return;
-    }
 
     res.end(JSON.stringify(apiResponse.body, null, 2));
   } catch (error) {

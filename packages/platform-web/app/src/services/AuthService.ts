@@ -21,7 +21,7 @@ export interface LoginResult {
  */
 export const API_BASE: string =
   ((import.meta as unknown as Record<string, Record<string, string>>).env
-    ?.VITE_API_BASE as string | undefined) || 'http://localhost:3000';
+    ?.VITE_API_BASE as string | undefined) || '';
 
 /**
  * Configurable mock delay in milliseconds to simulate network latency.
@@ -31,7 +31,7 @@ const MOCK_DELAY_MS = 500;
 
 /**
  * Whether to use mock responses instead of real API calls.
- * Set to `false` once the backend is ready.
+ * Set to `true` to enable mock responses for development without a backend.
  */
 const USE_MOCKS = true;
 
