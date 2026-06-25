@@ -3,7 +3,7 @@
  *
  * In-memory store for password reset tokens with 1-hour TTL.
  * Tokens are 32-byte random hex strings generated with crypto.randomBytes.
- * Production would use DynamoDB TTL.
+ * Production would use PostgreSQL with row-level expiry.
  *
  * Requirements: 3.1, 4.2, 4.3, 4.4
  */

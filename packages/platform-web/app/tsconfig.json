@@ -6,9 +6,10 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "jsx": "react-jsx",
     "lib": ["ES2022", "DOM"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["dist", "node_modules"],
   "references": [{ "path": "../../platform-contracts" }]
 }

@@ -72,16 +72,20 @@ async function toApiRequest(req: IncomingMessage): Promise<ApiRequest> {
   };
 }
 
+// CORS headers applied to all responses (needed for production / direct API calls)
+const CORS_HEADERS: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, x-learner-id',
+  'Access-Control-Max-Age': '86400',
+};
+
 // Create HTTP server
 const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
   try {
-    // Handle CORS preflight before dispatching to router
+    // Handle CORS preflight OPTIONS requests
     if (req.method === 'OPTIONS') {
-      res.writeHead(204, {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-learner-id',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-      });
+      res.writeHead(204, CORS_HEADERS);
       res.end();
       return;
     }
@@ -94,16 +98,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     res.writeHead(apiResponse.status, {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-learner-id',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+      ...CORS_HEADERS,
       ...apiResponse.headers,
     });
 
     res.end(JSON.stringify(apiResponse.body, null, 2));
   } catch (error) {
     console.error('Server error:', error);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.writeHead(500, {
+      'Content-Type': 'application/json',
+      ...CORS_HEADERS,
+    });
     res.end(JSON.stringify({ code: 'INTERNAL_ERROR', message: 'Server error', retryable: true }));
   }
 });

@@ -1,0 +1,21 @@
+• turbo 2.9.16
+
+   • Packages in scope: @learnverse/web-app
+   • Running build in 1 packages
+   • Remote caching disabled
+
+@learnverse/platform-contracts:build: cache bypass, force executing b33b695327a0a0f7
+@learnverse/platform-contracts:build: 
+@learnverse/platform-contracts:build: > @learnverse/platform-contracts@0.1.0 build
+@learnverse/platform-contracts:build: > tsc --build
+@learnverse/platform-contracts:build: 
+@learnverse/web-app:build: cache bypass, force executing 8da6b8a4ff5dbaa6
+@learnverse/web-app:build: 
+@learnverse/web-app:build: > @learnverse/web-app@0.1.0 build
+@learnverse/web-app:build: > tsc --build
+@learnverse/web-app:build: 
+
+ Tasks:    2 successful, 2 total
+Cached:    0 cached, 2 total
+  Time:    1.537s 
+

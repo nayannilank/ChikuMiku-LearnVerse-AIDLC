@@ -1,0 +1,131 @@
+• turbo 2.9.16
+
+   • Packages in scope: @learnverse/infra-cdk, @learnverse/mobile-app, @learnverse/mobile-audio, @learnverse/mobile-camera, @learnverse/mobile-filesystem, @learnverse/mobile-notifications, @learnverse/mobile-ui, @learnverse/platform-contracts, @learnverse/service-ai-gateway, @learnverse/service-api, @learnverse/service-auth, @learnverse/service-comprehension, @learnverse/service-content-ingestion, @learnverse/service-content-store, @learnverse/service-core, @learnverse/service-grammar, @learnverse/service-pronunciation, @learnverse/service-sync, @learnverse/web-app, @learnverse/web-audio, @learnverse/web-camera, @learnverse/web-filesystem, @learnverse/web-notifications, @learnverse/web-ui
+   • Running build in 24 packages
+   • Remote caching disabled
+
+@learnverse/platform-contracts:build: cache bypass, force executing b33b695327a0a0f7
+@learnverse/service-core:build: cache bypass, force executing 2e7ab754d4c77541
+@learnverse/platform-contracts:build: 
+@learnverse/platform-contracts:build: > @learnverse/platform-contracts@0.1.0 build
+@learnverse/platform-contracts:build: > tsc --build
+@learnverse/platform-contracts:build: 
+@learnverse/service-core:build: 
+@learnverse/service-core:build: > @learnverse/service-core@0.1.0 build
+@learnverse/service-core:build: > tsc --build
+@learnverse/service-core:build: 
+@learnverse/service-grammar:build: cache bypass, force executing 0c59c3fcc6c11434
+@learnverse/service-content-store:build: cache bypass, force executing 74632467a7c533bc
+@learnverse/service-ai-gateway:build: cache bypass, force executing a942862655094316
+@learnverse/service-sync:build: cache bypass, force executing 778d98d778f4bd0f
+@learnverse/service-pronunciation:build: cache bypass, force executing 50cc5da003a63fb3
+@learnverse/service-content-ingestion:build: cache bypass, force executing 20698d531dc6e11a
+@learnverse/service-auth:build: cache bypass, force executing 221d46985fb6a52a
+@learnverse/mobile-app:build: cache bypass, force executing 40cd960b4114512c
+@learnverse/mobile-camera:build: cache bypass, force executing 2fbd3947a5b1eace
+@learnverse/mobile-notifications:build: cache bypass, force executing 857cd8ae46c0da44
+@learnverse/service-grammar:build: 
+@learnverse/service-grammar:build: > @learnverse/service-grammar@0.1.0 build
+@learnverse/service-grammar:build: > tsc --build
+@learnverse/service-grammar:build: 
+@learnverse/service-content-store:build: 
+@learnverse/service-content-store:build: > @learnverse/service-content-store@0.1.0 build
+@learnverse/service-content-store:build: > tsc --build
+@learnverse/service-content-store:build: 
+@learnverse/service-sync:build: 
+@learnverse/service-sync:build: > @learnverse/service-sync@0.1.0 build
+@learnverse/service-sync:build: > tsc --build
+@learnverse/service-sync:build: 
+@learnverse/service-pronunciation:build: 
+@learnverse/service-pronunciation:build: > @learnverse/service-pronunciation@0.1.0 build
+@learnverse/service-pronunciation:build: > tsc --build
+@learnverse/service-pronunciation:build: 
+@learnverse/service-ai-gateway:build: 
+@learnverse/service-ai-gateway:build: > @learnverse/service-ai-gateway@0.1.0 build
+@learnverse/service-ai-gateway:build: > tsc --build
+@learnverse/service-ai-gateway:build: 
+@learnverse/mobile-camera:build: 
+@learnverse/mobile-camera:build: > @learnverse/mobile-camera@0.1.0 build
+@learnverse/mobile-camera:build: > tsc --build
+@learnverse/mobile-camera:build: 
+@learnverse/service-auth:build: 
+@learnverse/service-auth:build: > @learnverse/service-auth@0.1.0 build
+@learnverse/service-auth:build: > tsc --build
+@learnverse/service-auth:build: 
+@learnverse/mobile-notifications:build: 
+@learnverse/mobile-notifications:build: > @learnverse/mobile-notifications@0.1.0 build
+@learnverse/mobile-notifications:build: > tsc --build
+@learnverse/mobile-notifications:build: 
+@learnverse/mobile-app:build: 
+@learnverse/mobile-app:build: > @learnverse/mobile-app@0.1.0 build
+@learnverse/mobile-app:build: > tsc --build
+@learnverse/mobile-app:build: 
+@learnverse/service-content-ingestion:build: 
+@learnverse/service-content-ingestion:build: > @learnverse/service-content-ingestion@0.1.0 build
+@learnverse/service-content-ingestion:build: > tsc --build
+@learnverse/service-content-ingestion:build: 
+@learnverse/web-audio:build: cache bypass, force executing 4bf3303732225e17
+@learnverse/mobile-filesystem:build: cache bypass, force executing 0aaadefd67b0a959
+@learnverse/mobile-ui:build: cache bypass, force executing 74e19d3b8297d409
+@learnverse/mobile-audio:build: cache bypass, force executing 8b6ce70b75435900
+@learnverse/web-camera:build: cache bypass, force executing cb738cac6ee4b35c
+@learnverse/web-notifications:build: cache bypass, force executing 1f8a359e7c091c5f
+@learnverse/web-app:build: cache bypass, force executing 8da6b8a4ff5dbaa6
+@learnverse/web-filesystem:build: cache bypass, force executing c32da7d8549ef3af
+@learnverse/web-ui:build: cache bypass, force executing 079e9b2253c8e434
+@learnverse/service-comprehension:build: cache bypass, force executing 8df4c2d5ff755494
+@learnverse/web-audio:build: 
+@learnverse/web-audio:build: > @learnverse/web-audio@0.1.0 build
+@learnverse/web-audio:build: > tsc --build
+@learnverse/web-audio:build: 
+@learnverse/mobile-filesystem:build: 
+@learnverse/mobile-filesystem:build: > @learnverse/mobile-filesystem@0.1.0 build
+@learnverse/mobile-filesystem:build: > tsc --build
+@learnverse/mobile-filesystem:build: 
+@learnverse/web-camera:build: 
+@learnverse/web-camera:build: > @learnverse/web-camera@0.1.0 build
+@learnverse/web-camera:build: > tsc --build
+@learnverse/web-camera:build: 
+@learnverse/web-notifications:build: 
+@learnverse/web-notifications:build: > @learnverse/web-notifications@0.1.0 build
+@learnverse/web-notifications:build: > tsc --build
+@learnverse/web-notifications:build: 
+@learnverse/mobile-ui:build: 
+@learnverse/mobile-ui:build: > @learnverse/mobile-ui@0.1.0 build
+@learnverse/mobile-ui:build: > tsc --build
+@learnverse/mobile-ui:build: 
+@learnverse/web-app:build: 
+@learnverse/web-app:build: > @learnverse/web-app@0.1.0 build
+@learnverse/web-app:build: > tsc --build
+@learnverse/web-app:build: 
+@learnverse/web-filesystem:build: 
+@learnverse/web-filesystem:build: > @learnverse/web-filesystem@0.1.0 build
+@learnverse/web-filesystem:build: > tsc --build
+@learnverse/web-filesystem:build: 
+@learnverse/mobile-audio:build: 
+@learnverse/mobile-audio:build: > @learnverse/mobile-audio@0.1.0 build
+@learnverse/mobile-audio:build: > tsc --build
+@learnverse/mobile-audio:build: 
+@learnverse/web-ui:build: 
+@learnverse/web-ui:build: > @learnverse/web-ui@0.1.0 build
+@learnverse/web-ui:build: > tsc --build
+@learnverse/web-ui:build: 
+@learnverse/service-comprehension:build: 
+@learnverse/service-comprehension:build: > @learnverse/service-comprehension@0.1.0 build
+@learnverse/service-comprehension:build: > tsc --build
+@learnverse/service-comprehension:build: 
+@learnverse/service-api:build: cache bypass, force executing 65137bafc065d6d3
+@learnverse/service-api:build: 
+@learnverse/service-api:build: > @learnverse/service-api@0.1.0 build
+@learnverse/service-api:build: > tsc --build
+@learnverse/service-api:build: 
+@learnverse/infra-cdk:build: cache bypass, force executing 411833c602fb9901
+@learnverse/infra-cdk:build: 
+@learnverse/infra-cdk:build: > @learnverse/infra-cdk@0.1.0 build
+@learnverse/infra-cdk:build: > tsc
+@learnverse/infra-cdk:build: 
+
+ Tasks:    24 successful, 24 total
+Cached:    0 cached, 24 total
+  Time:    6.323s 
+

@@ -11,11 +11,19 @@ import {
 } from './src/navigation/routeResolver';
 import HeaderLogo from './src/components/HeaderLogo';
 
+// Bottom Tab Navigator (task 18.2)
+import {MainTabNavigator} from './src/navigation/BottomTabNavigator';
+
 // Existing screens
 import SubjectSelectionScreen from './src/screens/SubjectSelectionScreen';
 import TextbookListScreen from './src/screens/TextbookListScreen';
 import ChapterSelectionScreen from './src/screens/ChapterSelectionScreen';
 import LearningScreen from './src/screens/LearningScreen';
+
+// New screens (task 18.2)
+import PronunciationScreen from './src/screens/PronunciationScreen';
+import GrammarExerciseScreen from './src/screens/GrammarExerciseScreen';
+import QuizScreen from './src/screens/QuizScreen';
 
 // Auth screens (tasks 4.7, 4.9, 4.10)
 import LoginScreen from './src/screens/LoginScreen';
@@ -61,13 +69,20 @@ function AuthNavigator() {
   );
 }
 
+/**
+ * MainNavigator now uses the bottom tab navigator as the primary
+ * authenticated experience, with additional exercise screens accessible
+ * via stack navigation pushed on top.
+ *
+ * Requirements: 4.1, 4.2, 3.5
+ */
 function MainNavigator() {
   return (
     <MainStack.Navigator screenOptions={sharedScreenOptions}>
       <MainStack.Screen
         name="SubjectSelection"
-        component={SubjectSelectionScreen}
-        options={{title: 'ChikuMiku LearnVerse'}}
+        component={MainTabNavigator}
+        options={{title: 'ChikuMiku LearnVerse', headerShown: false}}
       />
       <MainStack.Screen
         name="TextbookList"

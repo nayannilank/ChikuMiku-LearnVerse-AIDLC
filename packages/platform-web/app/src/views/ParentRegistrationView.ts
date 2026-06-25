@@ -1,9 +1,12 @@
 /**
  * ParentRegistrationView — Refactored parent registration page for the LearnVerse web application.
  *
- * Composes TopNavBar at the top and a registration card with styled form fields,
+ * Composes a minimal auth header at the top and a registration card with styled form fields,
  * PasswordStrengthIndicator, and a pill-shaped submit button. Uses design tokens
  * from registration-view.css and follows the ChikuMiku LearnVerse design mockups.
+ *
+ * The auth header only shows the logo and a Login link — authenticated
+ * navigation items (Dashboard, Subjects, etc.) are NOT shown on this screen.
  *
  * Usage:
  *   import { createParentRegistrationView } from './views/ParentRegistrationView';
@@ -12,7 +15,7 @@
  * Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 7.1, 7.5, 8.1, 8.2, 8.3
  */
 
-import { createTopNavBar } from '../components/TopNavBar';
+import { createHeaderLogo } from '../components/HeaderLogo';
 import { createPasswordStrengthIndicator } from '../components/PasswordStrengthIndicator';
 import { registerParent } from '../services/AuthService';
 import {
@@ -127,7 +130,7 @@ const VALIDATION_RULES: ExtendedFieldRule[] = [
  * Creates the complete parent registration view element.
  *
  * The returned element contains:
- * - TopNavBar at the top with hash-based navigation (Req 5.1)
+ * - A minimal auth header with logo and Login link (no authenticated nav)
  * - A registration card with heading, subtitle, form fields, password strength
  *   indicator, and a pill-shaped submit button (Req 5.2–5.5, 6.1–6.7, 7.1, 7.5, 8.1–8.3)
  *
@@ -136,24 +139,34 @@ const VALIDATION_RULES: ExtendedFieldRule[] = [
 export function createParentRegistrationView(): HTMLElement {
   const container = document.createElement('div');
   container.className = 'registration-view';
-  container.style.backgroundColor = '#F8F5FF';
-  container.style.minHeight = '100vh';
-  container.style.display = 'flex';
-  container.style.flexDirection = 'column';
-  container.style.alignItems = 'center';
 
-  // TopNavBar at top (Req 5.1: same shared component as LoginView)
-  const navBar = createTopNavBar({
-    onNavigate: (route: string) => {
-      window.location.hash = route;
-    },
+  // Minimal auth header (logo + Login link, no authenticated nav)
+  const header = document.createElement('header');
+  header.className = 'auth-header';
+  header.setAttribute('aria-label', 'Site header');
+
+  const logo = createHeaderLogo({
+    logoSrc: '/ChikuMiku-LearnVerse-Logo.png',
+    maxHeight: 36,
+    altText: 'ChikuMiku LearnVerse',
   });
-  container.appendChild(navBar);
+  header.appendChild(logo);
+
+  const loginLink = document.createElement('a');
+  loginLink.className = 'auth-header__login-link';
+  loginLink.textContent = 'Login';
+  loginLink.href = '#login';
+  loginLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.hash = '#login';
+  });
+  header.appendChild(loginLink);
+
+  container.appendChild(header);
 
   // Registration card wrapper (Req 5.5: 16px radius, card shadow)
   const card = document.createElement('div');
   card.className = 'registration-card';
-  card.style.marginTop = '2rem';
 
   // Heading (Req 5.2: "Create Parent Account" 16-18px Bold #2C2341)
   const heading = document.createElement('h1');

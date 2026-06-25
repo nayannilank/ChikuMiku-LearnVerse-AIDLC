@@ -1,0 +1,16 @@
+{
+  "name": "@learnverse/service-ai-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@learnverse/service-core": "0.1.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "clean": "rm -rf dist"
+  }
+}

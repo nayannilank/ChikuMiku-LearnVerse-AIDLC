@@ -9,6 +9,18 @@
  * PlatformRegistry class. It contains NO platform-specific implementation code.
  */
 
+// --- Data Models ---
+export * from './models.js';
+
+// --- API Request/Response Types ---
+export * from './api-types.js';
+
+// --- Validation Rules ---
+export * from './validation-rules.js';
+
+// --- Error Types ---
+export * from './errors.js';
+
 // --- Camera Interface ---
 
 /** Camera capture options (platform-independent) */

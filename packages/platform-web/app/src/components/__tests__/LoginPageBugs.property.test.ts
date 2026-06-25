@@ -274,11 +274,11 @@ describe('Bug 4 - Post-Login Navigation (HomeView)', () => {
     parentRadio.checked = true;
     parentRadio.dispatchEvent(new Event('change', { bubbles: true }));
 
-    // Fill in credentials
+    // Fill in credentials (password must pass validation: 8-20 chars, uppercase, lowercase, digit, special)
     const usernameInput = view.querySelector('#login-username') as HTMLInputElement;
     const passwordInput = view.querySelector('#login-password') as HTMLInputElement;
     usernameInput.value = 'testuser';
-    passwordInput.value = 'testpass';
+    passwordInput.value = 'Test1234!';
 
     // Submit the form
     const form = view.querySelector('form') as HTMLFormElement;

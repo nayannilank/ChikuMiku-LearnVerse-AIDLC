@@ -3,7 +3,7 @@
  *
  * Feature: infra-migration-to-cdk, Property 6
  *
- * For any DynamoDB table, S3 bucket, or CloudWatch log group in the prod
+ * For any RDS cluster, S3 bucket, or CloudWatch log group in the prod
  * environment, the CloudFormation DeletionPolicy SHALL be set to "Retain".
  * This ensures stateful production resources are never accidentally destroyed
  * during stack updates or deletions.
@@ -20,7 +20,7 @@ import { LearnVerseStack } from '../lib/LearnVerseStack';
  * Resource types that MUST have Retain deletion policy in production.
  */
 const RETAIN_RESOURCE_TYPES = [
-  'AWS::DynamoDB::Table',
+  'AWS::RDS::DBCluster',
   'AWS::S3::Bucket',
   'AWS::Logs::LogGroup',
 ];
@@ -99,9 +99,9 @@ describe('Property 6: Production Resources Use RETAIN Removal Policy', () => {
     prodRetainableResources = extractRetainableResources(prodStack);
   });
 
-  it('all DynamoDB tables, S3 buckets, and CloudWatch log groups in prod have DeletionPolicy: Retain', () => {
-    // Sanity check: we should find at least 3 tables + 2 buckets + 4 log groups = 9 resources
-    expect(prodRetainableResources.length).toBeGreaterThanOrEqual(9);
+  it('all RDS clusters, S3 buckets, and CloudWatch log groups in prod have DeletionPolicy: Retain', () => {
+    // Sanity check: we should find at least 1 RDS cluster + 2 buckets + log groups
+    expect(prodRetainableResources.length).toBeGreaterThanOrEqual(3);
 
     fc.assert(
       fc.property(

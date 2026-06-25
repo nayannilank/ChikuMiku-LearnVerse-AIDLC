@@ -87,7 +87,7 @@ export function createLoginPanel(options: LoginPanelOptions): HTMLElement {
 
   // --- Card wrapper (Req 2.6: 16px radius, box-shadow) ---
   const card = document.createElement('div');
-  card.className = 'login-panel';
+  card.className = 'login-panel__card';
   Object.assign(card.style, {
     backgroundColor: '#FFFFFF',
     borderRadius: '16px',

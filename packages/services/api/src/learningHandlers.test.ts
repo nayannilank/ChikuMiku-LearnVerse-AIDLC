@@ -2,18 +2,21 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiRouter, createDefaultRoutes, ApiRequest } from './endpoints';
 import { clearEnrollmentStore, clearSessionStore, enrollSubject, addChapterToSubject } from '@learnverse/service-core';
 import type { Chapter } from '@learnverse/service-core';
+import { createTokenPair, getJwtConfig } from '@learnverse/service-auth';
 
 describe('Learning Session API Handlers (Integration)', () => {
   let router: ApiRouter;
   const learnerId = 'test-learner-1';
 
   function makeRequest(method: 'GET' | 'POST', path: string, body?: unknown): ApiRequest {
+    const jwtConfig = getJwtConfig();
+    const { accessToken } = createTokenPair(learnerId, ['student'], jwtConfig);
     return {
       method,
       path,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer valid-token',
+        'Authorization': `Bearer ${accessToken}`,
         'x-learner-id': learnerId,
       },
       body,

@@ -49,17 +49,30 @@ describe('LoginView', () => {
     });
   });
 
-  describe('TopNavBar presence', () => {
-    it('renders a nav element with class "top-nav-bar"', () => {
+  describe('auth header (minimal, no authenticated nav)', () => {
+    it('renders a header element with class "login-view__header"', () => {
       const view = createLoginView();
-      const nav = view.querySelector('nav.top-nav-bar');
-      expect(nav).not.toBeNull();
+      const header = view.querySelector('header.login-view__header');
+      expect(header).not.toBeNull();
     });
 
-    it('TopNavBar is a direct child of the container', () => {
+    it('auth header is a direct child of the container', () => {
       const view = createLoginView();
-      const nav = view.querySelector('nav.top-nav-bar');
-      expect(nav!.parentElement).toBe(view);
+      const header = view.querySelector('header.login-view__header');
+      expect(header!.parentElement).toBe(view);
+    });
+
+    it('does NOT render authenticated navigation links (Dashboard, Subjects, etc.)', () => {
+      const view = createLoginView();
+      const navLinks = view.querySelectorAll('.top-nav-link, .top-navigation-link');
+      expect(navLinks.length).toBe(0);
+    });
+
+    it('contains a Register link', () => {
+      const view = createLoginView();
+      const registerLink = view.querySelector('.login-view__register-link');
+      expect(registerLink).not.toBeNull();
+      expect(registerLink!.textContent).toBe('Register');
     });
   });
 
@@ -69,10 +82,12 @@ describe('LoginView', () => {
       expect(view.className).toBe('login-view');
     });
 
-    it('container has backgroundColor of #F8F5FF', () => {
+    it('container has backgroundColor via CSS class "login-view"', () => {
       const view = createLoginView();
-      // JSDOM normalizes hex to rgb
-      expect(view.style.backgroundColor).toBe('rgb(248, 245, 255)');
+      // Background color is now applied via the .login-view CSS class
+      // (defined in login-view.css as var(--cm-color-background) = #F8F5FF)
+      // In JSDOM, CSS classes are not computed, so we verify the class is applied
+      expect(view.classList.contains('login-view')).toBe(true);
     });
   });
 });

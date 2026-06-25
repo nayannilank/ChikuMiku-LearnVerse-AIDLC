@@ -101,17 +101,6 @@ export interface ApiErrorBody {
   retryable: boolean;
 }
 
-/** Paginated response wrapper */
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    totalItems: number;
-    totalPages: number;
-  };
-}
-
 // --- JWT Authentication Types ---
 
 /** JWT token payload */

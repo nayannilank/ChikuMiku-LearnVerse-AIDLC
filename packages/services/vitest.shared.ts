@@ -18,6 +18,7 @@ export default defineConfig({
       '@learnverse/service-comprehension': path.resolve(__dirname, 'comprehension/src'),
       '@learnverse/service-sync': path.resolve(__dirname, 'sync/src'),
       '@learnverse/service-api': path.resolve(__dirname, 'api/src'),
+      '@learnverse/service-ai-gateway': path.resolve(__dirname, 'ai-gateway/src'),
       '@learnverse/platform-contracts': path.resolve(__dirname, '../../packages/platform-contracts/src'),
     },
   },

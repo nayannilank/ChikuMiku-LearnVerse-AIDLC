@@ -14,11 +14,17 @@ describe('ParentRegistrationView', () => {
    * Validates: Requirements 5.1, 5.2, 5.3, 6.1, 6.2, 6.3, 6.4, 6.5, 8.1
    */
 
-  describe('TopNavBar presence', () => {
-    it('renders a nav element with class "top-nav-bar"', () => {
+  describe('auth header (minimal, no authenticated nav)', () => {
+    it('renders a header element with class "auth-header"', () => {
       const view = createParentRegistrationView();
-      const nav = view.querySelector('nav.top-nav-bar');
-      expect(nav).not.toBeNull();
+      const header = view.querySelector('header.auth-header');
+      expect(header).not.toBeNull();
+    });
+
+    it('does NOT render authenticated navigation links (Dashboard, Subjects, etc.)', () => {
+      const view = createParentRegistrationView();
+      const navLinks = view.querySelectorAll('.top-nav-link, .top-navigation-link');
+      expect(navLinks.length).toBe(0);
     });
   });
 

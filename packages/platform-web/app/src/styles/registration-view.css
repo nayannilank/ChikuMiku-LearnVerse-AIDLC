@@ -3,6 +3,7 @@
    Uses design tokens from design-tokens.css via CSS custom properties.
    Requirements: 5.4, 5.5, 6.6, 6.7, 7.1, 7.2, 7.3, 7.4, 8.1
    ========================================================================== */
+@import './design-tokens.css';
 
 /* --------------------------------------------------------------------------
    Registration View — Page Layout (Req 5.4)
@@ -13,7 +14,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: 0;
+  max-width: none;
+  margin: 0;
+  width: 100%;
 }
 
 /* --------------------------------------------------------------------------
@@ -26,6 +30,7 @@
   padding: 2rem;
   width: 100%;
   max-width: 480px;
+  margin-top: 2rem;
 }
 
 .registration-card__heading {
@@ -39,6 +44,38 @@
   font-size: var(--cm-font-body-sm);
   color: var(--cm-color-text-muted);
   margin: 0 0 1.5rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   Auth Header — Dark bar with logo and login link (Req 5.1)
+   -------------------------------------------------------------------------- */
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 24px;
+  background-color: var(--cm-color-dark);
+  box-sizing: border-box;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.auth-header__login-link {
+  color: var(--cm-color-white);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: background-color 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+
+.auth-header__login-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 /* --------------------------------------------------------------------------

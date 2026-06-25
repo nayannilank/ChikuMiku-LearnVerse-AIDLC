@@ -21,7 +21,6 @@ import { LearnVerseStack } from '../lib/LearnVerseStack';
  * the user-defined physical name.
  */
 const RESOURCE_TYPE_NAME_PROPERTY: Record<string, string> = {
-  'AWS::DynamoDB::Table': 'TableName',
   'AWS::Cognito::UserPool': 'UserPoolName',
   'AWS::Cognito::UserPoolClient': 'ClientName',
   'AWS::Lambda::Function': 'FunctionName',

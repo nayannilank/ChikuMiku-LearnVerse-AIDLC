@@ -2,6 +2,7 @@
  * @learnverse/service-sync
  *
  * Cross-platform data synchronization, conflict resolution, offline queue management.
+ * Also provides streak tracking handlers for the Progress service.
  */
 
 export {
@@ -78,3 +79,22 @@ export type {
   CacheConfig,
   CacheStats,
 } from './clientCache';
+
+
+// --- Streak Tracking Handlers ---
+export {
+  createGetStreakHandler,
+  createUpdateStreakHandler,
+  computeStreakUpdate,
+  daysBetween,
+  getToday,
+} from './handlers';
+
+export type {
+  GetStreakDbClient,
+  GetStreakRecord,
+  StreakResponse,
+  UpdateStreakDbClient,
+  UpdateStreakRecord,
+  StreakUpdateResult,
+} from './handlers';

@@ -3,8 +3,9 @@ import { Construct } from 'constructs';
 import { AuthStack } from './AuthStack';
 import { DatabaseStack } from './DatabaseStack';
 import { StorageStack } from './StorageStack';
+import { ComputeStack } from './ComputeStack';
 import { ApiStack } from './ApiStack';
-import { LambdaStack } from './LambdaStack';
+import { CdnStack } from './CdnStack';
 import { ObservabilityStack } from './ObservabilityStack';
 
 export interface LearnVerseStackProps extends cdk.StackProps {
@@ -30,47 +31,56 @@ export class LearnVerseStack extends cdk.Stack {
       stageName: props.stageName,
     });
 
-    // DatabaseStack (no dependencies)
+    // DatabaseStack (no dependencies — provisions VPC, Aurora PostgreSQL + pgvector)
     const databaseStack = new DatabaseStack(this, 'DatabaseStack', {
       stageName: props.stageName,
     });
 
-    // StorageStack (no dependencies)
+    // StorageStack (no dependencies — S3 buckets with lifecycle policies)
     const storageStack = new StorageStack(this, 'StorageStack', {
       stageName: props.stageName,
     });
 
-    // LambdaStack (depends on DatabaseStack, StorageStack, AuthStack)
-    const lambdaStack = new LambdaStack(this, 'LambdaStack', {
+    // ComputeStack (depends on DatabaseStack, StorageStack, AuthStack)
+    // Provisions all 8 Lambda service domains with VPC connectivity to PostgreSQL
+    const computeStack = new ComputeStack(this, 'ComputeStack', {
       stageName: props.stageName,
-      tables: {
-        learnersTable: databaseStack.learnersTable,
-        accountsTable: databaseStack.accountsTable,
-        contentTable: databaseStack.contentTable,
-      },
+      vpc: databaseStack.vpc,
+      lambdaSecurityGroup: databaseStack.lambdaSecurityGroup,
+      dbCluster: databaseStack.cluster,
       contentBucket: storageStack.contentBucket,
       userPool: authStack.userPool,
       userPoolClientId: authStack.userPoolClient.userPoolClientId,
     });
-    lambdaStack.addDependency(databaseStack);
-    lambdaStack.addDependency(storageStack);
-    lambdaStack.addDependency(authStack);
+    computeStack.addDependency(databaseStack);
+    computeStack.addDependency(storageStack);
+    computeStack.addDependency(authStack);
 
-    // ApiStack (depends on AuthStack.userPool and LambdaStack.functions)
+    // ApiStack (depends on AuthStack and ComputeStack)
+    // REST API with Cognito authorizer and all 40+ endpoint routes
     const apiStack = new ApiStack(this, 'ApiStack', {
       stageName: props.stageName,
       userPool: authStack.userPool,
-      functions: lambdaStack.functions,
+      functions: computeStack.functions,
     });
     apiStack.addDependency(authStack);
-    apiStack.addDependency(lambdaStack);
+    apiStack.addDependency(computeStack);
 
-    // ObservabilityStack (depends on LambdaStack.functions)
+    // CdnStack (depends on StorageStack)
+    // CloudFront distributions for web app and content assets
+    const cdnStack = new CdnStack(this, 'CdnStack', {
+      stageName: props.stageName,
+      webAppBucket: storageStack.webAppBucket,
+      contentBucket: storageStack.contentBucket,
+    });
+    cdnStack.addDependency(storageStack);
+
+    // ObservabilityStack (depends on ComputeStack)
     const observabilityStack = new ObservabilityStack(this, 'ObservabilityStack', {
       stageName: props.stageName,
-      functions: lambdaStack.functions,
+      functions: computeStack.functions,
     });
-    observabilityStack.addDependency(lambdaStack);
+    observabilityStack.addDependency(computeStack);
   }
 
   /**

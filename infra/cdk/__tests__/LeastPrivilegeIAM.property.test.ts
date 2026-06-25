@@ -3,7 +3,7 @@
  *
  * Feature: infra-migration-to-cdk, Property 4: Least-Privilege IAM
  *
- * For each Lambda, its IAM policy SHALL only reference table/bucket ARNs from
+ * For each Lambda, its IAM policy SHALL only reference resources from
  * its designated resource set. No Lambda SHALL have access to resources outside
  * its domain boundary.
  *
@@ -13,10 +13,11 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import * as fc from 'fast-check';
 import * as cdk from 'aws-cdk-lib';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as rds from 'aws-cdk-lib/aws-rds';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Template } from 'aws-cdk-lib/assertions';
-import { LambdaStack } from '../lib/LambdaStack';
+import { ComputeStack } from '../lib/ComputeStack';
 
 /**
  * Defines the allowed resource access matrix per Lambda.
@@ -36,117 +37,155 @@ const LAMBDA_ACCESS_RULES: LambdaAccessRule[] = [
   {
     name: 'Auth Lambda',
     rolePattern: /AuthLambda/,
-    // Auth Lambda: accounts table, learners table, Cognito user pool
+    // Auth Lambda: DB secret access, Cognito admin actions
     allowedPatterns: [
-      /AccountsTable/i,
-      /LearnersTable/i,
-      /UserPool/i,
+      /secretsmanager/i,
       /cognito-idp/i,
     ],
-    // Auth Lambda: no S3, no content table
+    // Auth Lambda: no S3 access
     forbiddenPatterns: [
       /ContentBucket/i,
-      /ContentTable/i,
-      /s3/i,
+      /s3:Put/i,
+      /s3:Get/i,
+      /s3:Delete/i,
     ],
   },
   {
-    name: 'Content Lambda',
-    rolePattern: /ContentLambda/,
-    // Content Lambda: content table, learners table, contentBucket
+    name: 'ContentStore Lambda',
+    rolePattern: /ContentStoreLambda/,
+    // ContentStore Lambda: DB secret access
     allowedPatterns: [
-      /ContentTable/i,
-      /LearnersTable/i,
-      /ContentBucket/i,
+      /secretsmanager/i,
     ],
-    // Content Lambda: no Cognito admin, no accounts table
+    // ContentStore Lambda: no Cognito admin, no S3 write
     forbiddenPatterns: [
       /cognito-idp/i,
-      /AccountsTable/i,
-      /UserPool/i,
     ],
   },
   {
-    name: 'Learning Lambda',
-    rolePattern: /LearningLambda/,
-    // Learning Lambda: learners table (R/W), content table (R only)
+    name: 'ContentIngestion Lambda',
+    rolePattern: /ContentIngestionLambda/,
+    // ContentIngestion Lambda: DB secret access, S3 access
     allowedPatterns: [
-      /LearnersTable/i,
-      /ContentTable/i,
+      /secretsmanager/i,
+      /ContentBucket|s3/i,
     ],
-    // Learning Lambda: no S3, no Cognito, no accounts table
+    // ContentIngestion Lambda: no Cognito admin
     forbiddenPatterns: [
-      /ContentBucket/i,
-      /s3/i,
       /cognito-idp/i,
-      /AccountsTable/i,
-      /UserPool/i,
+    ],
+  },
+  {
+    name: 'Comprehension Lambda',
+    rolePattern: /ComprehensionLambda/,
+    // Comprehension Lambda: DB secret access, S3 read
+    allowedPatterns: [
+      /secretsmanager/i,
+      /ContentBucket|s3/i,
+    ],
+    // Comprehension Lambda: no Cognito admin
+    forbiddenPatterns: [
+      /cognito-idp/i,
     ],
   },
   {
     name: 'Sync Lambda',
     rolePattern: /SyncLambda/,
-    // Sync Lambda: learners table (R/W), content table (R/W)
+    // Sync Lambda: DB secret access
     allowedPatterns: [
-      /LearnersTable/i,
-      /ContentTable/i,
+      /secretsmanager/i,
     ],
-    // Sync Lambda: no S3, no Cognito, no accounts table
+    // Sync Lambda: no S3, no Cognito admin
     forbiddenPatterns: [
       /ContentBucket/i,
-      /s3/i,
       /cognito-idp/i,
-      /AccountsTable/i,
-      /UserPool/i,
+    ],
+  },
+  {
+    name: 'Pronunciation Lambda',
+    rolePattern: /PronunciationLambda/,
+    // Pronunciation Lambda: DB secret access, S3 access for audio
+    allowedPatterns: [
+      /secretsmanager/i,
+      /ContentBucket|s3/i,
+    ],
+    // Pronunciation Lambda: no Cognito admin
+    forbiddenPatterns: [
+      /cognito-idp/i,
+    ],
+  },
+  {
+    name: 'Grammar Lambda',
+    rolePattern: /GrammarLambda/,
+    // Grammar Lambda: DB secret access
+    allowedPatterns: [
+      /secretsmanager/i,
+    ],
+    // Grammar Lambda: no S3, no Cognito admin
+    forbiddenPatterns: [
+      /ContentBucket/i,
+      /cognito-idp/i,
+    ],
+  },
+  {
+    name: 'AI Gateway Lambda',
+    rolePattern: /AiGatewayLambda/,
+    // AI Gateway Lambda: DB secret access, S3 access
+    allowedPatterns: [
+      /secretsmanager/i,
+      /ContentBucket|s3/i,
+    ],
+    // AI Gateway Lambda: no Cognito admin
+    forbiddenPatterns: [
+      /cognito-idp/i,
     ],
   },
 ];
 
 describe('Property 4: Least-Privilege IAM Per Lambda', () => {
-  let lambdaTemplate: Template;
+  let computeTemplate: Template;
 
   beforeAll(() => {
     const app = new cdk.App();
     const parentStack = new cdk.Stack(app, 'TestStack');
 
-    // Create mock dependencies
+    // Create mock dependencies (PostgreSQL-based)
     const userPool = new cognito.UserPool(parentStack, 'UserPool');
     const userPoolClient = new cognito.UserPoolClient(parentStack, 'UserPoolClient', {
       userPool,
     });
 
-    const learnersTable = new dynamodb.Table(parentStack, 'LearnersTable', {
-      tableName: 'learnverse-test-learners',
-      partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
+    const vpc = new ec2.Vpc(parentStack, 'Vpc', { maxAzs: 2 });
+    const lambdaSecurityGroup = new ec2.SecurityGroup(parentStack, 'LambdaSG', {
+      vpc,
+      securityGroupName: 'learnverse-test-lambda-sg',
     });
 
-    const accountsTable = new dynamodb.Table(parentStack, 'AccountsTable', {
-      tableName: 'learnverse-test-accounts',
-      partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
-    });
-
-    const contentTable = new dynamodb.Table(parentStack, 'ContentTable', {
-      tableName: 'learnverse-test-content',
-      partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
+    const dbCluster = new rds.DatabaseCluster(parentStack, 'PostgresCluster', {
+      engine: rds.DatabaseClusterEngine.auroraPostgres({
+        version: rds.AuroraPostgresEngineVersion.VER_16_4,
+      }),
+      writer: rds.ClusterInstance.serverlessV2('writer'),
+      vpc,
+      defaultDatabaseName: 'learnverse',
     });
 
     const contentBucket = new s3.Bucket(parentStack, 'ContentBucket', {
       bucketName: 'learnverse-test-content-bucket',
     });
 
-    // Create LambdaStack first (functions only)
-    const lambdaStack = new LambdaStack(parentStack, 'LambdaStack', {
+    // Create ComputeStack (PostgreSQL-connected Lambda functions)
+    const computeStack = new ComputeStack(parentStack, 'ComputeStack', {
       stageName: 'test',
-      tables: { learnersTable, accountsTable, contentTable },
+      vpc,
+      lambdaSecurityGroup,
+      dbCluster,
       contentBucket,
       userPool,
       userPoolClientId: userPoolClient.userPoolClientId,
     });
 
-    lambdaTemplate = Template.fromStack(lambdaStack);
+    computeTemplate = Template.fromStack(computeStack);
   });
 
   /**
@@ -159,7 +198,7 @@ describe('Property 4: Least-Privilege IAM Per Lambda', () => {
     Resource: unknown;
     policyId: string;
   }> {
-    const policies = lambdaTemplate.findResources('AWS::IAM::Policy');
+    const policies = computeTemplate.findResources('AWS::IAM::Policy');
     const statements: Array<{
       Action: string | string[];
       Effect: string;

@@ -31,7 +31,8 @@ ChikuMiku LearnVerse is deployed as a cloud-hosted multi-tenant SaaS application
 │                    Data Layer                             │
 │   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
 │   │ Database │ │  Object  │ │  Cache   │ │ Message  │ │
-│   │ (NoSQL)  │ │ Storage  │ │ (Redis)  │ │  Queue   │ │
+│   │(PostgreSQL│ │ Storage  │ │ (Redis)  │ │  Queue   │ │
+│   │+ pgvector)│ │          │ │          │ │          │ │
 │   └──────────┘ └──────────┘ └──────────┘ └──────────┘ │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -79,7 +80,7 @@ packages/
 
 | Component | Recommended Service | Purpose |
 |-----------|-------------------|---------|
-| Primary Database | DynamoDB / Firestore | Learner data, chapters, progress, accounts |
+| Primary Database | PostgreSQL (with pgvector) | Relational data, vector search, progress, accounts, AI cache |
 | Object Storage | S3 / Cloud Storage | Images, audio assets, page uploads |
 | Cache | ElastiCache (Redis) | Session cache, hot content, lockout state |
 | Message Queue | SQS / Cloud Tasks | Offline sync queue, batch processing |
@@ -197,8 +198,9 @@ USERNAME_ALLOWED_PATTERN="^[a-zA-Z0-9_-]+$"
 # Login Configuration
 LOGIN_TIMEOUT_SECONDS=30
 
-# Database
-DATABASE_URL=<connection-string>
+# Database (PostgreSQL connection string)
+DATABASE_URL=postgresql://<user>:<password>@<host>:5432/<dbname>?sslmode=require
+DB_SECRET_ARN=<rds-secrets-manager-arn>
 DATABASE_REGION=<aws-region>
 
 # Object Storage
@@ -314,7 +316,7 @@ terraform apply -var-file=production.tfvars
 2. **Deploy Database Schema**
 
 ```bash
-# Run migrations (includes parent_accounts and student_accounts tables, textbooks table)
+# Run PostgreSQL migrations
 npm run db:migrate -- --env production
 ```
 
@@ -465,26 +467,40 @@ functions:
       USERNAME_MIN_LENGTH: "5"
       USERNAME_MAX_LENGTH: "15"
       LOGIN_TIMEOUT_SECONDS: "30"
+      DB_SECRET_ARN: ${ssm:/learnverse/db-secret-arn}
+      DB_CLUSTER_ENDPOINT: ${ssm:/learnverse/db-cluster-endpoint}
 
   service-content-store:
     memory: 256MB
     timeout: 10s
     reserved_concurrency: 100
+    environment:
+      DB_SECRET_ARN: ${ssm:/learnverse/db-secret-arn}
+      DB_CLUSTER_ENDPOINT: ${ssm:/learnverse/db-cluster-endpoint}
 
   service-content-ingestion:
     memory: 512MB
     timeout: 30s  # OCR processing + image upload
     reserved_concurrency: 100
+    environment:
+      DB_SECRET_ARN: ${ssm:/learnverse/db-secret-arn}
+      DB_CLUSTER_ENDPOINT: ${ssm:/learnverse/db-cluster-endpoint}
     
   service-comprehension:
     memory: 512MB
     timeout: 15s  # Answer generation
     reserved_concurrency: 100
+    environment:
+      DB_SECRET_ARN: ${ssm:/learnverse/db-secret-arn}
+      DB_CLUSTER_ENDPOINT: ${ssm:/learnverse/db-cluster-endpoint}
     
   service-sync:
     memory: 256MB
     timeout: 5s
     reserved_concurrency: 200
+    environment:
+      DB_SECRET_ARN: ${ssm:/learnverse/db-secret-arn}
+      DB_CLUSTER_ENDPOINT: ${ssm:/learnverse/db-cluster-endpoint}
 ```
 
 ### Queue Processing
@@ -625,7 +641,7 @@ Logic:
 ```yaml
 backups:
   database:
-    frequency: continuous (point-in-time recovery)
+    frequency: continuous (RDS automated backups with point-in-time recovery)
     retention: 35 days
     cross_region: true
     
@@ -644,7 +660,7 @@ backups:
 
 | Metric | Per 1000 Learners | Notes |
 |--------|-------------------|-------|
-| Database Storage | ~50 GB | Chapters + progress + accounts |
+| Database Storage | ~50 GB | PostgreSQL tables + pgvector embeddings + AI cache |
 | Object Storage | ~500 GB | Images (compressed to 1 MB each) |
 | Cache Memory | ~2 GB | Active sessions + hot content + lockout state |
 | Compute (peak) | ~100 Lambda invocations/sec | During school hours |
@@ -670,11 +686,11 @@ aws apigateway update-stage \
 ### Database Rollback
 
 ```bash
-# Point-in-time recovery
-aws dynamodb restore-table-to-point-in-time \
-  --source-table-name learnverse-learners \
-  --target-table-name learnverse-learners-restored \
-  --restore-date-time <timestamp>
+# Point-in-time recovery (RDS PostgreSQL)
+aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier learnverse-prod-cluster \
+  --db-cluster-identifier learnverse-prod-restored \
+  --restore-to-time <timestamp>
 ```
 
 ### Incident Response

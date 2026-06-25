@@ -7,3 +7,4 @@
 export * from './syllableBreakdown';
 export * from './pronunciationScoring';
 export * from './errorHandling';
+export * from './handlers';

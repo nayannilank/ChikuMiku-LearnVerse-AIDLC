@@ -27,7 +27,7 @@ ChikuMiku LearnVerse is a multi-subject learning platform for children built as 
 | **Backend** | Serverless Framework | AWS Lambda + API Gateway emulation via `serverless-offline` |
 | | JWT | Authentication tokens (30-day minimum validity) |
 | **Infrastructure** | AWS Lambda + API Gateway | Production compute |
-| | DynamoDB | Database (local emulation for dev) |
+| | PostgreSQL + pgvector | Relational data, vector similarity search, AI cache |
 | | Tiered Storage | Hot (30-day) / Cold archival |
 
 ## Prerequisites
@@ -120,7 +120,7 @@ This starts a local HTTP server at `http://localhost:3000` with all API endpoint
 - Set `PORT=<number>` to use a different port: `PORT=4000 npx tsx packages/services/api/src/server.ts`
 - Set `NODE_ENV=development` for verbose logging
 - Rebuild service packages (`npm run build`) after making changes, then restart the server
-- DynamoDB Local or a local Docker instance can be used for database emulation
+- PostgreSQL can be run locally via Docker: `docker run -p 5432:5432 -e POSTGRES_PASSWORD=dev pgvector/pgvector:pg16`
 
 ### Running the Mobile App (Android)
 

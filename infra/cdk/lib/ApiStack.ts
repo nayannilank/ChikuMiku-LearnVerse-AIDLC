@@ -35,7 +35,7 @@ export class ApiStack extends cdk.NestedStack {
         metricsEnabled: true,
         accessLogDestination: new apigateway.LogGroupLogDestination(accessLogGroup),
         accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields(),
-        stageName: stageName,
+        stageName,
       },
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
@@ -78,12 +78,14 @@ export class ApiStack extends cdk.NestedStack {
       authorizerName: `learnverse-${stageName}-cognito-authorizer`,
     });
 
-    // --- Wire API Gateway routes to Lambda integrations ---
-
+    // --- Lambda Integrations ---
     const authIntegration = new apigateway.LambdaIntegration(functions.auth);
-    const contentIntegration = new apigateway.LambdaIntegration(functions.content);
-    const learningIntegration = new apigateway.LambdaIntegration(functions.learning);
+    const contentStoreIntegration = new apigateway.LambdaIntegration(functions['content-store']);
+    const contentIngestionIntegration = new apigateway.LambdaIntegration(functions['content-ingestion']);
+    const comprehensionIntegration = new apigateway.LambdaIntegration(functions.comprehension);
     const syncIntegration = new apigateway.LambdaIntegration(functions.sync);
+    const pronunciationIntegration = new apigateway.LambdaIntegration(functions.pronunciation);
+    const grammarIntegration = new apigateway.LambdaIntegration(functions.grammar);
 
     const publicMethodOptions: apigateway.MethodOptions = {
       authorizationType: apigateway.AuthorizationType.NONE,
@@ -94,71 +96,102 @@ export class ApiStack extends cdk.NestedStack {
       authorizer: this.authorizer,
     };
 
-    // Define all resource paths under /api/v1 prefix
-    const apiResource = this.api.root.addResource('api');
-    const v1 = apiResource.addResource('v1');
+    // ===== Route Definitions =====
 
-    // --- Auth routes ---
-    const auth = v1.addResource('auth');
+    // --- Auth routes (POST /auth/*) ---
+    const auth = this.api.root.addResource('auth');
+    const authRegister = auth.addResource('register');
+    authRegister.addResource('parent').addMethod('POST', authIntegration, publicMethodOptions);
+    authRegister.addResource('student').addMethod('POST', authIntegration, protectedMethodOptions);
     auth.addResource('login').addMethod('POST', authIntegration, publicMethodOptions);
-    const register = auth.addResource('register');
-    register.addResource('parent').addMethod('POST', authIntegration, publicMethodOptions);
-    register.addResource('student').addMethod('POST', authIntegration, publicMethodOptions);
-    auth.addResource('forgot-password').addMethod('POST', authIntegration, publicMethodOptions);
-    auth.addResource('validate').addMethod('GET', authIntegration, protectedMethodOptions);
     auth.addResource('refresh').addMethod('POST', authIntegration, publicMethodOptions);
+    auth.addResource('forgot-password').addMethod('POST', authIntegration, publicMethodOptions);
+    auth.addResource('verify-otp').addMethod('POST', authIntegration, publicMethodOptions);
+    auth.addResource('reset-password').addMethod('POST', authIntegration, publicMethodOptions);
+    auth.addResource('logout').addMethod('POST', authIntegration, protectedMethodOptions);
 
-    // --- Content routes ---
-    // /subjects
-    const subjects = v1.addResource('subjects');
-    subjects.addMethod('GET', contentIntegration, protectedMethodOptions);
+    // --- Content Store: Subjects ---
+    const subjects = this.api.root.addResource('subjects');
+    subjects.addMethod('GET', contentStoreIntegration, protectedMethodOptions);
     const subjectId = subjects.addResource('{subjectId}');
-    subjectId.addResource('enroll').addMethod('POST', contentIntegration, protectedMethodOptions);
-    const subjectTextbooks = subjectId.addResource('textbooks');
-    subjectTextbooks.addMethod('GET', contentIntegration, protectedMethodOptions);
-    subjectTextbooks.addMethod('POST', contentIntegration, protectedMethodOptions);
-    subjectId.addResource('chapters').addMethod('GET', contentIntegration, protectedMethodOptions);
+    const subjectBooks = subjectId.addResource('books');
+    subjectBooks.addMethod('GET', contentStoreIntegration, protectedMethodOptions);
+    subjectBooks.addMethod('POST', contentStoreIntegration, protectedMethodOptions);
 
-    // /textbooks
-    const textbooks = v1.addResource('textbooks');
-    const textbookId = textbooks.addResource('{textbookId}');
-    const textbookChapters = textbookId.addResource('chapters');
-    textbookChapters.addMethod('GET', contentIntegration, protectedMethodOptions);
-    textbookChapters.addMethod('POST', contentIntegration, protectedMethodOptions);
+    // --- Content Store: Books ---
+    const books = this.api.root.addResource('books');
+    const bookId = books.addResource('{bookId}');
+    const bookChapters = bookId.addResource('chapters');
+    bookChapters.addMethod('GET', contentStoreIntegration, protectedMethodOptions);
+    bookChapters.addMethod('POST', contentStoreIntegration, protectedMethodOptions);
 
-    // /chapters
-    const chapters = v1.addResource('chapters');
-    chapters.addMethod('POST', contentIntegration, protectedMethodOptions);
+    // --- Content Store: Exercises (CRUD) ---
+    const exercises = this.api.root.addResource('exercises');
+    exercises.addMethod('GET', contentStoreIntegration, protectedMethodOptions);
+    exercises.addMethod('POST', contentStoreIntegration, protectedMethodOptions);
+    const exerciseId = exercises.addResource('{exerciseId}');
+    exerciseId.addMethod('PUT', contentStoreIntegration, protectedMethodOptions);
+    exerciseId.addMethod('DELETE', contentStoreIntegration, protectedMethodOptions);
+
+    // --- Content Ingestion: Chapter pages and OCR ---
+    const chapters = this.api.root.addResource('chapters');
     const chapterId = chapters.addResource('{chapterId}');
-    chapterId.addMethod('GET', contentIntegration, protectedMethodOptions);
-    chapterId.addResource('pages').addMethod('POST', contentIntegration, protectedMethodOptions);
+    chapterId.addResource('pages').addMethod('POST', contentIngestionIntegration, protectedMethodOptions);
+    chapterId.addResource('extract').addMethod('POST', contentIngestionIntegration, protectedMethodOptions);
+    chapterId.addResource('transcript').addMethod('PUT', contentIngestionIntegration, protectedMethodOptions);
+    chapterId.addResource('classify-pages').addMethod('POST', contentIngestionIntegration, protectedMethodOptions);
 
-    // /progress
-    const progress = v1.addResource('progress');
-    progress.addMethod('GET', contentIntegration, protectedMethodOptions);
-    progress.addMethod('POST', contentIntegration, protectedMethodOptions);
+    // --- Comprehension: Explanation, audio, revision, summary, translate ---
+    const chapterExplanation = chapterId.addResource('explanation');
+    chapterExplanation.addMethod('GET', comprehensionIntegration, protectedMethodOptions);
+    chapterExplanation.addResource('audio').addMethod('POST', comprehensionIntegration, protectedMethodOptions);
 
-    // /revision
-    const revision = v1.addResource('revision');
-    const sessions = revision.addResource('sessions');
-    sessions.addMethod('POST', contentIntegration, protectedMethodOptions);
-    const sessionId = sessions.addResource('{sessionId}');
-    sessionId.addResource('answers').addMethod('POST', contentIntegration, protectedMethodOptions);
-    sessionId.addResource('summary').addMethod('GET', contentIntegration, protectedMethodOptions);
+    const revisionQuestions = chapterId.addResource('revision-questions');
+    revisionQuestions.addMethod('POST', comprehensionIntegration, protectedMethodOptions);
+    revisionQuestions.addMethod('GET', comprehensionIntegration, protectedMethodOptions);
 
-    // --- Learning routes ---
-    const learning = v1.addResource('learning');
-    learning.addResource('start').addMethod('POST', learningIntegration, protectedMethodOptions);
-    learning.addResource('select-subject').addMethod('POST', learningIntegration, protectedMethodOptions);
-    learning.addResource('select-chapter').addMethod('POST', learningIntegration, protectedMethodOptions);
-    learning.addResource('new-chapter').addMethod('POST', learningIntegration, protectedMethodOptions);
-    learning.addResource('end-chapter').addMethod('POST', learningIntegration, protectedMethodOptions);
-    learning.addResource('end').addMethod('POST', learningIntegration, protectedMethodOptions);
-    learning.addResource('session').addMethod('GET', learningIntegration, protectedMethodOptions);
+    const chapterSummary = chapterId.addResource('summary');
+    chapterSummary.addMethod('POST', comprehensionIntegration, protectedMethodOptions);
+    chapterSummary.addMethod('GET', comprehensionIntegration, protectedMethodOptions);
 
-    // --- Sync routes ---
-    const sync = v1.addResource('sync');
-    sync.addResource('push').addMethod('POST', syncIntegration, protectedMethodOptions);
-    sync.addResource('pull').addMethod('GET', syncIntegration, protectedMethodOptions);
+    chapterId.addResource('translate').addMethod('POST', comprehensionIntegration, protectedMethodOptions);
+
+    // --- Comprehension: Exercise assistance (hint, evaluate) ---
+    exerciseId.addResource('hint').addMethod('POST', comprehensionIntegration, protectedMethodOptions);
+    exerciseId.addResource('evaluate').addMethod('POST', comprehensionIntegration, protectedMethodOptions);
+
+    // --- Progress/Sync: Progress tracking ---
+    const progress = this.api.root.addResource('progress');
+    const progressStudentId = progress.addResource('{studentId}');
+    progressStudentId.addMethod('GET', syncIntegration, protectedMethodOptions);
+    progressStudentId.addResource('streak').addMethod('GET', syncIntegration, protectedMethodOptions);
+    progressStudentId.addResource('exercise-result').addMethod('POST', syncIntegration, protectedMethodOptions);
+
+    // --- Progress/Sync: Quiz sessions ---
+    const quiz = this.api.root.addResource('quiz');
+    const quizSessions = quiz.addResource('sessions');
+    quizSessions.addMethod('POST', syncIntegration, protectedMethodOptions);
+    const quizSessionId = quizSessions.addResource('{sessionId}');
+    quizSessionId.addResource('answer').addMethod('POST', syncIntegration, protectedMethodOptions);
+    quizSessionId.addResource('skip').addMethod('POST', syncIntegration, protectedMethodOptions);
+    quizSessionId.addResource('result').addMethod('GET', syncIntegration, protectedMethodOptions);
+
+    // --- Pronunciation ---
+    const pronunciation = this.api.root.addResource('pronunciation');
+    pronunciation.addResource('record').addMethod('POST', pronunciationIntegration, protectedMethodOptions);
+    pronunciation.addResource('reference').addResource('{wordId}').addMethod('GET', pronunciationIntegration, protectedMethodOptions);
+
+    // --- Parent management ---
+    const parent = this.api.root.addResource('parent');
+    const parentLearners = parent.addResource('learners');
+    parentLearners.addMethod('GET', authIntegration, protectedMethodOptions);
+    const parentLearnerId = parentLearners.addResource('{learnerId}');
+    parentLearnerId.addResource('subjects').addMethod('PUT', authIntegration, protectedMethodOptions);
+
+    // --- Output ---
+    new cdk.CfnOutput(this, 'ApiUrl', {
+      value: this.api.url,
+      description: 'API Gateway URL',
+    });
   }
 }

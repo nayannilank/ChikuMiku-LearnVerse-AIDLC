@@ -5,12 +5,14 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@learnverse/service-ai-gateway": "0.1.0",
     "@learnverse/service-core": "0.1.0"
   },
   "scripts": {
     "build": "tsc --build",
     "test": "vitest run",
     "clean": "rm -rf dist",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run --exclude='**/*.property.test.ts'",
+    "test:property": "vitest run src/**/*.property.test.ts"
   }
 }

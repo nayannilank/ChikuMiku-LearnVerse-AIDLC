@@ -224,7 +224,7 @@ describe('ObservabilityStack', () => {
 
   describe('Log Group References (Requirement 7.1)', () => {
     it('does not create new log group resources (they are imported from SecureLambda)', () => {
-      // Log groups are created by SecureLambda construct in LambdaStack, not ObservabilityStack
+      // Log groups are created by SecureLambda construct in ComputeStack, not ObservabilityStack
       // ObservabilityStack uses fromLogGroupName to import them
       qaTemplate.resourceCountIs('AWS::Logs::LogGroup', 0);
     });
@@ -244,7 +244,7 @@ describe('ObservabilityStack', () => {
     it('prod does not synthesize log group resources (imported, not created)', () => {
       // Since log groups are imported via fromLogGroupName, the CfnResource override
       // does not produce an AWS::Logs::LogGroup in the template.
-      // The RETAIN policy is handled by SecureLambda in LambdaStack for prod.
+      // The RETAIN policy is handled by SecureLambda in ComputeStack for prod.
       prodTemplate.resourceCountIs('AWS::Logs::LogGroup', 0);
     });
 

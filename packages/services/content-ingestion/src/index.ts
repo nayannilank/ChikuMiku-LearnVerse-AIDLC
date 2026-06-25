@@ -8,3 +8,4 @@ export * from './imageUpload';
 export * from './chapterPageManager';
 export * from './textExtraction';
 export * from './questionExtraction';
+export * from './handlers';

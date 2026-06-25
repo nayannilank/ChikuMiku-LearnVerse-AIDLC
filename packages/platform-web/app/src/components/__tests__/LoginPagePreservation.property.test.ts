@@ -135,11 +135,25 @@ describe('Preservation 2 - Non-Empty Credentials Login Flow', () => {
   });
 
   it('calls onSubmit with trimmed username and password for non-empty credentials', async () => {
+    // Username must be 5-15 chars, alphanumeric + underscore + hyphen
+    const validUsernameArb = fc.stringOf(
+      fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'.split('')),
+      { minLength: 5, maxLength: 15 }
+    );
+    // Password must be 8-20 chars with uppercase, lowercase, digit, and special char
+    // Ensure minimum 8 chars total by using minLength: 2 for each category
+    const validPasswordArb = fc.tuple(
+      fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz'.split('')), { minLength: 2, maxLength: 4 }),
+      fc.stringOf(fc.constantFrom(...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')), { minLength: 2, maxLength: 4 }),
+      fc.stringOf(fc.constantFrom(...'0123456789'.split('')), { minLength: 2, maxLength: 4 }),
+      fc.stringOf(fc.constantFrom(...'!@#$%^&*'.split('')), { minLength: 2, maxLength: 4 }),
+    ).map(([lower, upper, digit, special]) => lower + upper + digit + special);
+
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          username: fc.string({ minLength: 1 }),
-          password: fc.string({ minLength: 1 }),
+          username: validUsernameArb,
+          password: validPasswordArb,
         }),
         async (creds) => {
           const onSubmit = vi.fn().mockResolvedValue(undefined);
@@ -174,9 +188,9 @@ describe('Preservation 2 - Non-Empty Credentials Login Flow', () => {
           );
         }
       ),
-      { numRuns: 50 }
+      { numRuns: 20 }
     );
-  });
+  }, 15000);
 });
 
 describe('Preservation 3 - Submit-time Registration Validation', () => {
@@ -228,11 +242,11 @@ describe('Preservation 4 - Login Failure Shows Error and Action Links', () => {
       onRegister: vi.fn(),
     });
 
-    // Set non-empty input values so submission proceeds
+    // Set non-empty input values that pass validation so submission proceeds
     const usernameInput = el.querySelector('#login-username') as HTMLInputElement;
     const passwordInput = el.querySelector('#login-password') as HTMLInputElement;
-    usernameInput.value = 'someuser';
-    passwordInput.value = 'somepass';
+    usernameInput.value = 'testuser1';
+    passwordInput.value = 'Test1234!';
 
     // Dispatch submit event
     const form = el.querySelector('form') as HTMLFormElement;

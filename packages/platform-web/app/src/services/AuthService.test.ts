@@ -71,76 +71,88 @@ function mockResponseInvalidJson(status: number): Response {
 }
 
 // =============================================================================
-// Mock Mode Tests (USE_MOCKS = true) — ServiceResult Shape Verification
+// API Client Tests — ServiceResult Shape Verification
+//
+// Tests verify that AuthService functions return correct ServiceResult shapes
+// when the underlying API client receives successful/failed responses.
 // =============================================================================
 
-describe('AuthService (mock mode - ServiceResult shape)', () => {
+describe('AuthService (API client - ServiceResult shape)', () => {
+  let fetchMock: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
-    vi.useFakeTimers();
+    fetchMock = vi.fn();
+    globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    vi.restoreAllMocks();
     vi.resetModules();
   });
 
   describe('loginWithRole', () => {
     /**
-     * Validates: Requirement 1.3 - Auth_Service sends POST to /api/v1/auth/login with role
+     * Validates: Requirement 1.3 - Auth_Service sends POST to /auth/login with role
      */
     it('returns { success: true, data: { token, username } }', async () => {
+      fetchMock.mockResolvedValue(
+        mockResponse(200, { accessToken: 'jwt-token-parent', refreshToken: 'refresh-1', username: 'testuser', role: 'parent', userId: 'u1' })
+      );
+
       const { loginWithRole } = await import('./AuthService');
-      const promise = loginWithRole('testuser', 'password123', 'parent');
-      await vi.runAllTimersAsync();
-      const result = await promise;
+      const result = await loginWithRole('testuser', 'password123', 'parent');
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      expect(result.data!.token).toContain('mock-token-parent');
+      expect(result.data!.token).toBe('jwt-token-parent');
       expect(result.data!.username).toBe('testuser');
       expect(result.error).toBeUndefined();
     });
 
-    it('includes the role in the mock token', async () => {
-      const { loginWithRole } = await import('./AuthService');
-      const promise = loginWithRole('student1', 'pass', 'student');
-      await vi.runAllTimersAsync();
-      const result = await promise;
+    it('returns error on 401 response', async () => {
+      fetchMock.mockResolvedValue(
+        mockResponse(401, { message: 'incorrect username or password' })
+      );
 
-      expect(result.data!.token).toContain('mock-token-student');
+      const { loginWithRole } = await import('./AuthService');
+      const result = await loginWithRole('student1', 'wrong', 'student');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
     });
   });
 
   describe('registerParent', () => {
     /**
-     * Validates: Requirement 5.1 - Auth_Service sends POST to /api/v1/auth/register/parent
+     * Validates: Requirement 5.1 - Auth_Service sends POST to /auth/register/parent
      */
     it('returns { success: true } with no error', async () => {
+      fetchMock.mockResolvedValue(mockResponse(201, { id: 'p1' }));
+
       const { registerParent } = await import('./AuthService');
-      const promise = registerParent({
+      const result = await registerParent({
         username: 'parentuser',
         name: 'Parent Name',
         phone: '9876543210',
         email: 'parent@test.com',
         password: 'Secret123',
       });
-      await vi.runAllTimersAsync();
-      const result = await promise;
 
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
-      expect(result.data).toBeUndefined();
     });
   });
 
   describe('registerStudent', () => {
     /**
-     * Validates: Requirement 9.1 - Auth_Service sends POST to /api/v1/auth/register/student
+     * Validates: Requirement 9.1 - Auth_Service sends POST to /auth/register/student
      * with form data and parent authentication token
      */
     it('returns { success: true } with no error', async () => {
+      fetchMock.mockResolvedValue(mockResponse(201, { id: 's1' }));
+
       const { registerStudent } = await import('./AuthService');
-      const promise = registerStudent(
+      const result = await registerStudent(
         {
           parentUsername: 'parentuser',
           studentUsername: 'studentuser',
@@ -150,8 +162,6 @@ describe('AuthService (mock mode - ServiceResult shape)', () => {
         },
         'parent-auth-token'
       );
-      await vi.runAllTimersAsync();
-      const result = await promise;
 
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
@@ -160,13 +170,13 @@ describe('AuthService (mock mode - ServiceResult shape)', () => {
 
   describe('forgotPassword', () => {
     /**
-     * Validates: Requirement 10.4 - Auth_Service sends POST to /api/v1/auth/forgot-password
+     * Validates: Requirement 10.4 - Auth_Service sends POST to /auth/forgot-password
      */
     it('returns { success: true } with no error', async () => {
+      fetchMock.mockResolvedValue(mockResponse(200, {}));
+
       const { forgotPassword } = await import('./AuthService');
-      const promise = forgotPassword('parent@test.com');
-      await vi.runAllTimersAsync();
-      const result = await promise;
+      const result = await forgotPassword('parent@test.com');
 
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
@@ -175,13 +185,13 @@ describe('AuthService (mock mode - ServiceResult shape)', () => {
 
   describe('resetPassword', () => {
     /**
-     * Validates: Requirement 11.5 - Auth_Service sends POST to /api/v1/auth/reset-password
+     * Validates: Requirement 11.5 - Auth_Service sends POST to /auth/reset-password
      */
     it('returns { success: true } with no error', async () => {
+      fetchMock.mockResolvedValue(mockResponse(200, {}));
+
       const { resetPassword } = await import('./AuthService');
-      const promise = resetPassword('reset-token-123', 'NewPassword1!');
-      await vi.runAllTimersAsync();
-      const result = await promise;
+      const result = await resetPassword('reset-token-123', 'NewPassword1!');
 
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();

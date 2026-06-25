@@ -6,6 +6,13 @@
  * the native mobile platform (React Native).
  */
 
+export { BottomNavigation } from './components/BottomNavigation';
+export type {
+  NavigationTab,
+  TabPressCallback,
+  BottomNavigationConfig,
+} from './components/BottomNavigation';
+
 /**
  * MobileAppShell provides the top-level application container for the
  * mobile platform, managing screen hierarchy and React Navigation

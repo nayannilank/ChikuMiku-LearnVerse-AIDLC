@@ -2,18 +2,33 @@
    Login View Styles — Two-Panel Layout
    Requirements: 2.1, 2.2, 2.6, 2.7, 4.1, 4.2, 4.3, 4.4
    ========================================================================== */
+@import './design-tokens.css';
 
 /* --------------------------------------------------------------------------
-   Login View — Full-height flex row layout
-   Req 2.1: Two-panel horizontal layout
+   Login View — Full-height flex column layout (header + two-panel content)
+   Req 2.1: Two-panel horizontal layout (within the content area)
    Req 2.2: Background color #F8F5FF
    -------------------------------------------------------------------------- */
 .login-view {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   min-height: 100vh;
   background-color: var(--cm-color-background);
   position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Login View Content — Two-panel horizontal layout
+   Req 2.1: BrandingPanel left, LoginPanel right
+   -------------------------------------------------------------------------- */
+.login-view__content {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 2rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -88,8 +103,10 @@
    Req 2.7: Stack panels vertically with Branding_Panel above Login_Panel
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .login-view {
+  .login-view__content {
     flex-direction: column;
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
   }
 
   .branding-panel {

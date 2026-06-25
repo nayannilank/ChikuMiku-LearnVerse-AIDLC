@@ -20,3 +20,9 @@ export {
 // and TextbookPage to avoid naming conflicts with the legacy Chapter/Page in ./types.
 // For direct usage: import { Chapter, Page } from '@learnverse/service-core/src/textbook'
 export * from './pageManagement';
+
+// --- Middleware ---
+export * from './middleware/index';
+
+// --- Lambda Handler Types ---
+export * from './lambdaTypes';

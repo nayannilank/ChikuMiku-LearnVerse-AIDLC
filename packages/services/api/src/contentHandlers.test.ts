@@ -1,18 +1,21 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiRouter, createDefaultRoutes, ApiRequest } from './endpoints';
 import { clearContentStore } from './contentHandlers';
+import { createTokenPair, getJwtConfig } from '@learnverse/service-auth';
 
 describe('Content API Handlers (Textbooks, Chapters, Pages)', () => {
   let router: ApiRouter;
   const learnerId = 'test-learner-content';
 
   function makeRequest(method: 'GET' | 'POST', path: string, body?: unknown): ApiRequest {
+    const jwtConfig = getJwtConfig();
+    const { accessToken } = createTokenPair(learnerId, ['student'], jwtConfig);
     return {
       method,
       path,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer valid-token',
+        'Authorization': `Bearer ${accessToken}`,
         'x-learner-id': learnerId,
       },
       body,
