@@ -397,34 +397,28 @@ describe('registerParent handler', () => {
       expect(body.fieldErrors[0].field).toBe('username');
     });
 
-    it('should return 409 for duplicate email', async () => {
+    it('should return 500 (not 409) for duplicate email — email uniqueness not enforced', async () => {
       const error = new Error('Email exists') as CognitoDuplicateError;
       error.code = 'DuplicateAttribute';
-      error.duplicateField = 'email';
       (cognitoClient.createUser as ReturnType<typeof vi.fn>).mockRejectedValue(error);
 
       const event = createMockEvent(createValidBody());
       const result = await handler(event);
 
-      expect(result.statusCode).toBe(409);
-      const body = JSON.parse(result.body);
-      expect(body.message).toBe('Email already registered — try logging in or use a different email');
-      expect(body.fieldErrors[0].field).toBe('email');
+      // Email/phone duplicates are no longer handled as 409 — they propagate as 500
+      expect(result.statusCode).toBe(500);
     });
 
-    it('should return 409 for duplicate phone', async () => {
+    it('should return 500 (not 409) for duplicate phone — phone uniqueness not enforced', async () => {
       const error = new Error('Phone exists') as CognitoDuplicateError;
       error.code = 'DuplicateAttribute';
-      error.duplicateField = 'phone';
       (cognitoClient.createUser as ReturnType<typeof vi.fn>).mockRejectedValue(error);
 
       const event = createMockEvent(createValidBody());
       const result = await handler(event);
 
-      expect(result.statusCode).toBe(409);
-      const body = JSON.parse(result.body);
-      expect(body.message).toBe('Phone number already registered — try logging in or use a different number');
-      expect(body.fieldErrors[0].field).toBe('phone');
+      // Email/phone duplicates are no longer handled as 409 — they propagate as 500
+      expect(result.statusCode).toBe(500);
     });
   });
 

@@ -104,9 +104,11 @@ export function useStudentRegistration() {
       studentUsername: string;
       name: string;
       password: string;
+      gender: 'male' | 'female' | 'other';
       grade: string;
       schoolName: string;
       subjects: string[];
+      customSubjects?: { name: string }[];
     }): Promise<boolean> => {
       setIsLoading(true);
       setError(null);
@@ -213,7 +215,7 @@ export function useLogout(onLoggedOut: () => void) {
  */
 export function useDashboardStreak(studentId: string) {
   const fetchStreak = useCallback(async (): Promise<number> => {
-    const streak = await api.progress.getStreak(studentId);
+    const streak = await api.progress.getStreak();
     return streak.currentStreak;
   }, [studentId]);
 
@@ -227,7 +229,7 @@ export function useDashboardSubjects(studentId: string) {
   const fetchSubjects = useCallback(async (): Promise<SubjectCardData[]> => {
     const [subjects, progressList] = await Promise.all([
       api.content.getSubjects(),
-      api.progress.getProgress(studentId),
+      api.progress.getProgress(),
     ]);
 
     return subjects.map((subject) => {

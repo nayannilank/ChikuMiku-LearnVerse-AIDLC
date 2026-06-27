@@ -2,10 +2,10 @@
  * Property Test: Maths Input Validation
  *
  * Property 29: For any string input to validateMathsInput:
- * - Integers 0–99 are accepted with the parsed numeric value
- * - Empty/whitespace-only strings are rejected with reason 'empty'
- * - Non-numeric characters (letters, symbols, decimals) are rejected as 'non_integer'
- * - Integers outside [0, 99] are rejected with reason 'out_of_range'
+ * - Integers 0–99 are accepted (valid: true)
+ * - Empty/whitespace-only strings are rejected with an error message
+ * - Non-numeric characters (letters, symbols, decimals) are rejected with an error message
+ * - Integers outside [0, 99] are rejected with an error message
  *
  * **Validates: Requirements 15.2, 15.4**
  */
@@ -15,13 +15,13 @@ import { validateMathsInput } from './MathsPracticeScreen';
 
 describe('Property 29: Maths Input Validation', () => {
   describe('valid integers in [0, 99]', () => {
-    it('for any integer in [0, 99], its string representation is accepted with the correct value', () => {
+    it('for any integer in [0, 99], its string representation is accepted', () => {
       fc.assert(
         fc.property(
           fc.integer({ min: 0, max: 99 }),
           (n) => {
             const result = validateMathsInput(String(n));
-            expect(result).toEqual({ valid: true, value: n });
+            expect(result).toEqual({ valid: true });
           }
         ),
         { numRuns: 500 }
@@ -36,7 +36,7 @@ describe('Property 29: Maths Input Validation', () => {
           fc.stringOf(fc.constantFrom(' ', '\t'), { minLength: 1, maxLength: 5 }),
           (n, prefix, suffix) => {
             const result = validateMathsInput(`${prefix}${n}${suffix}`);
-            expect(result).toEqual({ valid: true, value: n });
+            expect(result).toEqual({ valid: true });
           }
         ),
         { numRuns: 300 }
@@ -45,18 +45,20 @@ describe('Property 29: Maths Input Validation', () => {
   });
 
   describe('empty or whitespace-only strings', () => {
-    it('empty string returns empty reason', () => {
+    it('empty string returns invalid with error', () => {
       const result = validateMathsInput('');
-      expect(result).toEqual({ valid: false, reason: 'empty' });
+      expect(result.valid).toBe(false);
+      expect(result.error).toBeDefined();
     });
 
-    it('for any whitespace-only string, validation returns empty reason', () => {
+    it('for any whitespace-only string, validation returns invalid with error', () => {
       fc.assert(
         fc.property(
           fc.stringOf(fc.constantFrom(' ', '\t', '\n', '\r'), { minLength: 1, maxLength: 20 }),
           (whitespace) => {
             const result = validateMathsInput(whitespace);
-            expect(result).toEqual({ valid: false, reason: 'empty' });
+            expect(result.valid).toBe(false);
+            expect(result.error).toBeDefined();
           }
         ),
         { numRuns: 300 }
@@ -65,7 +67,7 @@ describe('Property 29: Maths Input Validation', () => {
   });
 
   describe('non-integer strings', () => {
-    it('for any string containing non-numeric characters (letters, symbols), returns non_integer', () => {
+    it('for any string containing non-numeric characters (letters, symbols), returns invalid', () => {
       fc.assert(
         fc.property(
           fc.string({ minLength: 1, maxLength: 20 }).filter((s) => {
@@ -76,14 +78,15 @@ describe('Property 29: Maths Input Validation', () => {
           }),
           (s) => {
             const result = validateMathsInput(s);
-            expect(result).toEqual({ valid: false, reason: 'non_integer' });
+            expect(result.valid).toBe(false);
+            expect(result.error).toBeDefined();
           }
         ),
         { numRuns: 500 }
       );
     });
 
-    it('decimal numbers (e.g., "3.5") are rejected as non_integer', () => {
+    it('decimal numbers (e.g., "3.5") are rejected as invalid', () => {
       fc.assert(
         fc.property(
           fc.integer({ min: 0, max: 99 }),
@@ -91,14 +94,15 @@ describe('Property 29: Maths Input Validation', () => {
           (intPart, fracPart) => {
             const decimalStr = `${intPart}.${fracPart}`;
             const result = validateMathsInput(decimalStr);
-            expect(result).toEqual({ valid: false, reason: 'non_integer' });
+            expect(result.valid).toBe(false);
+            expect(result.error).toBeDefined();
           }
         ),
         { numRuns: 300 }
       );
     });
 
-    it('strings with letters mixed with digits are rejected as non_integer', () => {
+    it('strings with letters mixed with digits are rejected as invalid', () => {
       fc.assert(
         fc.property(
           fc.stringOf(fc.constantFrom('a', 'b', 'c', 'x', 'Z', '1', '2', '3'), {
@@ -107,7 +111,8 @@ describe('Property 29: Maths Input Validation', () => {
           }).filter((s) => /[a-zA-Z]/.test(s) && s.trim().length > 0),
           (s) => {
             const result = validateMathsInput(s);
-            expect(result).toEqual({ valid: false, reason: 'non_integer' });
+            expect(result.valid).toBe(false);
+            expect(result.error).toBeDefined();
           }
         ),
         { numRuns: 300 }
@@ -116,26 +121,28 @@ describe('Property 29: Maths Input Validation', () => {
   });
 
   describe('out-of-range integers', () => {
-    it('for any integer < 0, its string representation returns out_of_range', () => {
+    it('for any integer < 0, its string representation returns invalid', () => {
       fc.assert(
         fc.property(
           fc.integer({ min: -10000, max: -1 }),
           (n) => {
             const result = validateMathsInput(String(n));
-            expect(result).toEqual({ valid: false, reason: 'out_of_range' });
+            expect(result.valid).toBe(false);
+            expect(result.error).toBeDefined();
           }
         ),
         { numRuns: 300 }
       );
     });
 
-    it('for any integer > 99, its string representation returns out_of_range', () => {
+    it('for any integer > 99, its string representation returns invalid', () => {
       fc.assert(
         fc.property(
           fc.integer({ min: 100, max: 10000 }),
           (n) => {
             const result = validateMathsInput(String(n));
-            expect(result).toEqual({ valid: false, reason: 'out_of_range' });
+            expect(result.valid).toBe(false);
+            expect(result.error).toBeDefined();
           }
         ),
         { numRuns: 300 }

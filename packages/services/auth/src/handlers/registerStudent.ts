@@ -27,11 +27,16 @@ export interface CustomSubjectInput {
   name: string;
 }
 
+export type StudentGender = 'male' | 'female' | 'other';
+
+const VALID_GENDERS: readonly StudentGender[] = ['male', 'female', 'other'];
+
 export interface StudentRegistrationBody {
   parentUsername: string;
   username: string;
   name: string;
   password: string;
+  gender: string;
   grade: string;
   schoolName: string;
   subjects: string[]; // subject IDs
@@ -68,6 +73,7 @@ export interface DBClient {
     parentId: string;
     username: string;
     name: string;
+    gender: StudentGender;
     grade: StudentGrade;
     schoolName: string;
     cognitoSub: string;
@@ -140,6 +146,13 @@ function validateStudentPassword(password: unknown): FieldError | null {
 function validateStudentGrade(grade: unknown): FieldError | null {
   if (typeof grade !== 'string' || !VALID_GRADES.includes(grade as StudentGrade)) {
     return { field: 'grade', message: `Grade must be one of: ${VALID_GRADES.join(', ')}` };
+  }
+  return null;
+}
+
+function validateStudentGender(gender: unknown): FieldError | null {
+  if (typeof gender !== 'string' || !VALID_GENDERS.includes(gender as StudentGender)) {
+    return { field: 'gender', message: `Gender must be one of: ${VALID_GENDERS.join(', ')}` };
   }
   return null;
 }
@@ -228,6 +241,9 @@ export function createRegisterStudentHandler(
       const passwordError = validateStudentPassword(body.password);
       if (passwordError) errors.push(passwordError);
 
+      const genderError = validateStudentGender(body.gender);
+      if (genderError) errors.push(genderError);
+
       const gradeError = validateStudentGrade(body.grade);
       if (gradeError) errors.push(gradeError);
 
@@ -268,6 +284,7 @@ export function createRegisterStudentHandler(
         parentId: parent.id,
         username: body.username,
         name: body.name,
+        gender: body.gender as StudentGender,
         grade: body.grade as StudentGrade,
         schoolName: body.schoolName,
         cognitoSub,

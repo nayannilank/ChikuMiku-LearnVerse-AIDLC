@@ -19,6 +19,8 @@ import {
   registerParent,
   registerStudent,
   addLearnerToStore,
+  getLearnersByParentId,
+  getLearnerFromStoreById,
   createTokenPair,
   getJwtConfig,
   verifyToken,
@@ -165,11 +167,13 @@ export async function handleLogin(req: ApiRequest): Promise<ApiResponse> {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
     body: {
-      token: tokenPair.accessToken,
+      accessToken: tokenPair.accessToken,
       refreshToken: tokenPair.refreshToken,
       expiresAt: tokenPair.expiresAt,
       tokenType: 'Bearer',
       username: account.username,
+      role: parentAccount ? 'parent' : 'student',
+      userId: account.id,
     },
   };
 }
@@ -278,11 +282,10 @@ export async function handleRegisterParent(req: ApiRequest): Promise<ApiResponse
   });
 
   if (!result.success) {
-    // Determine if this is a duplicate/conflict error or a validation error
+    // Only username uniqueness is enforced — email and phone can be shared
+    // between multiple parent accounts per product requirements
     const conflictMessages = [
       'Username is already taken',
-      'Email is already registered',
-      'Phone number is already registered',
     ];
     const isConflict = result.errors.some((e) =>
       conflictMessages.includes(e.message)
@@ -294,8 +297,8 @@ export async function handleRegisterParent(req: ApiRequest): Promise<ApiResponse
         headers: { 'Content-Type': 'application/json' },
         body: {
           code: 'CONFLICT',
-          message: 'An account with this information already exists.',
-          errors: result.errors,
+          message: 'An account with this username already exists.',
+          errors: result.errors.filter((e) => conflictMessages.includes(e.message)),
           retryable: false,
         },
       };
@@ -338,9 +341,12 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
   const body = req.body as {
     name?: string;
     username?: string;
+    studentUsername?: string;
     password?: string;
-    grade?: number;
+    grade?: number | string;
     parentUsername?: string;
+    subjects?: string[];
+    customSubjects?: Array<{ name: string }>;
   } | undefined;
 
   if (!body) {
@@ -353,6 +359,25 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
         retryable: false,
       },
     };
+  }
+
+  // Accept both "username" and "studentUsername" for compatibility with frontend
+  if (!body.username && body.studentUsername) {
+    body.username = body.studentUsername;
+  }
+
+  // Accept grade as string name (e.g., "Third") or number — convert to number
+  if (typeof body.grade === 'string') {
+    const GRADE_MAP: Record<string, number> = {
+      'LKG': 0, 'UKG': 0,
+      'First': 1, 'Second': 2, 'Third': 3, 'Fourth': 4,
+      'Fifth': 5, 'Sixth': 6, 'Seventh': 7, 'Eighth': 8,
+      'Ninth': 9, 'Tenth': 10, 'Eleventh': 11, 'Twelfth': 12,
+      '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
+      '7': 7, '8': 8, '9': 9, '10': 10, '11': 11, '12': 12,
+    };
+    const mapped = GRADE_MAP[body.grade];
+    (body as { grade?: number | string }).grade = mapped !== undefined ? mapped : body.grade;
   }
 
   const errors: Array<{ field: string; message: string }> = [];
@@ -384,11 +409,14 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
     }
   }
 
-  // Validate grade (1-12)
+  // Validate grade (0-12, where 0 = LKG/UKG)
   if (body.grade === undefined || body.grade === null) {
     errors.push({ field: 'grade', message: 'Grade is required.' });
-  } else if (!Number.isInteger(body.grade) || body.grade < 1 || body.grade > 12) {
-    errors.push({ field: 'grade', message: 'Grade must be an integer between 1 and 12.' });
+  } else {
+    const gradeNum = Number(body.grade);
+    if (!Number.isInteger(gradeNum) || gradeNum < 0 || gradeNum > 12) {
+      errors.push({ field: 'grade', message: 'Grade must be valid (LKG through Twelfth).' });
+    }
   }
 
   // Validate parent username
@@ -419,7 +447,7 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
     name: body.name!,
     username: body.username!,
     password: body.password!,
-    grade: body.grade!,
+    grade: Number(body.grade!),
     parentUsername: body.parentUsername!,
   });
 
@@ -450,8 +478,8 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
         status: 400,
         headers: { 'Content-Type': 'application/json' },
         body: {
-          code: 'VALIDATION_ERROR',
-          message: 'Parent username does not exist.',
+          code: 'PARENT_NOT_FOUND',
+          message: 'Parent account not found. Please register the parent first, then add learners.',
           errors: result.errors,
           retryable: false,
         },
@@ -471,6 +499,19 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
   }
 
   // Add a Learner record to the learner store with contactValue = student username
+  // Collect subjects from the registration payload
+  const subjectNames: string[] = [];
+  if (body.subjects && Array.isArray(body.subjects)) {
+    subjectNames.push(...body.subjects.filter((s): s is string => typeof s === 'string'));
+  }
+  if (body.customSubjects && Array.isArray(body.customSubjects)) {
+    for (const cs of body.customSubjects) {
+      if (cs && typeof cs.name === 'string' && cs.name.trim().length > 0) {
+        subjectNames.push(cs.name.trim());
+      }
+    }
+  }
+
   const learner: Learner = {
     id: randomUUID(),
     displayName: result.account.name,
@@ -478,7 +519,7 @@ export async function handleRegisterStudent(req: ApiRequest): Promise<ApiRespons
     contactValue: result.account.username,
     passwordHash: result.account.passwordHash,
     grade: result.account.grade as Grade,
-    enrolledSubjects: [],
+    enrolledSubjects: subjectNames,
     parentAccountId: result.account.parentAccountId,
     createdAt: result.account.createdAt,
     updatedAt: result.account.updatedAt,
@@ -849,5 +890,156 @@ export async function handleRefresh(req: ApiRequest): Promise<ApiResponse> {
       expiresAt: newTokenPair.expiresAt,
       tokenType: 'Bearer',
     },
+  };
+}
+
+// --- GET /api/v1/parent/learners ---
+
+/**
+ * Returns all learners linked to the authenticated parent.
+ * Extracts the parent ID from the JWT token (sub field).
+ * Returns an array of learner objects with id, name, grade, and subjects.
+ *
+ * Requires a valid Bearer token with 'parent' role.
+ */
+export async function handleGetLearners(req: ApiRequest): Promise<ApiResponse> {
+  const authHeader =
+    req.headers['authorization'] ?? req.headers['Authorization'];
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required.',
+        retryable: false,
+      },
+    };
+  }
+
+  const token = authHeader.slice(7);
+  const jwtConfig = getJwtConfig();
+  const decoded = verifyToken(token, jwtConfig);
+
+  if (!decoded) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'UNAUTHORIZED',
+        message: 'Invalid or expired token.',
+        retryable: false,
+      },
+    };
+  }
+
+  // The parent ID is the 'sub' claim in the JWT
+  const parentId = decoded.sub;
+
+  // Fetch all learners linked to this parent
+  const learners = getLearnersByParentId(parentId);
+
+  // Map grade number to a readable string
+  const GRADE_NAMES: Record<number, string> = {
+    0: 'LKG/UKG',
+    1: 'First', 2: 'Second', 3: 'Third', 4: 'Fourth',
+    5: 'Fifth', 6: 'Sixth', 7: 'Seventh', 8: 'Eighth',
+    9: 'Ninth', 10: 'Tenth', 11: 'Eleventh', 12: 'Twelfth',
+  };
+
+  const result = learners.map((learner) => ({
+    id: learner.id,
+    name: learner.displayName,
+    grade: GRADE_NAMES[learner.grade as number] ?? `Grade ${learner.grade}`,
+    subjects: learner.enrolledSubjects ?? [],
+  }));
+
+  return {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: result,
+  };
+}
+
+// --- GET /api/v1/learner/subjects ---
+
+/** Subject color mapping for the design system. */
+const SUBJECT_COLORS: Record<string, string> = {
+  Maths: '#E94F9B',
+  Science: '#4ECDC4',
+  Computers: '#4A6CF7',
+  EVS: '#27AE60',
+  Hindi: '#F7C948',
+  English: '#5DADE2',
+  Kannada: '#9B59B6',
+};
+
+/**
+ * Returns the enrolled subjects for the authenticated learner.
+ * Extracts learner ID from the JWT token's `sub` claim and
+ * looks up the learner's enrolledSubjects array.
+ *
+ * Returns an array of { name, color } objects.
+ * Requires a valid Bearer token with 'student' role.
+ */
+export async function handleGetLearnerSubjects(req: ApiRequest): Promise<ApiResponse> {
+  const authHeader =
+    req.headers['authorization'] ?? req.headers['Authorization'];
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required.',
+        retryable: false,
+      },
+    };
+  }
+
+  const token = authHeader.slice(7);
+  const jwtConfig = getJwtConfig();
+  const decoded = verifyToken(token, jwtConfig);
+
+  if (!decoded) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        code: 'UNAUTHORIZED',
+        message: 'Invalid or expired token.',
+        retryable: false,
+      },
+    };
+  }
+
+  // The learner ID is the 'sub' claim in the JWT
+  const learnerId = decoded.sub;
+
+  // Look up the learner in the session store
+  const learner = getLearnerFromStoreById(learnerId);
+
+  if (!learner) {
+    return {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: [],
+    };
+  }
+
+  // Default color for subjects not in the design system
+  const DEFAULT_COLOR = '#6B7280';
+
+  const subjects = (learner.enrolledSubjects ?? []).map((name) => ({
+    name,
+    color: SUBJECT_COLORS[name] ?? DEFAULT_COLOR,
+  }));
+
+  return {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: subjects,
   };
 }

@@ -105,8 +105,6 @@ const FIELD_CONFIGS: FieldConfig[] = [
 
 const SERVER_ERROR_MESSAGES: Record<string, string> = {
   username: 'Username already taken \u2014 please choose a different username',
-  email: 'Email already registered \u2014 try logging in or use a different email',
-  phone: 'Phone number already registered \u2014 try logging in or use a different number',
 };
 
 const GENERIC_SERVER_ERROR = 'Something went wrong \u2014 please try again after some time';

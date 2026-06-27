@@ -18,11 +18,14 @@ export interface Parent {
   createdAt: string;
 }
 
+export type Gender = 'male' | 'female' | 'other';
+
 export interface Student {
   id: string;
   parentId: string;
   username: string;
   name: string;
+  gender: Gender;
   grade: Grade;
   schoolName: string;
   subjects: SubjectAssignment[];

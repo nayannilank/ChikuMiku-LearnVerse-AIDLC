@@ -531,11 +531,13 @@ export const authApi = {
     studentUsername: string;
     name: string;
     password: string;
+    gender: 'male' | 'female' | 'other';
     grade: string;
     schoolName: string;
     subjects: string[];
+    customSubjects?: { name: string }[];
   }): Promise<{ id: string }> {
-    return post('/auth/register/student', data);
+    return post('/auth/register/student', data, { skipAuth: true });
   },
 
   /** POST /auth/forgot-password — Initiate password recovery */
@@ -738,14 +740,14 @@ export const comprehensionApi = {
 // ============================================================
 
 export const progressApi = {
-  /** GET /progress/:studentId — Get progress summary */
-  getProgress(studentId: string): Promise<StudentProgress[]> {
-    return get(`/progress/${studentId}`);
+  /** GET /progress — Get progress summary (learner identified from auth token) */
+  getProgress(): Promise<StudentProgress[]> {
+    return get('/progress');
   },
 
-  /** GET /progress/:studentId/streak — Get streak data */
-  getStreak(studentId: string): Promise<Streak> {
-    return get(`/progress/${studentId}/streak`);
+  /** GET /progress/streak — Get streak data (no backend endpoint yet; returns default) */
+  getStreak(): Promise<Streak> {
+    return get('/progress/streak');
   },
 
   /** POST /progress/:studentId/exercise-result — Record exercise result */

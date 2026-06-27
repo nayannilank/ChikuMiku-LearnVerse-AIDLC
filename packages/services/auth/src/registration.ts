@@ -594,17 +594,10 @@ export function registerParent(input: ParentRegistrationInput): ParentRegistrati
     return { success: false, errors, preservedData };
   }
 
-  // Check for duplicates
+  // Check for duplicates — only username must be unique.
+  // Multiple parents CAN share the same email and phone number per product requirements.
   if (isUsernameTaken(input.username)) {
     errors.push({ field: 'username', message: 'Username is already taken' });
-  }
-
-  if (findParentByEmail(input.email)) {
-    errors.push({ field: 'email', message: 'Email is already registered' });
-  }
-
-  if (findParentByPhone(input.phoneNumber)) {
-    errors.push({ field: 'phoneNumber', message: 'Phone number is already registered' });
   }
 
   if (errors.length > 0) {

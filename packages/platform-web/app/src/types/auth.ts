@@ -45,8 +45,12 @@ export interface StudentRegistrationRequest {
   parentUsername: string;
   studentUsername: string;
   name: string;
+  password: string;
+  gender: 'male' | 'female' | 'other';
   grade: string;
   schoolName: string;
+  subjects: string[];
+  customSubjects?: { name: string }[];
 }
 
 /** Payload sent to POST /api/v1/auth/forgot-password. */

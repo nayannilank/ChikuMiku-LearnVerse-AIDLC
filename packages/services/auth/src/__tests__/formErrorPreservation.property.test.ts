@@ -74,12 +74,14 @@ function createMockDb(): DbClient {
   };
 }
 
-function createDuplicateCognito(field: 'username' | 'email' | 'phone'): CognitoClient {
+function createDuplicateCognito(field: string): CognitoClient {
   return {
     createUser: async () => {
       const error = new Error('Duplicate') as CognitoDuplicateError;
-      error.code = 'UsernameExistsException';
-      error.duplicateField = field;
+      error.code = field === 'username' ? 'UsernameExistsException' : 'DuplicateAttribute';
+      if (field === 'username') {
+        error.duplicateField = 'username';
+      }
       throw error;
     },
     addUserToGroup: async () => {},
@@ -358,7 +360,7 @@ describe('Property 3: Form Error State Preservation', () => {
     );
   });
 
-  it('duplicate email (409) returns fieldErrors with email field and correct message', async () => {
+  it('duplicate email is NOT enforced — error propagates as 500 (not 409)', async () => {
     const duplicateHandler = createRegisterParentHandler(
       createDuplicateCognito('email'),
       createMockDb(),
@@ -369,22 +371,15 @@ describe('Property 3: Form Error State Preservation', () => {
         const event = makeEvent(body);
         const result = await duplicateHandler(event);
 
-        expect(result.statusCode).toBe(409);
-        const parsed = JSON.parse(result.body);
-        const fieldErrors: Array<{ field: string; message: string }> = parsed.fieldErrors;
-
-        expect(fieldErrors).toBeDefined();
-        expect(fieldErrors.length).toBe(1);
-        expect(fieldErrors[0].field).toBe('email');
-        expect(fieldErrors[0].message).toBe(
-          'Email already registered — try logging in or use a different email',
-        );
+        // Email uniqueness is no longer enforced; non-username duplicate errors
+        // propagate as internal server errors (500)
+        expect(result.statusCode).toBe(500);
       }),
       { numRuns: 50 },
     );
   });
 
-  it('duplicate phone (409) returns fieldErrors with phone field and correct message', async () => {
+  it('duplicate phone is NOT enforced — error propagates as 500 (not 409)', async () => {
     const duplicateHandler = createRegisterParentHandler(
       createDuplicateCognito('phone'),
       createMockDb(),
@@ -395,16 +390,9 @@ describe('Property 3: Form Error State Preservation', () => {
         const event = makeEvent(body);
         const result = await duplicateHandler(event);
 
-        expect(result.statusCode).toBe(409);
-        const parsed = JSON.parse(result.body);
-        const fieldErrors: Array<{ field: string; message: string }> = parsed.fieldErrors;
-
-        expect(fieldErrors).toBeDefined();
-        expect(fieldErrors.length).toBe(1);
-        expect(fieldErrors[0].field).toBe('phone');
-        expect(fieldErrors[0].message).toBe(
-          'Phone number already registered — try logging in or use a different number',
-        );
+        // Phone uniqueness is no longer enforced; non-username duplicate errors
+        // propagate as internal server errors (500)
+        expect(result.statusCode).toBe(500);
       }),
       { numRuns: 50 },
     );

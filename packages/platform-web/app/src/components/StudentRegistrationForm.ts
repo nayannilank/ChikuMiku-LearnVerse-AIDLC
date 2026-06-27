@@ -355,8 +355,11 @@ export function createStudentRegistrationForm(options: StudentRegistrationFormOp
         parentUsername,
         studentUsername: values.studentUsername,
         name: values.name,
+        password: values.password || '',
+        gender: (values.gender as 'male' | 'female' | 'other') || 'other',
         grade: values.grade,
         schoolName: values.schoolName,
+        subjects: [],
       },
       parentToken
     );

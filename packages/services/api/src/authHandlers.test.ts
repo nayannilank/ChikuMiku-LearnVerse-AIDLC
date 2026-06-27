@@ -101,12 +101,14 @@ describe('Auth API Handlers (Integration)', () => {
         })
       );
       expect(res.status).toBe(200);
-      expect((res.body as any).token).toBeDefined();
-      expect((res.body as any).token.length).toBeGreaterThan(0);
+      expect((res.body as any).accessToken).toBeDefined();
+      expect((res.body as any).accessToken.length).toBeGreaterThan(0);
       expect((res.body as any).refreshToken).toBeDefined();
       expect((res.body as any).tokenType).toBe('Bearer');
       expect((res.body as any).expiresAt).toBeGreaterThan(Date.now());
       expect((res.body as any).username).toBe('testparent');
+      expect((res.body as any).role).toBe('parent');
+      expect((res.body as any).userId).toBeDefined();
     });
 
     it('should return 429 when account is locked after 3 failed attempts', async () => {
@@ -294,7 +296,7 @@ describe('Auth API Handlers (Integration)', () => {
           password: 'ValidPass1!',
         })
       );
-      const token = (loginRes.body as any).token;
+      const token = (loginRes.body as any).accessToken;
 
       const res = await router.dispatch(
         makeRequest('GET', '/api/v1/auth/validate', undefined, {

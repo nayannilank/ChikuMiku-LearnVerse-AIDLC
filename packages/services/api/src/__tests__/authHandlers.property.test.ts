@@ -286,12 +286,11 @@ describe('Property 3: Parent registration detects duplicates', () => {
     clearLearnerStore();
   });
 
-  it('for any successfully registered parent, re-registering with the same username/email/phone returns 409', async () => {
+  it('for any successfully registered parent, re-registering with the same username returns 409', async () => {
     await fc.assert(
       fc.asyncProperty(
-        fc.constantFrom('username', 'email', 'phone') as fc.Arbitrary<'username' | 'email' | 'phone'>,
         uniqueSuffixArb,
-        async (duplicateField, suffix) => {
+        async (suffix) => {
           const base = {
             name: 'Test Parent',
             username: `user_${suffix}`,
@@ -310,13 +309,14 @@ describe('Property 3: Parent registration detects duplicates', () => {
           const res1 = await handleRegisterParent(req1);
           if (res1.status !== 201) return; // skip if first registration failed (e.g., collisions in fast-check)
 
-          // Second registration with same duplicate field should get 409
+          // Second registration with same username should get 409
+          // (email and phone uniqueness is NOT enforced per product requirements)
           const duplicate = {
             name: 'Another Parent',
-            username: duplicateField === 'username' ? base.username : `other${suffix}`,
+            username: base.username,
             password: 'Other1Pass!',
-            phone: duplicateField === 'phone' ? base.phone : `98765${suffix.padEnd(5, '0').slice(0, 5)}`.replace(/[^0-9]/g, '').slice(0, 10).padEnd(10, '0'),
-            email: duplicateField === 'email' ? base.email : `other_${suffix}@example.com`,
+            phone: `98765${suffix.padEnd(5, '0').slice(0, 5)}`.replace(/[^0-9]/g, '').slice(0, 10).padEnd(10, '0'),
+            email: `other_${suffix}@example.com`,
           };
 
           // Ensure duplicate username is valid length
@@ -330,6 +330,54 @@ describe('Property 3: Parent registration detects duplicates', () => {
           expect(body.code).toBe('CONFLICT');
           expect(body.errors).toBeDefined();
           expect(body.errors.length).toBeGreaterThan(0);
+          expect(body.errors[0].field).toBe('username');
+        },
+      ),
+      { numRuns: 200 },
+    );
+  });
+
+  it('re-registering with the same email or phone but different username succeeds (201)', async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.constantFrom('email', 'phone') as fc.Arbitrary<'email' | 'phone'>,
+        uniqueSuffixArb,
+        async (duplicateField, suffix) => {
+          const base = {
+            name: 'Test Parent',
+            username: `user_${suffix}`,
+            password: 'Valid1Pass!',
+            phone: `12345${suffix.padEnd(5, '0').slice(0, 5)}`,
+            email: `test_${suffix}@example.com`,
+          };
+
+          // Ensure username is valid length
+          if (base.username.length < 5 || base.username.length > 15) return;
+          // Ensure phone is exactly 10 digits
+          base.phone = base.phone.replace(/[^0-9]/g, '').slice(0, 10).padEnd(10, '0');
+
+          // First registration should succeed
+          const req1 = makeParentRequest(base);
+          const res1 = await handleRegisterParent(req1);
+          if (res1.status !== 201) return;
+
+          // Second registration with same email or phone but DIFFERENT username should succeed
+          const otherUsername = `oth_${suffix}`.slice(0, 15);
+          if (otherUsername.length < 5) return;
+
+          const duplicate = {
+            name: 'Another Parent',
+            username: otherUsername,
+            password: 'Other1Pass!',
+            phone: duplicateField === 'phone' ? base.phone : `98765${suffix.padEnd(5, '0').slice(0, 5)}`.replace(/[^0-9]/g, '').slice(0, 10).padEnd(10, '0'),
+            email: duplicateField === 'email' ? base.email : `other_${suffix}@example.com`,
+          };
+
+          const req2 = makeParentRequest(duplicate);
+          const res2 = await handleRegisterParent(req2);
+
+          // Email/phone are NOT unique constraints — should succeed with 201
+          expect(res2.status).toBe(201);
         },
       ),
       { numRuns: 200 },

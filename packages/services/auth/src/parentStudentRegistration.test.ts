@@ -215,30 +215,26 @@ describe('registerParent', () => {
     }
   });
 
-  it('rejects duplicate email', () => {
+  it('allows duplicate email — email uniqueness not enforced', () => {
     registerParent(validParentInput);
     const result = registerParent({
       ...validParentInput,
       username: 'other_user',
       phoneNumber: '1234567890',
     });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.errors.some((e) => e.field === 'email' && e.message.includes('registered'))).toBe(true);
-    }
+    // Email can be shared between multiple parents
+    expect(result.success).toBe(true);
   });
 
-  it('rejects duplicate phone number', () => {
+  it('allows duplicate phone number — phone uniqueness not enforced', () => {
     registerParent(validParentInput);
     const result = registerParent({
       ...validParentInput,
       username: 'other_user',
       email: 'other@example.com',
     });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.errors.some((e) => e.field === 'phoneNumber' && e.message.includes('registered'))).toBe(true);
-    }
+    // Phone number can be shared between multiple parents
+    expect(result.success).toBe(true);
   });
 
   it('preserves valid fields on validation failure', () => {

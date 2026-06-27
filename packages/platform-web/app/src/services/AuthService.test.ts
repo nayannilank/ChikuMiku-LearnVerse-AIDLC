@@ -157,8 +157,11 @@ describe('AuthService (API client - ServiceResult shape)', () => {
           parentUsername: 'parentuser',
           studentUsername: 'studentuser',
           name: 'Student Name',
+          password: 'Test1234!',
+          gender: 'male',
           grade: 'Fifth',
           schoolName: 'Test School',
+          subjects: ['Maths', 'Science'],
         },
         'parent-auth-token'
       );

@@ -28,6 +28,7 @@ import { createNavigationShell, NavigationShellOptions } from './NavigationShell
 import { createMobileBottomNav, MobileBottomNavOptions } from './MobileBottomNav';
 import { colors } from '../theme/tokens';
 import { SidebarSubject } from './Sidebar';
+import { TreeSidebarProps } from './TreeSidebar';
 
 /** Breakpoint threshold: desktop ≥ 960px, mobile < 960px. */
 const DESKTOP_BREAKPOINT = 960;
@@ -55,6 +56,8 @@ export interface ResponsiveLayoutOptions {
   onMobileTabPress: (tabId: string) => void;
   /** Currently active mobile tab ID for highlighting. */
   activeMobileTab?: string;
+  /** Optional TreeSidebar props for hierarchical navigation. */
+  treeSidebar?: TreeSidebarProps;
 }
 
 const RESPONSIVE_STYLE_ID = 'learnverse-responsive-layout-style';
@@ -119,6 +122,7 @@ export function createResponsiveLayout(options: ResponsiveLayoutOptions): HTMLEl
       subjects: options.subjects,
       onSelectSubject: options.onSelectSubject,
       content: options.content,
+      treeSidebar: options.treeSidebar,
     };
     return createNavigationShell(shellOptions);
   }

@@ -149,6 +149,7 @@ describe('Integration: Auth Flow', () => {
         studentUsername: 'studentuser1',
         name: 'Student Name',
         password: 'StudPass1!',
+        gender: 'male',
         grade: 'Fifth',
         schoolName: 'Test School Name',
         subjects: ['Kannada', 'English', 'Maths'],
@@ -159,9 +160,8 @@ describe('Integration: Auth Flow', () => {
       expect(url).toContain('/auth/register/student');
       expect(options.method).toBe('POST');
 
-      // Verify parent auth token is attached
-      expect(options.headers['Authorization']).toBe('Bearer parent-access-token-xyz');
-
+      // registerStudent uses skipAuth: true — no Authorization header is sent
+      // The parent context is passed via the parentUsername field in the body
       const body = JSON.parse(options.body);
       expect(body.parentUsername).toBe('parentuser1');
       expect(body.studentUsername).toBe('studentuser1');
@@ -179,6 +179,7 @@ describe('Integration: Auth Flow', () => {
         studentUsername: 'student1',
         name: 'Kid One',
         password: 'KidPass1!',
+        gender: 'female',
         grade: 'Third',
         schoolName: 'Green Valley School',
         subjects: ['English', 'Science'],
@@ -190,6 +191,7 @@ describe('Integration: Auth Flow', () => {
         studentUsername: 'student1',
         name: 'Kid One',
         password: 'KidPass1!',
+        gender: 'female',
         grade: 'Third',
         schoolName: 'Green Valley School',
         subjects: ['English', 'Science'],
@@ -291,7 +293,7 @@ describe('Integration: Auth Flow', () => {
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
       const [url, options] = fetchMock.mock.calls[0];
-      expect(url).toContain(`/progress/${studentId}/streak`);
+      expect(url).toContain('/progress/streak');
       expect(options.headers['Authorization']).toBe('Bearer student-access-jwt');
       expect(streak).toBe(7);
     });
@@ -318,9 +320,9 @@ describe('Integration: Auth Flow', () => {
       const [subjectsUrl] = fetchMock.mock.calls[0];
       expect(subjectsUrl).toContain('/subjects');
 
-      // Verify progress endpoint called with correct studentId
+      // Verify progress endpoint called (learner identified from auth token)
       const [progressUrl] = fetchMock.mock.calls[1];
-      expect(progressUrl).toContain(`/progress/${studentId}`);
+      expect(progressUrl).toContain('/progress');
 
       // Verify correct mapping
       expect(subjects).toHaveLength(3);

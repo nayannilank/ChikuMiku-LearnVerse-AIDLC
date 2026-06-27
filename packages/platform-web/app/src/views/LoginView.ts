@@ -125,8 +125,17 @@ export function createLoginView(): HTMLElement {
       const result = await loginWithRole(username, password, role);
 
       if (result.success) {
-        // Navigate to dashboard on successful login (Req 2.7 equivalent)
-        window.location.hash = '#dashboard';
+        // Store username (role-agnostic) and role for use across the app
+        if (result.data?.username) {
+          localStorage.setItem('learnverse_username', result.data.username);
+          localStorage.setItem('learnverse_user_role', role);
+        }
+        // Role-based routing: parent → parent dashboard, learner → learner dashboard
+        if (role === 'parent') {
+          window.location.hash = '#dashboard';
+        } else {
+          window.location.hash = '#learner-dashboard';
+        }
       } else {
         // Throw error so LoginPanel can display it in the error area
         throw new Error(result.error || 'Login failed. Please try again.');

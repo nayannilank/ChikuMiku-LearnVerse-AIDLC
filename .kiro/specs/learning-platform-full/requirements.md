@@ -70,12 +70,12 @@ This document defines the requirements for the ChikuMiku LearnVerse learning pla
 
 ##### Registration Error Handling
 
-44. THE Registration Forms (Parent and Student) SHALL perform inline validation on each input field as the user types or when the field loses focus, displaying field-specific error messages adjacent to the invalid field
-45. IF the server returns a duplicate username error, THEN THE Registration Form SHALL display a clear error message "Username already taken — please choose a different username" adjacent to the username field
-46. IF the server returns a duplicate email error, THEN THE Registration Form SHALL display a clear error message "Email already registered — try logging in or use a different email" adjacent to the email field
-47. IF the server returns a duplicate phone number error, THEN THE Registration Form SHALL display a clear error message "Phone number already registered — try logging in or use a different number" adjacent to the phone field
-48. IF the server returns an internal error (5xx), THEN THE Registration Form SHALL display a message "Something went wrong — please try again after some time" and preserve all entered field values
-49. WHEN a validation error is displayed, THE Registration Form SHALL preserve all valid field values and only highlight the invalid fields
+45. THE Registration Forms (Parent and Student) SHALL perform inline validation on each input field as the user types or when the field loses focus, displaying field-specific error messages adjacent to the invalid field
+46. IF the server returns a duplicate username error, THEN THE Registration Form SHALL display a clear error message "Username already taken — please choose a different username" adjacent to the username field
+47. IF the server returns a duplicate email error, THEN THE Registration Form SHALL display a clear error message "Email already registered — try logging in or use a different email" adjacent to the email field
+48. IF the server returns a duplicate phone number error, THEN THE Registration Form SHALL display a clear error message "Phone number already registered — try logging in or use a different number" adjacent to the phone field
+49. IF the server returns an internal error (5xx), THEN THE Registration Form SHALL display a message "Something went wrong — please try again after some time" and preserve all entered field values
+50. WHEN a validation error is displayed, THE Registration Form SHALL preserve all valid field values and only highlight the invalid fields
 
 ##### Student Registration (by Parent)
 
@@ -83,32 +83,33 @@ This document defines the requirements for the ChikuMiku LearnVerse learning pla
 21. THE Student Registration Form SHALL contain a Student Username text input field with a visible label (between 8-15 characters with alphabets, numbers, hyphens, or underscores)
 22. THE Student Registration Form SHALL contain a Name text input field with a visible label (5-20 characters with alphabets and spaces)
 23. THE Student Registration Form SHALL contain a Password input field with a visible label and masked characters (8-20 characters, at least one Uppercase alphabet, at least one lowercase alphabet, at least one number, at least one special symbol)
-24. THE Student Registration Form SHALL contain a Grade dropdown with options: LKG, UKG, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Ninth, Tenth, Eleventh, Twelfth
-25. THE Student Registration Form SHALL contain a School Name text input field with a visible label (5-30 characters, allowing alphabets, numbers, commas, and hyphens)
-26. THE Student Registration Form SHALL display a subject selection interface showing the 7 default subjects (Maths, Science, Computers, EVS, Hindi, English, Kannada) as selectable checkboxes, with all selected by default
-27. THE Student Registration Form SHALL allow the Parent to deselect subjects that are not applicable to the Student
-28. THE Student Registration Form SHALL provide an "Add Subject" option allowing the Parent to create a custom subject with a name of 1-50 characters (e.g., "French") which is then added to the selectable list
-29. THE Student Registration Form SHALL require at least one subject to be selected before submission
-30. THE Student Registration Form SHALL contain a submit button labeled "Register Student"
+24. THE Learner Registration Form SHALL contain a Gender radio button field with a visible icons, options would be MALE, FEMALE, OTHER
+25. THE Student Registration Form SHALL contain a Grade dropdown with options: LKG, UKG, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Ninth, Tenth, Eleventh, Twelfth
+26. THE Student Registration Form SHALL contain a School Name text input field with a visible label (5-30 characters, allowing alphabets, numbers, commas, and hyphens)
+27. THE Student Registration Form SHALL display a subject selection interface showing the 7 default subjects (Maths, Science, Computers, EVS, Hindi, English, Kannada) as selectable checkboxes, with all selected by default
+28. THE Student Registration Form SHALL allow the Parent to deselect subjects that are not applicable to the Student
+29. THE Student Registration Form SHALL provide an "Add Subject" option allowing the Parent to create a custom subject with a name of 1-50 characters (e.g., "French") which is then added to the selectable list
+30. THE Student Registration Form SHALL require at least one subject to be selected before submission
+31. THE Student Registration Form SHALL contain a submit button labeled "Register Student"
 
 ##### Password Recovery (Forgot Password)
 
-31. THE Login Screen SHALL display a "Forgot Password?" link that navigates to the Password Recovery flow
-32. WHEN a Parent or Student initiates Password Recovery, THE application SHALL display a form requesting the Parent's registered email address and phone number
-33. WHEN the Parent or Student submits valid email and phone, THE Authentication service SHALL send a one-time password (OTP) to both the Parent's registered email and phone number simultaneously
-34. THE OTP Verification screen SHALL display input fields for the OTP received via email and the OTP received via phone, both of which must be provided correctly before proceeding
-35. IF either OTP is incorrect or expired (OTPs expire after 10 minutes), THEN THE application SHALL display an error message indicating the OTP is invalid and allow the user to request a new OTP
-36. WHEN both OTPs are verified successfully, THE application SHALL navigate to the New Password screen where the user enters a new password conforming to the same complexity rules (8-20 characters, at least one uppercase, one lowercase, one number, one special symbol)
-37. WHEN the new password is submitted, THE Authentication service SHALL update the password for the corresponding account (Parent or Student) and redirect to the Login screen with a success message
-38. THE Password Recovery flow SHALL work for both Parent accounts (using the Parent's own email/phone) and Student accounts (using the linked Parent's email/phone)
+32. THE Login Screen SHALL display a "Forgot Password?" link that navigates to the Password Recovery flow
+33. WHEN a Parent or Student initiates Password Recovery, THE application SHALL display a form requesting the Parent's registered email address and phone number
+34. WHEN the Parent or Student submits valid email and phone, THE Authentication service SHALL send a one-time password (OTP) to both the Parent's registered email and phone number simultaneously
+35. THE OTP Verification screen SHALL display input fields for the OTP received via email and the OTP received via phone, both of which must be provided correctly before proceeding
+36. IF either OTP is incorrect or expired (OTPs expire after 10 minutes), THEN THE application SHALL display an error message indicating the OTP is invalid and allow the user to request a new OTP
+37. WHEN both OTPs are verified successfully, THE application SHALL navigate to the New Password screen where the user enters a new password conforming to the same complexity rules (8-20 characters, at least one uppercase, one lowercase, one number, one special symbol)
+38. WHEN the new password is submitted, THE Authentication service SHALL update the password for the corresponding account (Parent or Student) and redirect to the Login screen with a success message
+39. THE Password Recovery flow SHALL work for both Parent accounts (using the Parent's own email/phone) and Student accounts (using the linked Parent's email/phone)
 
 ##### Logout
 
-39. THE application SHALL display a Logout button in the top-right corner of both web and mobile screens, visible on all authenticated pages
-40. WHEN a Parent or Student taps the Logout button, THE application SHALL display a confirmation dialog asking "Are you sure you want to log out?"
-41. WHEN the user confirms logout, THE application SHALL persist the latest state of all progress, exercise results, and session data to PostgreSQL before terminating the session
-42. WHEN the state has been persisted, THE application SHALL clear the local JWT tokens and navigate to the Login Screen
-43. WHEN the same Parent or Student logs back in, THE application SHALL restore the same state they had before logout (progress, streak, last viewed chapter/page)
+40. THE application SHALL display a Logout button in the top-right corner of both web and mobile screens, visible on all authenticated pages
+41. WHEN a Parent or Student taps the Logout button, THE application SHALL display a confirmation dialog asking "Are you sure you want to log out?"
+42. WHEN the user confirms logout, THE application SHALL persist the latest state of all progress, exercise results, and session data to PostgreSQL before terminating the session
+43. WHEN the state has been persisted, THE application SHALL clear the local JWT tokens and navigate to the Login Screen
+44. WHEN the same Parent or Student logs back in, THE application SHALL restore the same state they had before logout (progress, streak, last viewed chapter/page)
 
 ### Requirement 2: AWS Serverless Infrastructure
 

@@ -297,13 +297,14 @@ describe('ParentRegistrationForm Screen', () => {
 
       await tick();
 
+      // Email uniqueness is no longer enforced — generic error shown instead
       const errorEl = getErrorEl(element, 'email');
+      // The error should NOT show a specific "Email already registered" message
+      // since only username uniqueness is enforced
       expect(errorEl.style.display).toBe('block');
-      expect(errorEl.textContent).toContain('Email already registered');
-      expect(errorEl.textContent).toContain('try logging in or use a different email');
     });
 
-    it('shows duplicate phone message adjacent to phone field', async () => {
+    it('shows generic error for duplicate phone — phone uniqueness not enforced', async () => {
       const onSubmit = vi.fn().mockResolvedValue({
         success: false,
         fieldErrors: [{ field: 'phone', message: 'duplicate' }],
@@ -315,10 +316,9 @@ describe('ParentRegistrationForm Screen', () => {
 
       await tick();
 
+      // Phone uniqueness is no longer enforced — generic error shown instead
       const errorEl = getErrorEl(element, 'phone');
       expect(errorEl.style.display).toBe('block');
-      expect(errorEl.textContent).toContain('Phone number already registered');
-      expect(errorEl.textContent).toContain('try logging in or use a different number');
     });
 
     it('shows generic error and preserves fields on 5xx (no fieldErrors)', async () => {

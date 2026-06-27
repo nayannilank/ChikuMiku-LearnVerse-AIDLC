@@ -35,11 +35,60 @@ export interface SidebarOptions {
   subjects: SidebarSubject[];
   /** Callback invoked when a subject is clicked. Receives the subject name as ID. */
   onSelectSubject: (subjectId: string) => void;
+  /** Currently active route hash for highlighting the corresponding subject. */
+  activeRoute?: string;
 }
 
 /** Unique class name used for the sidebar's media query style injection. */
 const SIDEBAR_CLASS = 'learnverse-sidebar';
 const STYLE_ID = 'learnverse-sidebar-media-style';
+
+/**
+ * Maps known exercise route prefixes to subject names (lowercase).
+ * Used to determine which sidebar subject should be highlighted.
+ */
+const EXERCISE_ROUTE_SUBJECT_MAP: Record<string, string> = {
+  pronunciation: '', // subjectId resolved at render time
+  grammar: '',
+  quiz: '',
+  maths: 'maths',
+  computers: 'computers',
+  evs: 'evs',
+};
+
+/**
+ * Determines the active subject name from the current route hash.
+ * Returns the lowercase subject name if the route is an exercise route,
+ * or the subject name from a `#subject-{name}` route.
+ */
+function getActiveSubjectFromRoute(activeRoute: string | undefined): string | null {
+  if (!activeRoute) return null;
+
+  // Strip leading # if present
+  const route = activeRoute.startsWith('#') ? activeRoute.slice(1) : activeRoute;
+
+  // Match #subject-{name}
+  const subjectMatch = route.match(/^subject-(.+)$/);
+  if (subjectMatch) return subjectMatch[1].toLowerCase();
+
+  // Match exercise routes like #pronunciation/{subjectId}, #grammar/{subjectId}, etc.
+  // For subject-specific routes (maths, computers, evs), the route prefix IS the subject
+  const exerciseMatch = route.match(/^(pronunciation|grammar|quiz|maths|computers|evs)\/(.+)$/);
+  if (exerciseMatch) {
+    const routePrefix = exerciseMatch[1];
+    const subjectIdOrName = exerciseMatch[2];
+    // For maths/computers/evs, the route prefix is the subject name
+    if (EXERCISE_ROUTE_SUBJECT_MAP[routePrefix]) {
+      return EXERCISE_ROUTE_SUBJECT_MAP[routePrefix];
+    }
+    // For language exercise routes (pronunciation, grammar, quiz),
+    // the subjectId parameter is often the subject name (lowercase).
+    // Return it so it can be matched against sidebar subject names.
+    return subjectIdOrName.toLowerCase();
+  }
+
+  return null;
+}
 
 /**
  * Injects a <style> element with a media query that hides the sidebar
@@ -104,6 +153,22 @@ export function createSidebar(options: SidebarOptions): HTMLElement {
   });
   aside.appendChild(heading);
 
+  // Empty state when no subjects are available
+  if (options.subjects.length === 0) {
+    const emptyState = document.createElement('p');
+    emptyState.className = 'sidebar-empty-state';
+    emptyState.textContent = 'No subjects to display';
+    Object.assign(emptyState.style, {
+      fontSize: typography.body.size,
+      color: colors.textMuted,
+      padding: '8px 16px',
+      margin: '0',
+      fontStyle: 'italic',
+    });
+    aside.appendChild(emptyState);
+    return aside;
+  }
+
   // Subject list
   const list = document.createElement('ul');
   list.className = 'sidebar-subject-list';
@@ -114,35 +179,49 @@ export function createSidebar(options: SidebarOptions): HTMLElement {
     padding: '0',
   });
 
+  // Determine which subject should be highlighted based on activeRoute
+  const activeSubject = getActiveSubjectFromRoute(options.activeRoute);
+
   for (const subject of options.subjects) {
     const item = document.createElement('li');
     item.className = 'sidebar-subject-item';
     item.setAttribute('role', 'listitem');
 
+    const isActive = activeSubject !== null &&
+      subject.name.toLowerCase() === activeSubject;
+
     const button = document.createElement('button');
     button.className = 'sidebar-subject-button';
     button.type = 'button';
     button.setAttribute('aria-label', `${subject.name} - ${subject.progress}% complete`);
+    if (isActive) {
+      button.setAttribute('aria-current', 'true');
+    }
     Object.assign(button.style, {
       display: 'flex',
       alignItems: 'center',
       width: '100%',
       padding: '8px 16px',
       border: 'none',
-      backgroundColor: 'transparent',
+      backgroundColor: isActive ? `${subject.color}18` : 'transparent',
       cursor: 'pointer',
       textAlign: 'left',
       transition: 'background-color 0.2s',
       gap: '10px',
       boxSizing: 'border-box',
+      borderLeft: isActive ? `3px solid ${subject.color}` : '3px solid transparent',
     });
 
     // Hover/focus styles
     button.addEventListener('mouseenter', () => {
-      button.style.backgroundColor = colors.background;
+      if (!isActive) {
+        button.style.backgroundColor = colors.background;
+      }
     });
     button.addEventListener('mouseleave', () => {
-      button.style.backgroundColor = 'transparent';
+      if (!isActive) {
+        button.style.backgroundColor = 'transparent';
+      }
     });
     button.addEventListener('focus', () => {
       button.style.outline = `2px solid ${colors.primary}`;

@@ -317,26 +317,80 @@ export function createParentRegistrationView(): HTMLElement {
     setLoading(false);
 
     if (response.success) {
-      // Navigate to login on success
-      window.location.hash = '#login';
-    } else {
-      // Show API error as inline error on the relevant field or as a general message
-      const errorMessage = response.error || 'Registration failed. Please try again.';
-      // Display as a general error below the form by reusing the first field's error area
-      // or create a general error display
-      const generalError = document.createElement('div');
-      generalError.className = 'form-field__error';
-      generalError.style.display = 'block';
-      generalError.style.textAlign = 'center';
-      generalError.style.marginTop = '0.5rem';
-      generalError.innerHTML = `<span>${escapeHtml(errorMessage)}</span>`;
-
-      // Remove any previous general error
-      const existingError = form.querySelector('.registration-form__general-error');
-      if (existingError) {
-        existingError.remove();
+      // Remove any previous error/success banners
+      const existingBanner = form.querySelector('.registration-form__general-error, .registration-form__success');
+      if (existingBanner) {
+        existingBanner.remove();
       }
-      generalError.classList.add('registration-form__general-error');
+
+      // Show success banner (Req 1.45: feedback on registration success)
+      const successBanner = document.createElement('div');
+      successBanner.className = 'registration-form__success';
+      successBanner.setAttribute('role', 'status');
+      successBanner.setAttribute('aria-live', 'polite');
+      Object.assign(successBanner.style, {
+        marginTop: '0.75rem',
+        padding: '0.75rem 1rem',
+        borderRadius: '8px',
+        color: '#166534',
+        backgroundColor: '#f0fdf4',
+        border: '1px solid #bbf7d0',
+        fontSize: '13px',
+        fontWeight: '600',
+        textAlign: 'center',
+      });
+      successBanner.textContent = '\u2713 Registration successful! Redirecting to login...';
+      form.appendChild(successBanner);
+
+      // Also add a fallback login link
+      const fallbackLink = document.createElement('a');
+      fallbackLink.href = '#login';
+      fallbackLink.textContent = 'Go to Login';
+      Object.assign(fallbackLink.style, {
+        display: 'block',
+        textAlign: 'center',
+        marginTop: '0.5rem',
+        color: '#E94F9B',
+        fontSize: '12px',
+        textDecoration: 'underline',
+        cursor: 'pointer',
+      });
+      fallbackLink.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        window.location.hash = '#login';
+      });
+      form.appendChild(fallbackLink);
+
+      // Redirect to login after 3 seconds
+      setTimeout(() => {
+        window.location.hash = '#login';
+      }, 3000);
+    } else {
+      // Show API error clearly with red styling
+      const errorMessage = response.error || 'Registration failed. Please try again.';
+
+      // Remove any previous general error or success banner
+      const existingBanner = form.querySelector('.registration-form__general-error, .registration-form__success');
+      if (existingBanner) {
+        existingBanner.remove();
+      }
+
+      const generalError = document.createElement('div');
+      generalError.className = 'registration-form__general-error';
+      generalError.setAttribute('role', 'alert');
+      generalError.setAttribute('aria-live', 'assertive');
+      Object.assign(generalError.style, {
+        marginTop: '0.75rem',
+        padding: '0.75rem 1rem',
+        borderRadius: '8px',
+        color: '#991b1b',
+        backgroundColor: '#fef2f2',
+        border: '1px solid #fecaca',
+        fontSize: '13px',
+        fontWeight: '500',
+        textAlign: 'center',
+      });
+      generalError.innerHTML = `<span>${escapeHtml(errorMessage)}</span>`;
       form.appendChild(generalError);
     }
   });

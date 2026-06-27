@@ -113,17 +113,19 @@ export async function registerParent(
  */
 export async function registerStudent(
   data: StudentRegistrationRequest,
-  _token: string
+  _token?: string
 ): Promise<ServiceResult> {
   try {
     await authApi.registerStudent({
       parentUsername: data.parentUsername,
       studentUsername: data.studentUsername,
       name: data.name,
-      password: '', // Password should be added to the StudentRegistrationRequest type
+      password: data.password,
+      gender: data.gender,
       grade: data.grade,
       schoolName: data.schoolName,
-      subjects: [],
+      subjects: data.subjects,
+      customSubjects: data.customSubjects,
     });
     return { success: true };
   } catch (err) {

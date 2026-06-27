@@ -4,7 +4,10 @@
  * Validates registration input, creates a Cognito user, adds to "parent" group,
  * and inserts a record into the `parents` table.
  *
- * Requirements: 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.44, 1.45, 1.46, 1.47
+ * Only username must be unique. Multiple parents CAN share the same email
+ * and phone number per product requirements.
+ *
+ * Requirements: 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.44, 1.45
  */
 
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from '@learnverse/service-core';
@@ -152,13 +155,11 @@ const CORS_HEADERS: Record<string, string> = {
 
 export interface CognitoDuplicateError extends Error {
   code: string;
-  duplicateField?: 'username' | 'email' | 'phone';
+  duplicateField?: 'username';
 }
 
 const DUPLICATE_MESSAGES: Record<string, string> = {
   username: 'Username already taken — please choose a different username',
-  email: 'Email already registered — try logging in or use a different email',
-  phone: 'Phone number already registered — try logging in or use a different number',
 };
 
 // ============================================================
@@ -231,9 +232,10 @@ export function createRegisterParentHandler(
         cognitoSub = result.cognitoSub;
       } catch (error: unknown) {
         const cognitoError = error as CognitoDuplicateError;
-        if (cognitoError.code === 'UsernameExistsException' || cognitoError.duplicateField) {
-          const field = cognitoError.duplicateField || 'username';
-          const message = DUPLICATE_MESSAGES[field];
+        // Only enforce username uniqueness — email and phone can be shared
+        // between multiple parent accounts per product requirements
+        if (cognitoError.code === 'UsernameExistsException' || cognitoError.duplicateField === 'username') {
+          const message = DUPLICATE_MESSAGES['username'];
           return {
             statusCode: 409,
             headers: CORS_HEADERS,
@@ -241,7 +243,7 @@ export function createRegisterParentHandler(
               statusCode: 409,
               errorCode: 'DUPLICATE_ENTRY',
               message,
-              fieldErrors: [{ field, message }],
+              fieldErrors: [{ field: 'username', message }],
             }),
           };
         }

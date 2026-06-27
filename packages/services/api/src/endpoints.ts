@@ -41,6 +41,8 @@ import {
   handleValidateSession,
   handleResetPassword,
   handleRefresh,
+  handleGetLearners,
+  handleGetLearnerSubjects,
 } from './authHandlers';
 
 import { handleGetProgress, handleUpdateProgress } from './progressHandlers';
@@ -479,6 +481,24 @@ export function createDefaultRoutes(): ApiRoute[] {
       requiresAuth: false,
       description: 'Refresh an expired access token',
       tags: ['auth'],
+    },
+    // Parent routes
+    {
+      method: 'GET',
+      path: '/api/v1/parent/learners',
+      handler: handleGetLearners,
+      requiresAuth: true,
+      description: 'List learners linked to the authenticated parent',
+      tags: ['parent'],
+    },
+    // Learner routes
+    {
+      method: 'GET',
+      path: '/api/v1/learner/subjects',
+      handler: handleGetLearnerSubjects,
+      requiresAuth: true,
+      description: 'Get enrolled subjects for the authenticated learner',
+      tags: ['learner'],
     },
     // Content routes — Textbooks
     {

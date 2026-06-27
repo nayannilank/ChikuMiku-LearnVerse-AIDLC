@@ -101,6 +101,26 @@ export function findLearnerByContact(contactValue: string): Learner | undefined 
 }
 
 /**
+ * Retrieves all learners linked to a given parent account ID.
+ */
+export function getLearnersByParentId(parentId: string): Learner[] {
+  const result: Learner[] = [];
+  for (const learner of learnerStore.values()) {
+    if (learner.parentAccountId === parentId) {
+      result.push(learner);
+    }
+  }
+  return result;
+}
+
+/**
+ * Retrieves a learner by ID from the session store.
+ */
+export function getLearnerFromStoreById(learnerId: string): Learner | undefined {
+  return learnerStore.get(learnerId);
+}
+
+/**
  * Clears the in-memory store. Useful for test isolation.
  */
 export function clearLearnerStore(): void {

@@ -23,6 +23,7 @@
 
 import { createTopNavigation, TopNavigationOptions } from './TopNavigation';
 import { createSidebar, SidebarSubject, SidebarOptions } from './Sidebar';
+import { createTreeSidebar, TreeSidebarProps } from './TreeSidebar';
 import { colors } from '../theme/tokens';
 
 /**
@@ -37,12 +38,17 @@ export interface NavigationShellOptions {
   activeRoute?: string;
   /** User name for the avatar initials. */
   userName?: string;
-  /** List of subjects to display in the sidebar. */
+  /** List of subjects to display in the sidebar (legacy flat sidebar). */
   subjects: SidebarSubject[];
   /** Callback invoked when a sidebar subject is selected. */
   onSelectSubject: (subjectId: string) => void;
   /** The content element to render in the main content area. */
   content: HTMLElement;
+  /**
+   * Optional TreeSidebar props. When provided, renders the tree sidebar
+   * instead of the flat subject sidebar. Used for Parent and Learner dashboards.
+   */
+  treeSidebar?: TreeSidebarProps;
 }
 
 /** Unique class name for the shell's responsive media query. */
@@ -65,6 +71,9 @@ function ensureShellMediaStyle(): void {
     @media (min-width: 960px) {
       .${SHELL_CONTENT_CLASS} {
         margin-left: 200px;
+      }
+      .${SHELL_CONTENT_CLASS}.tree-sidebar-active {
+        margin-left: 240px;
       }
     }
   `;
@@ -121,11 +130,21 @@ export function createNavigationShell(options: NavigationShellOptions): HTMLElem
   });
 
   // Sidebar (fixed left, below top nav)
-  const sidebarOptions: SidebarOptions = {
-    subjects: options.subjects,
-    onSelectSubject: options.onSelectSubject,
-  };
-  const sidebar = createSidebar(sidebarOptions);
+  // Use TreeSidebar if treeSidebar props are provided; otherwise fall back to flat sidebar
+  let sidebar: HTMLElement;
+  let useTreeSidebar = false;
+
+  if (options.treeSidebar) {
+    useTreeSidebar = true;
+    sidebar = createTreeSidebar(options.treeSidebar);
+  } else {
+    const sidebarOptions: SidebarOptions = {
+      subjects: options.subjects,
+      onSelectSubject: options.onSelectSubject,
+      activeRoute: options.activeRoute,
+    };
+    sidebar = createSidebar(sidebarOptions);
+  }
   Object.assign(sidebar.style, {
     position: 'fixed',
     top: '36px',
@@ -137,7 +156,7 @@ export function createNavigationShell(options: NavigationShellOptions): HTMLElem
 
   // Main content area
   const main = document.createElement('main');
-  main.className = SHELL_CONTENT_CLASS;
+  main.className = SHELL_CONTENT_CLASS + (useTreeSidebar ? ' tree-sidebar-active' : '');
   main.setAttribute('role', 'main');
   Object.assign(main.style, {
     flex: '1',
