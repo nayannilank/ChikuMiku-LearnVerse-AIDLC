@@ -794,15 +794,8 @@ function initApp(): void {
             wrapInResponsiveLayout(createLoadingView('Loading progress...'), '#progress')
           );
 
-          // Extract studentId from the JWT access token
-          const studentId = getStudentIdFromToken();
-
-          if (!studentId) {
-            // No valid session — redirect to login
-            clearTokens();
-            window.location.hash = '#login';
-            return wrapper;
-          }
+          // Extract studentId from the JWT access token (for default streak display only)
+          const studentId = getStudentIdFromToken() || 'unknown';
 
           // Fetch progress and streak data (streak has no backend endpoint yet, so handle gracefully)
           const defaultStreak: Streak = { studentId: studentId, currentStreak: 0, lastActivityDate: null };
